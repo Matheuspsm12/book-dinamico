@@ -1,0 +1,43 @@
+# Env / segredos
+.env
+.env.*
+!.env.example
+
+# Maven
+target/
+*.jar
+*.war
+
+# Logs
+logs/
+*.log
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot devtools
+.spring-boot-devtools.properties
+
+# Arquivos uploadados em dev (não commitar binários)
+book-dinamico-arquivos/*
+!book-dinamico-arquivos/.gitkeep
+
+# Python venv usado pelos smoke tests
+.venv/
+__pycache__/
+*.pyc

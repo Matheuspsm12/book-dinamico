@@ -1,0 +1,73 @@
+app:
+  ambiente: ${BOOK_AMBIENTE}
+  jwt-secret: ${BOOK_JWT_SECRET}
+  empresa: TCIA
+  nome-sistema: ${BOOK_NOME_SISTEMA}
+  url-site: ${BOOK_URL_SITE}
+  url-front-end: ${BOOK_URL_FRONT_END}
+  diretorio: ${BOOK_DIRETORIO}
+  email:
+    # Gate explícito pra evitar travar/falhar em DEV (SMTP placeholder).
+    # Em PROD setar BOOK_EMAIL_HABILITADO=true.
+    habilitado: ${BOOK_EMAIL_HABILITADO:false}
+    remetente: ${BOOK_MAIL_USERNAME}
+
+server:
+  port: ${BOOK_APP_PORT}
+  max-http-request-header-size: 512000
+  forward-headers-strategy: native
+  servlet:
+    context-path: ${BOOK_APP_CONTEXT_PATH}
+    encoding:
+      charset: UTF-8
+
+spring:
+  session:
+    store-type: none
+  profiles:
+    default: dev
+  application:
+    name: ${BOOK_APP_NAME}
+  servlet:
+    multipart:
+      max-file-size: 60MB
+      max-request-size: 60MB
+  messages:
+    basename: ValidationMessages
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: true
+  datasource:
+    url: ${BOOK_DB_URL}
+    username: ${BOOK_DB_USERNAME}
+    password: ${BOOK_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 15
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-timeout: 60000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 1
+  mail:
+    host: ${BOOK_MAIL_HOST}
+    port: ${BOOK_MAIL_PORT}
+    username: ${BOOK_MAIL_USERNAME}
+    password: ${BOOK_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
