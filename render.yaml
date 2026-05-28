@@ -12,6 +12,7 @@
 databases:
   - name: book-dinamico-db
     plan: free
+    region: ohio                  # mesma região do backend pra reduzir latência
     databaseName: book_dinamico
     user: book_user
     # postgresVersion não setado = Render escolhe padrão (Postgres 16)
@@ -67,6 +68,9 @@ services:
         fromDatabase:
           name: book-dinamico-db
           property: password
+      # Render Postgres exige SSL — append ao JDBC URL composto via application.yml
+      - key: BOOK_DB_PARAMS
+        value: "?sslmode=require"
       - key: BOOK_EMAIL_HABILITADO
         value: "false"
       # Mail placeholders — só ativar quando configurar SMTP real

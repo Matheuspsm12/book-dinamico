@@ -23,7 +23,11 @@
       "Bash(git ls-tree *)",
       "Bash(git rm *)",
       "Bash(git add *)",
-      "Bash(git commit -m 'deploy: dockerize backend + frontend, render blueprint, monorepo *)"
+      "Bash(git commit -m 'deploy: dockerize backend + frontend, render blueprint, monorepo *)",
+      "Bash(gh auth *)",
+      "Bash(gh repo *)",
+      "Bash(git branch *)",
+      "Bash(git push *)"
     ]
   }
 }
