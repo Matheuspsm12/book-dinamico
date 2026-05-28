@@ -1,23 +1,29 @@
+# application.yml — config base.
+# Suporta dev (local) e cloud (Render) via fallbacks de env var.
+#
+# Render injeta PORT dinamicamente em runtime; localmente caímos em BOOK_APP_PORT.
+# BOOK_DB_URL é usado direto quando setado; senão é composto a partir de HOST/PORT/NAME.
+
 app:
-  ambiente: ${BOOK_AMBIENTE}
+  ambiente: ${BOOK_AMBIENTE:DEV}
   jwt-secret: ${BOOK_JWT_SECRET}
   empresa: TCIA
-  nome-sistema: ${BOOK_NOME_SISTEMA}
-  url-site: ${BOOK_URL_SITE}
-  url-front-end: ${BOOK_URL_FRONT_END}
-  diretorio: ${BOOK_DIRETORIO}
+  nome-sistema: ${BOOK_NOME_SISTEMA:Book Dinâmico}
+  url-site: ${BOOK_URL_SITE:http://localhost:8082/book_dinamico}
+  url-front-end: ${BOOK_URL_FRONT_END:http://localhost:3000}
+  diretorio: ${BOOK_DIRETORIO:/data/book-dinamico}
   email:
-    # Gate explícito pra evitar travar/falhar em DEV (SMTP placeholder).
-    # Em PROD setar BOOK_EMAIL_HABILITADO=true.
     habilitado: ${BOOK_EMAIL_HABILITADO:false}
-    remetente: ${BOOK_MAIL_USERNAME}
+    remetente: ${BOOK_MAIL_USERNAME:noreply@example.com}
 
 server:
-  port: ${BOOK_APP_PORT}
+  # PORT (injetado pelo Render) > BOOK_APP_PORT (local) > 8082
+  port: ${PORT:${BOOK_APP_PORT:8082}}
+  address: 0.0.0.0
   max-http-request-header-size: 512000
   forward-headers-strategy: native
   servlet:
-    context-path: ${BOOK_APP_CONTEXT_PATH}
+    context-path: ${BOOK_APP_CONTEXT_PATH:/book_dinamico}
     encoding:
       charset: UTF-8
 
@@ -27,7 +33,7 @@ spring:
   profiles:
     default: dev
   application:
-    name: ${BOOK_APP_NAME}
+    name: ${BOOK_APP_NAME:book_dinamico_backend}
   servlet:
     multipart:
       max-file-size: 60MB
@@ -40,7 +46,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: true
   datasource:
-    url: ${BOOK_DB_URL}
+    # BOOK_DB_URL completo (local/docker-compose) > composto a partir das partes (Render)
+    url: ${BOOK_DB_URL:jdbc:postgresql://${BOOK_DB_HOST:localhost}:${BOOK_DB_PORT:5432}/${BOOK_DB_NAME:book_dinamico}}
     username: ${BOOK_DB_USERNAME}
     password: ${BOOK_DB_PASSWORD}
     hikari:
@@ -55,10 +62,10 @@ spring:
     baseline-on-migrate: true
     baseline-version: 1
   mail:
-    host: ${BOOK_MAIL_HOST}
-    port: ${BOOK_MAIL_PORT}
-    username: ${BOOK_MAIL_USERNAME}
-    password: ${BOOK_MAIL_PASSWORD}
+    host: ${BOOK_MAIL_HOST:smtp.example.com}
+    port: ${BOOK_MAIL_PORT:587}
+    username: ${BOOK_MAIL_USERNAME:noreply@example.com}
+    password: ${BOOK_MAIL_PASSWORD:placeholder}
     properties:
       mail:
         smtp:

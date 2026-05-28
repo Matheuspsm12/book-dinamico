@@ -13,7 +13,17 @@
       "Bash(tee \"C:/Users/mathe/Documents/backend-upload-book/logs/app-startup.log\")",
       "Bash(awk '{print $5}')",
       "Bash(xargs -I {} taskkill //F //PID {})",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "Bash(docker info *)",
+      "Bash(docker version *)",
+      "Bash(docker compose *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8082/book_dinamico/v3/api-docs)",
+      "Bash(C:/Users/mathe/Documents/backend-upload-book/.venv/Scripts/python.exe C:/Users/mathe/Documents/backend-upload-book/tests/smoke_phase__TRACKED_VAR__.py)",
+      "Bash(docker exec *)",
+      "Bash(git ls-tree *)",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'deploy: dockerize backend + frontend, render blueprint, monorepo *)"
     ]
   }
 }

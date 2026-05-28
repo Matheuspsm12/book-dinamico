@@ -41,3 +41,13 @@ book-dinamico-arquivos/*
 .venv/
 __pycache__/
 *.pyc
+
+# ===== Frontend (Next.js) =====
+reversa-claro-book-frontend/node_modules/
+reversa-claro-book-frontend/.next/
+reversa-claro-book-frontend/.env
+reversa-claro-book-frontend/.env.*
+!reversa-claro-book-frontend/.env.example
+reversa-claro-book-frontend/.idea/
+reversa-claro-book-frontend/*.tsbuildinfo
+reversa-claro-book-frontend/next-env.d.ts

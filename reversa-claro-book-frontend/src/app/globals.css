@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f7f8;
+  --foreground: #18181b;
+  --claro-red: #e60000;
+  --claro-red-dark: #b80000;
+  --claro-red-darker: #8a0000;
+  --sidebar-bg: #f3f1ee;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Claro 3D card */
+.claro-card {
+  background: linear-gradient(180deg, #ff1a1a 0%, #c80000 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.25),
+    0 12px 24px -8px rgba(230, 0, 0, 0.4);
+  color: white;
+  border-radius: 14px;
+}
+
+.baixar-arrow {
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 8% 100%, 0 50%);
+}
