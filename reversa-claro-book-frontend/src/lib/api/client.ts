@@ -27,6 +27,8 @@ type RequestOptions = Omit<RequestInit, "body"> & {
   asBlob?: boolean;
   /** Quando true, NÃO joga erro para 401/403 — caller trata. */
   silent401?: boolean;
+  /** Timeout em ms (default: 120s p/ multipart, 30s p/ resto). */
+  timeoutMs?: number;
 };
 
 async function request<T>(
@@ -34,14 +36,15 @@ async function request<T>(
   path: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { body, asBlob, silent401, headers: extraHeaders, ...rest } = options;
+  const { body, asBlob, silent401, timeoutMs, headers: extraHeaders, ...rest } = options;
   const headers = new Headers(extraHeaders);
 
   const token = getToken();
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
   let payload: BodyInit | undefined;
-  if (body instanceof FormData) {
+  const isMultipart = body instanceof FormData;
+  if (isMultipart) {
     payload = body;
     // NÃO setar Content-Type — o browser coloca multipart/form-data com boundary.
   } else if (body !== undefined && body !== null) {
@@ -49,12 +52,33 @@ async function request<T>(
     payload = JSON.stringify(body);
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method,
-    ...rest,
-    headers,
-    body: payload,
-  });
+  // Timeout: 120s pra upload multipart (acomoda cold start do Render free), 30s p/ resto.
+  // Sem isso, fetch pode pendurar indefinidamente quando o backend dorme.
+  const ctrl = new AbortController();
+  const effectiveTimeout = timeoutMs ?? (isMultipart ? 120_000 : 30_000);
+  const timer = setTimeout(() => ctrl.abort(), effectiveTimeout);
+
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}${path}`, {
+      method,
+      ...rest,
+      headers,
+      body: payload,
+      signal: ctrl.signal,
+    });
+  } catch (e) {
+    clearTimeout(timer);
+    if ((e as Error).name === "AbortError") {
+      throw new ApiError(
+        408,
+        "timeout",
+        "Tempo esgotado. O servidor pode estar acordando — tente novamente em 1 minuto.",
+      );
+    }
+    throw new ApiError(0, "network", "Falha de rede. Verifique sua conexão e tente novamente.");
+  }
+  clearTimeout(timer);
 
   if (!response.ok) {
     // Tenta interpretar envelope ApiErrorBody do backend

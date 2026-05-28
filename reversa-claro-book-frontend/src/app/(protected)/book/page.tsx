@@ -1,14 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Download } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Download, Pencil, RefreshCw, Upload, X } from "lucide-react";
 import * as docsApi from "@/lib/api/documentos";
 import type { DocumentoResponse } from "@/lib/api/types";
-import { formatDate } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { formatDate, cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog } from "@/components/ui/dialog";
+
+const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
+const MAX_BYTES = 60 * 1024 * 1024;
 
 function formatoLabel(ext: DocumentoResponse["extensao"]) {
   if (ext === "XLSM" || ext === "XLSX") return "EXCEL";
   return "POWER POINT";
+}
+
+function validarArquivo(f: File | null): string | null {
+  if (!f) return "Selecione um arquivo.";
+  const ext = "." + (f.name.split(".").pop()?.toLowerCase() ?? "");
+  if (!ALLOWED.includes(ext as (typeof ALLOWED)[number])) {
+    return `Extensão inválida (${ext}). Permitidas: ${ALLOWED.join(", ")}`;
+  }
+  if (f.size > MAX_BYTES) return "Arquivo maior que 60 MB.";
+  return null;
 }
 
 function BookCard({
@@ -50,28 +68,29 @@ function BookCard({
 }
 
 export default function BookDownloadPage() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
   const [docs, setDocs] = useState<DocumentoResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
   const [baixandoId, setBaixandoId] = useState<number | null>(null);
+  const [editando, setEditando] = useState<DocumentoResponse | null>(null);
+  const [substituindo, setSubstituindo] = useState<DocumentoResponse | null>(null);
+
+  const carregar = useCallback(async () => {
+    setLoading(true);
+    try {
+      setDocs(await docsApi.listar());
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro ao carregar documentos.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    let mounted = true;
-    docsApi
-      .listar()
-      .then((d) => {
-        if (mounted) setDocs(d);
-      })
-      .catch((e) => {
-        if (mounted) setErr(e instanceof Error ? e.message : "Erro ao carregar documentos.");
-      })
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    void carregar();
+  }, [carregar]);
 
   async function handleDownload(doc: DocumentoResponse) {
     setErr(null);
@@ -136,32 +155,235 @@ export default function BookDownloadPage() {
           </div>
         </div>
 
-        <aside className="flex flex-col justify-between bg-[var(--claro-red)] px-8 py-12 text-white">
-          <div className="flex w-full flex-col items-center">
-            <h3 className="w-full text-center text-base font-bold uppercase tracking-wide">
-              Última Atualização
-            </h3>
-            <div className="mt-6 w-full max-w-[240px] rounded-md bg-white/15 p-5 text-xs text-white">
-              {docs.length === 0 && (
-                <p className="text-center opacity-80">Nenhum documento publicado.</p>
-              )}
-              {docs.map((d) => (
-                <div key={d.id} className="mb-4 text-center last:mb-0">
-                  <p className="font-bold uppercase">{d.nome}</p>
-                  <p className="mt-0.5 opacity-80">{d.descricao}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+        <aside className="flex flex-col bg-[var(--claro-red)] px-6 py-12 text-white">
+          <h3 className="text-center text-base font-bold uppercase tracking-wide">
+            Última Atualização
+          </h3>
 
-          <div className="flex w-full flex-col items-center">
-            <img src="/img/TCIA_white.svg" alt="TCIA" className="h-14 w-auto" />
-            <p className="mt-2 text-[10px] uppercase tracking-widest opacity-80">
-              tciagroup.com
-            </p>
+          <div className="mt-6 space-y-3">
+            {docs.length === 0 && (
+              <p className="text-center text-xs opacity-80">Nenhum documento publicado.</p>
+            )}
+            {docs.map((d) => (
+              <div
+                key={d.id}
+                className="group relative rounded-md bg-white/15 p-4 text-xs text-white"
+              >
+                <p className="text-center font-bold uppercase">{d.nome}</p>
+                <p className="mt-1 text-center opacity-80">{d.descricao}</p>
+                <p className="mt-1 text-center text-[10px] uppercase opacity-70">
+                  {formatDate(d.dataAtualizacao)}
+                </p>
+
+                {isAdmin && (
+                  <div className="mt-3 flex justify-center gap-2 border-t border-white/20 pt-3">
+                    <button
+                      onClick={() => setEditando(d)}
+                      className="inline-flex items-center gap-1 rounded bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase hover:bg-white/25"
+                      title="Editar informações"
+                    >
+                      <Pencil size={11} /> Editar
+                    </button>
+                    <button
+                      onClick={() => setSubstituindo(d)}
+                      className="inline-flex items-center gap-1 rounded bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase hover:bg-white/25"
+                      title="Trocar arquivo"
+                    >
+                      <RefreshCw size={11} /> Trocar
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </aside>
       </div>
+
+      {editando && (
+        <QuickEditModal
+          doc={editando}
+          onClose={() => setEditando(null)}
+          onSaved={async () => {
+            setEditando(null);
+            await carregar();
+          }}
+        />
+      )}
+      {substituindo && (
+        <QuickReplaceModal
+          doc={substituindo}
+          onClose={() => setSubstituindo(null)}
+          onSaved={async () => {
+            setSubstituindo(null);
+            await carregar();
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Modal: editar metadata (nome/descricao/data)
+// ---------------------------------------------------------------------------
+
+function QuickEditModal({
+  doc,
+  onClose,
+  onSaved,
+}: {
+  doc: DocumentoResponse;
+  onClose: () => void;
+  onSaved: () => Promise<void>;
+}) {
+  const [nome, setNome] = useState(doc.nome);
+  const [descricao, setDescricao] = useState(doc.descricao);
+  const [data, setData] = useState(doc.dataAtualizacao);
+  const [err, setErr] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    setSubmitting(true);
+    try {
+      await docsApi.atualizarMetadados(doc.id, {
+        nome: nome.trim(),
+        descricao: descricao.trim(),
+        dataAtualizacao: data,
+      });
+      await onSaved();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro ao salvar.");
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()} title="Editar documento" size="lg">
+      <form onSubmit={submit} className="space-y-4">
+        <div>
+          <Label htmlFor="qe-nome">Nome</Label>
+          <Input id="qe-nome" className="mt-1" value={nome} onChange={(e) => setNome(e.target.value)} />
+        </div>
+        <div>
+          <Label htmlFor="qe-data">Data de atualização</Label>
+          <Input id="qe-data" type="date" className="mt-1" value={data} onChange={(e) => setData(e.target.value)} />
+        </div>
+        <div>
+          <Label htmlFor="qe-desc">Descrição</Label>
+          <textarea
+            id="qe-desc"
+            rows={3}
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            className="mt-1 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--claro-red)] focus:ring-2 focus:ring-[var(--claro-red)]/20"
+          />
+        </div>
+        {err && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{err}</div>}
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={submitting}>
+            <Pencil size={14} /> {submitting ? "Salvando…" : "Salvar"}
+          </Button>
+        </div>
+      </form>
+    </Dialog>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Modal: trocar arquivo (também atualiza data pra hoje)
+// ---------------------------------------------------------------------------
+
+function QuickReplaceModal({
+  doc,
+  onClose,
+  onSaved,
+}: {
+  doc: DocumentoResponse;
+  onClose: () => void;
+  onSaved: () => Promise<void>;
+}) {
+  const [file, setFile] = useState<File | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    const v = validarArquivo(file);
+    if (v) return setErr(v);
+    setSubmitting(true);
+    try {
+      // 1) substitui o binário
+      await docsApi.substituirArquivo(doc.id, file!);
+      // 2) ajusta a data de atualização pra hoje (backend não faz isso sozinho)
+      const hoje = new Date().toISOString().slice(0, 10);
+      await docsApi.atualizarMetadados(doc.id, {
+        nome: doc.nome,
+        descricao: doc.descricao,
+        dataAtualizacao: hoje,
+      });
+      await onSaved();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Erro ao substituir.");
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <Dialog
+      open
+      onOpenChange={(o) => !o && onClose()}
+      title="Trocar arquivo"
+      description={
+        <>
+          Documento: <strong>{doc.nome}</strong>. A data de atualização será marcada como hoje automaticamente.
+        </>
+      }
+    >
+      <form onSubmit={submit} className="space-y-4">
+        <div>
+          <Label>Novo arquivo</Label>
+          <label
+            htmlFor="qr-file"
+            className={cn(
+              "mt-1 flex cursor-pointer items-center justify-center gap-3 rounded-md border-2 border-dashed border-zinc-300 bg-zinc-50 px-4 py-6 text-sm text-zinc-500",
+              "hover:border-[var(--claro-red)] hover:bg-red-50/50",
+            )}
+          >
+            <Upload size={20} />
+            {file ? (
+              <span className="font-semibold text-zinc-800">{file.name}</span>
+            ) : (
+              <span>
+                Clique para escolher — <strong>{ALLOWED.join(", ")}</strong> (até 60 MB)
+              </span>
+            )}
+          </label>
+          <input
+            ref={inputRef}
+            id="qr-file"
+            type="file"
+            accept={ALLOWED.join(",")}
+            className="sr-only"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+        </div>
+        {err && <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{err}</div>}
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="outline" onClick={onClose}>
+            <X size={14} /> Cancelar
+          </Button>
+          <Button type="submit" disabled={submitting}>
+            <RefreshCw size={14} /> {submitting ? "Enviando…" : "Substituir"}
+          </Button>
+        </div>
+      </form>
+    </Dialog>
   );
 }
