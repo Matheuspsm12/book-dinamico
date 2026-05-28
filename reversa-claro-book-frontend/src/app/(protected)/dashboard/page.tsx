@@ -7,7 +7,6 @@ import { StatCard } from "@/components/StatCard";
 import * as docsApi from "@/lib/api/documentos";
 import * as usuariosApi from "@/lib/api/usuarios";
 import type { DocumentoResponse } from "@/lib/api/types";
-import { formatDate } from "@/lib/utils";
 
 type Counts = {
   documentos: number;
@@ -117,10 +116,6 @@ export default function DashboardPage() {
                 value={d.nome}
                 valueClassName="text-2xl leading-tight"
                 icon={d.extensao === "PPTX" ? FileText : FileSpreadsheet}
-                meta={[
-                  { label: "Atualizado", value: formatDate(d.dataAtualizacao) },
-                  { label: "Tamanho", value: `${(d.tamanhoBytes / 1024).toFixed(1)} KB` },
-                ]}
               />
             ))}
           </div>
