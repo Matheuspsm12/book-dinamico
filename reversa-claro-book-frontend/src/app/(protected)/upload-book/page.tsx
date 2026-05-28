@@ -460,7 +460,15 @@ function SubstituirArquivoModal({
     if (err) return setErroLocal(err);
     setSubmitting(true);
     try {
-      const updated = await docsApi.substituirArquivo(doc.id, file!);
+      // 1) substitui o binário
+      await docsApi.substituirArquivo(doc.id, file!);
+      // 2) atualiza dataAtualizacao pra hoje (backend não faz isso sozinho — vide DocumentoService.substituirArquivo)
+      const hoje = new Date().toISOString().slice(0, 10);
+      const updated = await docsApi.atualizarMetadados(doc.id, {
+        nome: doc.nome,
+        descricao: doc.descricao,
+        dataAtualizacao: hoje,
+      });
       await onSuccess(updated);
     } catch (e) {
       onError(e instanceof Error ? e.message : "Erro ao substituir.");
