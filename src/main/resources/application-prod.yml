@@ -1,0 +1,43 @@
+# application-prod.yml — overrides para produção (Render free tier).
+# Ativado via SPRING_PROFILES_ACTIVE=prod (setado em render.yaml).
+#
+# Objetivos:
+#   - Reduzir tempo de cold start
+#   - Aliviar pool de conexões (free tier tem CPU/RAM minúsculas)
+#   - Silenciar logging verboso herdado do default
+
+spring:
+  main:
+    lazy-initialization: true
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: lazy
+  jpa:
+    # Evita N+1 silencioso e libera conexão do pool mais cedo
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc.batch_size: 25
+        order_inserts: true
+        order_updates: true
+        query.in_clause_parameter_padding: true
+        connection.provider_disables_autocommit: true
+  datasource:
+    hikari:
+      # Free tier não aguenta 15 conexões — 5 é suficiente para baixo tráfego
+      maximum-pool-size: 5
+      minimum-idle: 1
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 30000
+  flyway:
+    out-of-order: true
+
+logging:
+  level:
+    root: WARN
+    com.tcia: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.web: WARN
+    org.springframework.security: WARN
