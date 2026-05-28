@@ -21,7 +21,7 @@ import { Dialog } from "@/components/ui/dialog";
 import * as docsApi from "@/lib/api/documentos";
 import type { DocumentoResponse } from "@/lib/api/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, hojeLocal } from "@/lib/utils";
 
 const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
 const MAX_BYTES = 60 * 1024 * 1024;
@@ -323,7 +323,7 @@ function NovoModal({
 }) {
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [data, setData] = useState(() => new Date().toISOString().slice(0, 10));
+  const [data, setData] = useState(() => hojeLocal());
   const [file, setFile] = useState<File | null>(null);
   const [erroLocal, setErroLocal] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -331,7 +331,7 @@ function NovoModal({
   function reset() {
     setNome("");
     setDescricao("");
-    setData(new Date().toISOString().slice(0, 10));
+    setData(hojeLocal());
     setFile(null);
     setErroLocal(null);
     setSubmitting(false);
@@ -463,7 +463,7 @@ function SubstituirArquivoModal({
       // 1) substitui o binário
       await docsApi.substituirArquivo(doc.id, file!);
       // 2) atualiza dataAtualizacao pra hoje (backend não faz isso sozinho — vide DocumentoService.substituirArquivo)
-      const hoje = new Date().toISOString().slice(0, 10);
+      const hoje = hojeLocal();
       const updated = await docsApi.atualizarMetadados(doc.id, {
         nome: doc.nome,
         descricao: doc.descricao,

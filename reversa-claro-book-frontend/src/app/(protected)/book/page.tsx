@@ -5,7 +5,7 @@ import { Download, Pencil, RefreshCw, Upload, X } from "lucide-react";
 import * as docsApi from "@/lib/api/documentos";
 import type { DocumentoResponse } from "@/lib/api/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { formatDate, cn } from "@/lib/utils";
+import { formatDate, cn, hojeLocal } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -322,7 +322,7 @@ function QuickReplaceModal({
       // 1) substitui o binário
       await docsApi.substituirArquivo(doc.id, file!);
       // 2) ajusta a data de atualização pra hoje (backend não faz isso sozinho)
-      const hoje = new Date().toISOString().slice(0, 10);
+      const hoje = hojeLocal();
       await docsApi.atualizarMetadados(doc.id, {
         nome: doc.nome,
         descricao: doc.descricao,
