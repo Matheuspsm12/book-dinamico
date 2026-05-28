@@ -9,9 +9,11 @@ type Props = {
   supraLabel?: string;
   meta?: { label: string; value: number | string }[];
   className?: string;
+  /** Override do tamanho da fonte do "value" (texto longo precisa reduzir). */
+  valueClassName?: string;
 };
 
-export function StatCard({ label, value, icon: Icon, supraLabel = "DOWNLOADS", meta, className }: Props) {
+export function StatCard({ label, value, icon: Icon, supraLabel = "DOWNLOADS", meta, className, valueClassName }: Props) {
   return (
     <div
       className={cn(
@@ -27,7 +29,7 @@ export function StatCard({ label, value, icon: Icon, supraLabel = "DOWNLOADS", m
         <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">{supraLabel}</p>
         <p className="text-[13px] font-bold uppercase text-zinc-700 leading-tight">{label}</p>
       </div>
-      <p className="text-4xl font-bold text-zinc-900">{value}</p>
+      <p className={cn("text-4xl font-bold text-zinc-900", valueClassName)}>{value}</p>
       {meta && meta.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {meta.map((m) => (

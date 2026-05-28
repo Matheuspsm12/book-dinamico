@@ -18,6 +18,8 @@ const FRIENDLY: Record<string, string> = {
   "erro-usuario-nao-desativado": "Usuário não está desativado.",
   "cap-usuarios-excedido":
     "Limite de 40 usuários aprovados atingido. Desative alguém antes de aprovar outro.",
+  "email-desabilitado":
+    "O envio de e-mail está desabilitado no servidor. Peça ao administrador para configurar SMTP ou resetar sua senha manualmente.",
 
   // Upload
   "arquivo-invalido": "Arquivo inválido. Verifique extensão, tamanho e conteúdo.",

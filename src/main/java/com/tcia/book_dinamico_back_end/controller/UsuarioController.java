@@ -37,6 +37,18 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // -- Usuário autenticado --------------------------------------------
+
+    @Operation(summary = "Resetar minha senha por e-mail",
+            description = "Gera uma nova senha temporária para o usuário autenticado e envia por e-mail.")
+    @DocumentarAPI
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/me/resetar-senha")
+    public ResponseEntity<Void> resetarMinhaSenhaPorEmail() {
+        usuarioService.resetarMinhaSenhaPorEmail();
+        return ResponseEntity.noContent().build();
+    }
+
     // -- Admin (US3 / RN09–RN11) ----------------------------------------
 
     @Operation(summary = "Aprovar usuário pendente",

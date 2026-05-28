@@ -44,3 +44,8 @@ export async function ativar(id: number) {
 export async function desativar(id: number) {
   return api.post<UsuarioResponse>(`/api/usuarios/${id}/desativar`);
 }
+
+/** Solicita reset de senha do usuário autenticado — backend envia nova senha por e-mail. */
+export async function resetarMinhaSenhaPorEmail() {
+  return api.post<void>("/api/usuarios/me/resetar-senha");
+}

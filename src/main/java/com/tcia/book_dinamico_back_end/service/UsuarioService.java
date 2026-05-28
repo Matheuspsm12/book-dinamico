@@ -173,6 +173,40 @@ public class UsuarioService {
     }
 
     // ------------------------------------------------------------------
+    // Reset de senha por e-mail (usuário logado solicita nova senha)
+    // ------------------------------------------------------------------
+
+    /**
+     * Gera uma senha temporária aleatória para o usuário autenticado, persiste
+     * o hash e dispara e-mail com a senha em texto plano. Idempotente.
+     */
+    @Transactional
+    public void resetarMinhaSenhaPorEmail() {
+        Usuario usuario = authUtils.getUsuarioLogado();
+        if (usuario == null) {
+            throw new ErroAutenticacaoException("erro-credenciais-invalidas");
+        }
+        // Sem e-mail ativo a nova senha ficaria perdida e o usuário fora do sistema.
+        if (!emailAdapter.isHabilitado()) {
+            throw new NegocioException("email-desabilitado");
+        }
+        String senhaTemp = gerarSenhaTemporaria();
+        usuario.setSenhaHash(passwordEncoder.encode(senhaTemp));
+        usuarioRepository.save(usuario);
+        emailAdapter.enviarSenhaTemporaria(usuario, senhaTemp);
+        log.info("Senha temporária gerada e enviada para usuário id={}", usuario.getId());
+    }
+
+    private static String gerarSenhaTemporaria() {
+        // 10 chars: letras maiúsculas + minúsculas + dígitos (sem ambíguos 0/O/1/l/I)
+        final String alfabeto = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+        java.security.SecureRandom rnd = new java.security.SecureRandom();
+        StringBuilder sb = new StringBuilder(10);
+        for (int i = 0; i < 10; i++) sb.append(alfabeto.charAt(rnd.nextInt(alfabeto.length())));
+        return sb.toString();
+    }
+
+    // ------------------------------------------------------------------
     // Gerenciamento (Phase 4 — US4 / RN12-RN15 / A3)
     // ------------------------------------------------------------------
 

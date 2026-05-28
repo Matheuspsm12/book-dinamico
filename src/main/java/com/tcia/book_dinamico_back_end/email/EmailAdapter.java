@@ -31,6 +31,11 @@ public class EmailAdapter {
     @Value("${app.email.remetente}")
     private String remetente;
 
+    /** Indica se o envio de e-mails está ativo (configurado em {@code app.email.habilitado}). */
+    public boolean isHabilitado() {
+        return habilitado;
+    }
+
     @Async
     public void enviarAprovacao(Usuario usuario) {
         String assunto = "Seu cadastro no Portal Book Dinâmico foi aprovado";
@@ -41,6 +46,21 @@ public class EmailAdapter {
                 <p>Você já pode entrar com o e-mail e a senha que cadastrou.</p>
                 <p>Atenciosamente,<br/>Equipe Book Dinâmico</p>
                 """.formatted(escape(usuario.getNome()));
+        enviar(usuario.getEmail(), assunto, corpo);
+    }
+
+    @Async
+    public void enviarSenhaTemporaria(Usuario usuario, String senhaTemporaria) {
+        String assunto = "Sua nova senha de acesso — Portal Book Dinâmico";
+        String corpo = """
+                <p>Olá %s,</p>
+                <p>Você solicitou a alteração de senha no <strong>Portal Book Dinâmico</strong>.</p>
+                <p>Sua nova senha temporária é:</p>
+                <p style="font-size:18px;font-weight:bold;letter-spacing:1px;background:#f3f3f3;padding:8px 14px;display:inline-block;border-radius:4px;">%s</p>
+                <p>Recomendamos que, após o login, você acesse o portal e troque por uma senha de sua preferência.</p>
+                <p>Se você não solicitou esta alteração, entre em contato imediatamente com o administrador.</p>
+                <p>Atenciosamente,<br/>Equipe Book Dinâmico</p>
+                """.formatted(escape(usuario.getNome()), escape(senhaTemporaria));
         enviar(usuario.getEmail(), assunto, corpo);
     }
 

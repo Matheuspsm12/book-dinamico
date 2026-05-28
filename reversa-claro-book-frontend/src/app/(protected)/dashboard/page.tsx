@@ -74,28 +74,24 @@ export default function DashboardPage() {
             label="Aprovados"
             value={loading ? "…" : counts.aprovados}
             icon={CheckCircle2}
-            meta={[{ label: "Cap", value: "40" }]}
           />
           <StatCard
             supraLabel="USUÁRIOS"
             label="Pendentes"
             value={loading ? "…" : counts.pendentes}
             icon={Clock}
-            meta={[{ label: "Aguardando decisão", value: "" }]}
           />
           <StatCard
             supraLabel="USUÁRIOS"
             label="Rejeitados"
             value={loading ? "…" : counts.rejeitados}
             icon={X}
-            meta={[{ label: "Histórico", value: "" }]}
           />
           <StatCard
             supraLabel="CATÁLOGO"
             label="Documentos publicados"
             value={loading ? "…" : counts.documentos}
             icon={Users}
-            meta={[{ label: "Total ativo", value: "" }]}
           />
         </div>
       </section>
@@ -116,9 +112,10 @@ export default function DashboardPage() {
             {docs.map((d) => (
               <StatCard
                 key={d.id}
-                supraLabel="DOCUMENTO"
-                label={d.nome}
-                value={d.extensao}
+                supraLabel={d.extensao}
+                label="Documento"
+                value={d.nome}
+                valueClassName="text-2xl leading-tight"
                 icon={d.extensao === "PPTX" ? FileText : FileSpreadsheet}
                 meta={[
                   { label: "Atualizado", value: formatDate(d.dataAtualizacao) },
