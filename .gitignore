@@ -1,0 +1,53 @@
+# Env / segredos
+.env
+.env.*
+!.env.example
+
+# Maven
+target/
+*.jar
+*.war
+
+# Logs
+logs/
+*.log
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot devtools
+.spring-boot-devtools.properties
+
+# Arquivos uploadados em dev (não commitar binários)
+book-dinamico-arquivos/*
+!book-dinamico-arquivos/.gitkeep
+
+# Python venv usado pelos smoke tests
+.venv/
+__pycache__/
+*.pyc
+
+# ===== Frontend (Next.js) =====
+reversa-claro-book-frontend/node_modules/
+reversa-claro-book-frontend/.next/
+reversa-claro-book-frontend/.env
+reversa-claro-book-frontend/.env.*
+!reversa-claro-book-frontend/.env.example
+reversa-claro-book-frontend/.idea/
+reversa-claro-book-frontend/*.tsbuildinfo
+reversa-claro-book-frontend/next-env.d.ts
