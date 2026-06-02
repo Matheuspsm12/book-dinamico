@@ -362,7 +362,9 @@ function NovoModal({
       reset();
       await onSuccess(created);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Erro ao criar.");
+      const msg = e instanceof Error ? e.message : "Erro ao criar.";
+      setErroLocal(msg);
+      onError(msg);
       setSubmitting(false);
     }
   }
@@ -478,7 +480,9 @@ function SubstituirArquivoModal({
       });
       await onSuccess(updated);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Erro ao substituir.");
+      const msg = e instanceof Error ? e.message : "Erro ao substituir.";
+      setErroLocal(msg);
+      onError(msg);
       setSubmitting(false);
     }
   }
@@ -575,7 +579,9 @@ function EditarMetadadosModal({
       });
       await onSuccess(updated);
     } catch (e) {
-      onError(e instanceof Error ? e.message : "Erro ao atualizar.");
+      const msg = e instanceof Error ? e.message : "Erro ao atualizar.";
+      setErroLocal(msg);
+      onError(msg);
       setSubmitting(false);
     }
   }
