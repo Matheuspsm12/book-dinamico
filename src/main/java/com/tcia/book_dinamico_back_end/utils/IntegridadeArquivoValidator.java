@@ -63,11 +63,21 @@ public class IntegridadeArquivoValidator {
 
     private boolean confereMagicBytesAceito(MultipartFile arquivo) {
         try (InputStream in = arquivo.getInputStream()) {
-            // readNBytes garante leitura exata (ou menos no EOF), evitando
-            // o "lidos < 4" intermitente do antigo read() simples.
             byte[] head = in.readNBytes(4);
-            if (head.length != 4) return false;
-            return startsWith(head, MAGIC_ZIP) || startsWith(head, MAGIC_CFB);
+            if (head.length != 4) {
+                log.warn("Magic bytes: lidos < 4 para {} (lidos={})", arquivo.getOriginalFilename(), head.length);
+                return false;
+            }
+            boolean ok = startsWith(head, MAGIC_ZIP) || startsWith(head, MAGIC_CFB);
+            if (!ok) {
+                log.warn("Magic bytes não reconhecidos em {}: {} {} {} {} (esperado PK\\x03\\x04 ou D0CF11E0)",
+                        arquivo.getOriginalFilename(),
+                        String.format("%02X", head[0]),
+                        String.format("%02X", head[1]),
+                        String.format("%02X", head[2]),
+                        String.format("%02X", head[3]));
+            }
+            return ok;
         } catch (IOException e) {
             log.warn("Falha ao ler magic bytes de {}: {}", arquivo.getOriginalFilename(), e.getMessage());
             return false;
