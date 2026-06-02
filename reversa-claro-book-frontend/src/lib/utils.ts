@@ -28,23 +28,36 @@ export function formatDate(d: string | Date) {
 }
 
 /**
- * Extrai um nome amigável de um documento a partir do filename:
+ * Extrai um nome amigável de um documento a partir do filename. Lida com
+ * formatos comuns que aparecem na operação Claro:
  *   "Book Dinâmico - Alto Giro 18 (3).xlsm"        → "Book Dinâmico"
+ *   "Book_Dinamico-Alto_Giro_18.xlsm"               → "Book Dinâmico"
  *   "2026 Maio_Book de Terminais-HFC (1).pptx"      → "Book de Terminais"
  *   "2026 Maio_Book de fontes Claro-HFC (1).pptx"   → "Book de Fontes"
  */
 export function inferNomeFromFilename(filename: string): string {
+  // 1) tira extensão
   let name = filename.replace(/\.(xlsm|xlsx|pptx)$/i, "");
-  name = name.replace(/^\d{4}\s+\p{L}+_/iu, "");      // remove "2026 Maio_"
-  name = name.replace(/\s+Claro.*$/i, "");            // remove " Claro..."
-  name = name.replace(/-HFC.*$/i, "");                // remove "-HFC..."
-  name = name.replace(/\s*-\s+.*$/, "");              // remove " - {subtítulo}"
-  name = name.replace(/\s*\(\d+\)\s*$/, "");          // remove " (N)" copies
+  // 2) tira prefixo "AAAA Mes_" (qualquer combinação de palavras+underscores no início)
+  name = name.replace(/^\d{4}[\s_]+\p{L}+_/iu, "");
+  // 3) NORMALIZA: underscores viram espaços (antes dos regex de palavras)
+  name = name.replace(/_/g, " ");
+  // 4) corta sufixo da operadora " Claro..."
+  name = name.replace(/\s+Claro.*$/i, "");
+  // 5) corta sufixo técnico "-HFC..."
+  name = name.replace(/-HFC.*$/i, "");
+  // 6) corta tudo a partir de hífen (com ou sem espaço): "X-Y" e "X - Y" → "X"
+  name = name.replace(/\s*-.*$/, "");
+  // 7) corta " (N)" de cópias do browser
+  name = name.replace(/\s*\(\d+\)\s*$/, "");
+  // 8) corta números soltos no fim ("18", "v2")
+  name = name.replace(/\s+v?\d+\s*$/i, "");
   name = name.trim();
 
   const minusculas = new Set(["de", "da", "do", "das", "dos", "e", "a", "o"]);
   return name
     .split(/\s+/)
+    .filter(Boolean)
     .map((w, i) => {
       const lower = w.toLowerCase();
       if (i > 0 && minusculas.has(lower)) return lower;
