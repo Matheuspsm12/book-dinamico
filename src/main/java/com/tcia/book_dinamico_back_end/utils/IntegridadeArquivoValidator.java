@@ -7,12 +7,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Valida integridade básica de arquivos no upload (RN31 / N5):
  * (i)  extensão na whitelist (RN21)
- * (ii) MIME magic-byte casa com a extensão — todos os formatos são OOXML (ZIP),
- *      então checamos o magic do ZIP {@code PK\x03\x04}
+ * (ii) magic bytes do header casa com um formato aceito —
+ *      <ul>
+ *        <li>{@code PK\x03\x04} → OOXML / ZIP (xlsx, xlsm, pptx modernos)</li>
+ *        <li>{@code D0 CF 11 E0} → CFB (Compound File Binary) — usado pelos
+ *            formatos binários antigos (xls, ppt) e também por arquivos
+ *            OOXML <strong>protegidos por senha</strong>, que o Office encapsula
+ *            num container CFB encriptado</li>
+ *      </ul>
  * (iii) {@code 0 < tamanho ≤ 60 MB}
  */
 @Log4j2
@@ -21,8 +28,10 @@ public class IntegridadeArquivoValidator {
 
     public static final long TAMANHO_MAXIMO_BYTES = 60L * 1024 * 1024;
 
-    /** Assinatura local-file-header de qualquer arquivo ZIP/OOXML. */
-    private static final byte[] ZIP_LOCAL_FILE_HEADER = {0x50, 0x4B, 0x03, 0x04};
+    /** Local-file-header de ZIP/OOXML. */
+    private static final byte[] MAGIC_ZIP = {0x50, 0x4B, 0x03, 0x04};
+    /** Header de Compound File Binary (Office binário antigo + OOXML criptografado). */
+    private static final byte[] MAGIC_CFB = {(byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0};
 
     /**
      * Valida e retorna a extensão do arquivo.
@@ -45,25 +54,30 @@ public class IntegridadeArquivoValidator {
             throw new ArquivoException("arquivo-tamanho-excedido");
         }
 
-        if (!confereMagicBytesZip(arquivo)) {
+        if (!confereMagicBytesAceito(arquivo)) {
             throw new ArquivoException("arquivo-conteudo-incompativel");
         }
 
         return ext;
     }
 
-    private boolean confereMagicBytesZip(MultipartFile arquivo) {
-        try (var in = arquivo.getInputStream()) {
-            byte[] head = new byte[4];
-            int lidos = in.read(head);
-            if (lidos != 4) return false;
-            for (int i = 0; i < 4; i++) {
-                if (head[i] != ZIP_LOCAL_FILE_HEADER[i]) return false;
-            }
-            return true;
+    private boolean confereMagicBytesAceito(MultipartFile arquivo) {
+        try (InputStream in = arquivo.getInputStream()) {
+            // readNBytes garante leitura exata (ou menos no EOF), evitando
+            // o "lidos < 4" intermitente do antigo read() simples.
+            byte[] head = in.readNBytes(4);
+            if (head.length != 4) return false;
+            return startsWith(head, MAGIC_ZIP) || startsWith(head, MAGIC_CFB);
         } catch (IOException e) {
             log.warn("Falha ao ler magic bytes de {}: {}", arquivo.getOriginalFilename(), e.getMessage());
             return false;
         }
+    }
+
+    private static boolean startsWith(byte[] head, byte[] magic) {
+        for (int i = 0; i < magic.length; i++) {
+            if (head[i] != magic[i]) return false;
+        }
+        return true;
     }
 }
