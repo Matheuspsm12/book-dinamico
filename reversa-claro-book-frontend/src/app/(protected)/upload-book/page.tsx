@@ -21,7 +21,7 @@ import { Dialog } from "@/components/ui/dialog";
 import * as docsApi from "@/lib/api/documentos";
 import type { DocumentoResponse } from "@/lib/api/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { cn, formatDate, hojeLocal } from "@/lib/utils";
+import { cn, formatDate, hojeLocal, inferNomeFromFilename } from "@/lib/utils";
 
 const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
 const MAX_BYTES = 60 * 1024 * 1024;
@@ -403,7 +403,14 @@ function NovoModal({
         <div>
           <Label>Arquivo</Label>
           <div className="mt-1">
-            <FilePicker file={file} onPick={setFile} />
+            <FilePicker
+              file={file}
+              onPick={(f) => {
+                setFile(f);
+                // Auto-preenche o nome a partir do filename se ainda estiver vazio
+                if (f && !nome.trim()) setNome(inferNomeFromFilename(f.name));
+              }}
+            />
           </div>
         </div>
         {erroLocal && (
@@ -483,8 +490,8 @@ function SubstituirArquivoModal({
       title="Substituir arquivo"
       description={
         <>
-          Documento: <strong>{doc.nome}</strong>. O binário atual será sobrescrito; a
-          metadata (nome/descrição/data) é preservada.
+          Documento: <strong>{doc.nome}</strong> será substituído pelo documento{" "}
+          <strong>{file ? inferNomeFromFilename(file.name) : "selecionado"}</strong>.
         </>
       }
     >

@@ -28,6 +28,32 @@ export function formatDate(d: string | Date) {
 }
 
 /**
+ * Extrai um nome amigável de um documento a partir do filename:
+ *   "Book Dinâmico - Alto Giro 18 (3).xlsm"        → "Book Dinâmico"
+ *   "2026 Maio_Book de Terminais-HFC (1).pptx"      → "Book de Terminais"
+ *   "2026 Maio_Book de fontes Claro-HFC (1).pptx"   → "Book de Fontes"
+ */
+export function inferNomeFromFilename(filename: string): string {
+  let name = filename.replace(/\.(xlsm|xlsx|pptx)$/i, "");
+  name = name.replace(/^\d{4}\s+\p{L}+_/iu, "");      // remove "2026 Maio_"
+  name = name.replace(/\s+Claro.*$/i, "");            // remove " Claro..."
+  name = name.replace(/-HFC.*$/i, "");                // remove "-HFC..."
+  name = name.replace(/\s*-\s+.*$/, "");              // remove " - {subtítulo}"
+  name = name.replace(/\s*\(\d+\)\s*$/, "");          // remove " (N)" copies
+  name = name.trim();
+
+  const minusculas = new Set(["de", "da", "do", "das", "dos", "e", "a", "o"]);
+  return name
+    .split(/\s+/)
+    .map((w, i) => {
+      const lower = w.toLowerCase();
+      if (i > 0 && minusculas.has(lower)) return lower;
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(" ");
+}
+
+/**
  * Retorna a data de hoje em formato "YYYY-MM-DD" usando timezone LOCAL,
  * não UTC. Usado para popular inputs <input type="date"> e payloads
  * para o backend evitando off-by-one.

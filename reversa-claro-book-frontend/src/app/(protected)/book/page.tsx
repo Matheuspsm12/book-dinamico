@@ -5,7 +5,7 @@ import { Download, Pencil, RefreshCw, Upload, X } from "lucide-react";
 import * as docsApi from "@/lib/api/documentos";
 import type { DocumentoResponse } from "@/lib/api/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { formatDate, cn, hojeLocal } from "@/lib/utils";
+import { formatDate, cn, hojeLocal, inferNomeFromFilename } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -342,7 +342,9 @@ function QuickReplaceModal({
       title="Trocar arquivo"
       description={
         <>
-          Documento: <strong>{doc.nome}</strong>. A data de atualização será marcada como hoje automaticamente.
+          Documento: <strong>{doc.nome}</strong> será substituído pelo documento{" "}
+          <strong>{file ? inferNomeFromFilename(file.name) : "selecionado"}</strong>. A data
+          de atualização será marcada como hoje automaticamente.
         </>
       }
     >
