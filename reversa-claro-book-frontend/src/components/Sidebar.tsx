@@ -18,7 +18,7 @@ type Item = { label: string; href: string; icon: React.ComponentType<{ size?: nu
 
 const items: Item[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["ADMIN"] },
-  { label: "Book Dinâmico", href: "/book", icon: Download, roles: ["ADMIN", "USUARIO"] },
+  { label: "Book", href: "/book", icon: Download, roles: ["ADMIN", "USUARIO"] },
   { label: "Upload Book", href: "/upload-book", icon: Upload, roles: ["ADMIN"] },
   { label: "Gerenciar Usuários", href: "/gerenciar-usuarios", icon: Users, roles: ["ADMIN"] },
 ];
@@ -52,7 +52,7 @@ export function Sidebar() {
           {open && (
             <div className="border-l border-zinc-300 ml-2 pl-3">
               <p className="text-[10px] font-bold uppercase text-zinc-700 leading-tight">
-                Book Dinâmico<br />Claro / Logística
+                Book<br />Claro / Logística
               </p>
             </div>
           )}

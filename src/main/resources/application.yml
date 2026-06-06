@@ -8,7 +8,7 @@ app:
   ambiente: ${BOOK_AMBIENTE:DEV}
   jwt-secret: ${BOOK_JWT_SECRET}
   empresa: TCIA
-  nome-sistema: ${BOOK_NOME_SISTEMA:Book Dinâmico}
+  nome-sistema: ${BOOK_NOME_SISTEMA:Book}
   url-site: ${BOOK_URL_SITE:http://localhost:8082/book_dinamico}
   url-front-end: ${BOOK_URL_FRONT_END:http://localhost:3000}
   diretorio: ${BOOK_DIRETORIO:/data/book-dinamico}

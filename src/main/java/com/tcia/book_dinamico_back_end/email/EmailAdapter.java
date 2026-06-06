@@ -38,41 +38,41 @@ public class EmailAdapter {
 
     @Async
     public void enviarAprovacao(Usuario usuario) {
-        String assunto = "Seu cadastro no Portal Book Dinâmico foi aprovado";
+        String assunto = "Seu cadastro no Portal Book foi aprovado";
         String corpo = """
                 <p>Olá %s,</p>
-                <p>Boa notícia! Seu cadastro no <strong>Portal Book Dinâmico</strong> foi
+                <p>Boa notícia! Seu cadastro no <strong>Portal Book</strong> foi
                 <strong>aprovado</strong> pelo administrador.</p>
                 <p>Você já pode entrar com o e-mail e a senha que cadastrou.</p>
-                <p>Atenciosamente,<br/>Equipe Book Dinâmico</p>
+                <p>Atenciosamente,<br/>Equipe Book</p>
                 """.formatted(escape(usuario.getNome()));
         enviar(usuario.getEmail(), assunto, corpo);
     }
 
     @Async
     public void enviarSenhaTemporaria(Usuario usuario, String senhaTemporaria) {
-        String assunto = "Sua nova senha de acesso — Portal Book Dinâmico";
+        String assunto = "Sua nova senha de acesso — Portal Book";
         String corpo = """
                 <p>Olá %s,</p>
-                <p>Você solicitou a alteração de senha no <strong>Portal Book Dinâmico</strong>.</p>
+                <p>Você solicitou a alteração de senha no <strong>Portal Book</strong>.</p>
                 <p>Sua nova senha temporária é:</p>
                 <p style="font-size:18px;font-weight:bold;letter-spacing:1px;background:#f3f3f3;padding:8px 14px;display:inline-block;border-radius:4px;">%s</p>
                 <p>Recomendamos que, após o login, você acesse o portal e troque por uma senha de sua preferência.</p>
                 <p>Se você não solicitou esta alteração, entre em contato imediatamente com o administrador.</p>
-                <p>Atenciosamente,<br/>Equipe Book Dinâmico</p>
+                <p>Atenciosamente,<br/>Equipe Book</p>
                 """.formatted(escape(usuario.getNome()), escape(senhaTemporaria));
         enviar(usuario.getEmail(), assunto, corpo);
     }
 
     @Async
     public void enviarRejeicao(Usuario usuario) {
-        String assunto = "Seu cadastro no Portal Book Dinâmico foi rejeitado";
+        String assunto = "Seu cadastro no Portal Book foi rejeitado";
         String corpo = """
                 <p>Olá %s,</p>
-                <p>Infelizmente seu cadastro no <strong>Portal Book Dinâmico</strong> foi
+                <p>Infelizmente seu cadastro no <strong>Portal Book</strong> foi
                 <strong>rejeitado</strong>. Se acredita que isto é um engano, entre em contato
                 com o administrador.</p>
-                <p>Atenciosamente,<br/>Equipe Book Dinâmico</p>
+                <p>Atenciosamente,<br/>Equipe Book</p>
                 """.formatted(escape(usuario.getNome()));
         enviar(usuario.getEmail(), assunto, corpo);
     }

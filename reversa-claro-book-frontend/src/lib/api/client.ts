@@ -1,4 +1,4 @@
-// Wrapper de fetch para o backend Book Dinâmico.
+// Wrapper de fetch para o backend Book.
 // - Injeta Authorization: Bearer <token> quando há sessão
 // - Desempacota o envelope ApiErrorBody do GlobalExceptionHandler em ApiError
 // - Aceita JSON, multipart (FormData) e respostas Blob

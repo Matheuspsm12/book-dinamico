@@ -37,7 +37,7 @@ services:
       - key: BOOK_APP_CONTEXT_PATH
         value: /book_dinamico
       - key: BOOK_NOME_SISTEMA
-        value: Book Dinâmico
+        value: Book
       - key: BOOK_URL_SITE
         value: https://book-dinamico-backend.onrender.com/book_dinamico
       - key: BOOK_URL_FRONT_END

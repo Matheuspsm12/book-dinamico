@@ -3,8 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
-  title: "Book Dinâmico Claro",
-  description: "Portal de Book Dinâmico — Claro / Logística",
+  title: "Book Claro",
+  description: "Portal Book — Claro / Logística",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
