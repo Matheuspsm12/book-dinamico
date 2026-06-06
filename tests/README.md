@@ -27,6 +27,7 @@ Se `python` não funcionar no terminal, instale via Microsoft Store (Python 3.12
 | Script | Fase | Cenários |
 | --- | --- | --- |
 | `smoke_phase1.py` | Phase 1 — Login | Admin seed, APROVADO, senha errada, e-mail inexistente, PENDENTE/REJEITADO/DESATIVADO, endpoint protegido com/sem token, logout, token revogado |
+| `smoke_phase6.py` | Phase 6 — Acessos | esqueci-senha (204 sem vazar existência / validação), redefinir-senha e manter-acesso (rejeição de token forjado, rotas públicas) |
 
 ## Resultado
 
