@@ -31,6 +31,11 @@ const FRIENDLY: Record<string, string> = {
   "erro-lote-quantidades-divergentes":
     "Quantidade de metadados precisa bater com a quantidade de arquivos.",
 
+  // Recuperação de senha / ociosidade
+  "token-invalido": "Link inválido ou expirado. Solicite um novo.",
+  "ociosidade-acesso-ja-removido":
+    "Seu acesso já foi removido por inatividade. Solicite um novo cadastro.",
+
   // Genérico
   "erro-inesperado": "Ocorreu um erro inesperado. Tente novamente em instantes.",
   "erro-validacao": "Dados inválidos. Verifique os campos.",

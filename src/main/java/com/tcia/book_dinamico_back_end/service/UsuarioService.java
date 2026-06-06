@@ -1,5 +1,6 @@
 package com.tcia.book_dinamico_back_end.service;
 
+import com.tcia.book_dinamico_back_end.config.PortalLinks;
 import com.tcia.book_dinamico_back_end.controller.mapper.UsuarioMapper;
 import com.tcia.book_dinamico_back_end.controller.request.LoginRequest;
 import com.tcia.book_dinamico_back_end.controller.request.UsuarioCadastroRequest;
@@ -28,6 +29,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Log4j2
@@ -45,6 +47,8 @@ public class UsuarioService {
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailAdapter emailAdapter;
     private final AuthUtils authUtils;
+    private final TokenAcaoService tokenAcaoService;
+    private final PortalLinks portalLinks;
 
     // ------------------------------------------------------------------
     // Autenticação (Phase 1 — US1)
@@ -60,6 +64,11 @@ public class UsuarioService {
         }
 
         validarStatusParaLogin(usuario.getStatus());
+
+        // Login conta como "retorno": registra o acesso e zera eventual aviso de ociosidade (Item 1).
+        usuario.setUltimoAcesso(LocalDateTime.now());
+        usuario.setAvisoOciosidadeEnviadoEm(null);
+        usuarioRepository.save(usuario);
 
         String token = jwtTokenProvider.gerarToken(usuario, httpRequest);
         log.info("Login bem-sucedido: {}", usuario.getEmail());
@@ -204,6 +213,42 @@ public class UsuarioService {
         StringBuilder sb = new StringBuilder(10);
         for (int i = 0; i < 10; i++) sb.append(alfabeto.charAt(rnd.nextInt(alfabeto.length())));
         return sb.toString();
+    }
+
+    // ------------------------------------------------------------------
+    // Recuperação de senha pública ("Esqueci minha senha")
+    // ------------------------------------------------------------------
+
+    /**
+     * Dispara o link de redefinição por e-mail. Nunca revela se o e-mail existe
+     * (o controller responde sempre 204). Sem SMTP ativo, apenas registra e ignora.
+     */
+    public void solicitarResetSenha(String email) {
+        if (!emailAdapter.isHabilitado()) {
+            log.warn("Reset de senha solicitado, mas e-mail está desabilitado no servidor; ignorando.");
+            return;
+        }
+        usuarioRepository.findByEmail(email)
+                .filter(u -> u.getStatus() == UsuarioStatus.APROVADO)
+                .ifPresentOrElse(u -> {
+                    String token = tokenAcaoService.gerar(
+                            u.getId(), TokenAcaoService.Proposito.RESET_SENHA, Duration.ofMinutes(30));
+                    emailAdapter.enviarLinkRedefinicaoSenha(u, portalLinks.redefinirSenha(token));
+                    log.info("Link de redefinição enviado para usuário id={}", u.getId());
+                }, () -> log.info("Reset solicitado para e-mail inexistente/não-aprovado (silenciado)"));
+    }
+
+    /** Redefine a senha a partir do token recebido por e-mail. Token é single-use. */
+    @Transactional
+    public void redefinirSenha(String token, String novaSenha) {
+        Long usuarioId = tokenAcaoService.validar(token, TokenAcaoService.Proposito.RESET_SENHA)
+                .orElseThrow(() -> new NegocioException("token-invalido"));
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new NegocioException("token-invalido"));
+        usuario.setSenhaHash(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+        tokenAcaoService.consumir(token);
+        log.info("Senha redefinida via token para usuário id={}", usuarioId);
     }
 
     // ------------------------------------------------------------------

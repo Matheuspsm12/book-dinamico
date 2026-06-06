@@ -82,17 +82,25 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <input
-            id="permanecerLogado"
-            type="checkbox"
-            checked={permanecerLogado}
-            onChange={(e) => setPermanecerLogado(e.target.checked)}
-            className="h-4 w-4 rounded border-zinc-300 accent-[var(--claro-red)]"
-          />
-          <Label htmlFor="permanecerLogado" className="text-sm font-normal cursor-pointer">
-            Permanecer logado
-          </Label>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <input
+              id="permanecerLogado"
+              type="checkbox"
+              checked={permanecerLogado}
+              onChange={(e) => setPermanecerLogado(e.target.checked)}
+              className="h-4 w-4 rounded border-zinc-300 accent-[var(--claro-red)]"
+            />
+            <Label htmlFor="permanecerLogado" className="text-sm font-normal cursor-pointer">
+              Permanecer logado
+            </Label>
+          </div>
+          <Link
+            href="/esqueci-senha"
+            className="text-sm text-[var(--claro-red)] hover:underline"
+          >
+            Esqueci minha senha
+          </Link>
         </div>
 
         <Button

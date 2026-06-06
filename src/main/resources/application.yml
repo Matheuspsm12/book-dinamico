@@ -15,6 +15,11 @@ app:
   email:
     habilitado: ${BOOK_EMAIL_HABILITADO:false}
     remetente: ${BOOK_MAIL_USERNAME:noreply@example.com}
+  ociosidade:
+    habilitado: ${BOOK_OCIOSIDADE_HABILITADO:true}
+    meses-inatividade: ${BOOK_OCIOSIDADE_MESES:4}
+    dias-uteis-prazo: ${BOOK_OCIOSIDADE_DIAS_UTEIS:2}
+    cron: ${BOOK_OCIOSIDADE_CRON:0 0 8 * * *}
 
 server:
   # PORT (injetado pelo Render) > BOOK_APP_PORT (local) > 8082

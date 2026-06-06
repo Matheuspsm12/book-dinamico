@@ -77,6 +77,62 @@ public class EmailAdapter {
         enviar(usuario.getEmail(), assunto, corpo);
     }
 
+    @Async
+    public void enviarLinkRedefinicaoSenha(Usuario usuario, String link) {
+        String assunto = "Redefinição de senha — Portal Book";
+        String corpo = """
+                <p>Olá %s,</p>
+                <p>Recebemos uma solicitação para redefinir a senha da sua conta no <strong>Portal Book</strong>.</p>
+                <p>Para criar uma nova senha, clique no botão abaixo (válido por 30 minutos):</p>
+                <p><a href="%s" style="display:inline-block;background:#e2231a;color:#fff;text-decoration:none;font-weight:bold;padding:10px 18px;border-radius:6px;">Redefinir minha senha</a></p>
+                <p>Se você não solicitou esta alteração, ignore este e-mail — sua senha permanecerá a mesma.</p>
+                <p>Atenciosamente,<br/>Equipe Book</p>
+                """.formatted(escape(usuario.getNome()), link);
+        enviar(usuario.getEmail(), assunto, corpo);
+    }
+
+    @Async
+    public void enviarAvisoOciosidade(Usuario usuario, String linkManterAcesso, int meses, int diasUteis) {
+        String assunto = "Confirmação de interesse na manutenção do seu acesso";
+        String corpo = """
+                <p>Olá %s,</p>
+                <p>Identificamos que seu usuário não realiza acesso ao <strong>Portal Book</strong> há mais de %d meses.</p>
+                <p>Para mantermos nossa base de usuários atualizada e garantir a segurança das informações disponibilizadas, solicitamos que confirme seu interesse em manter o acesso ativo em até %d dias úteis.</p>
+                <p>Para manter seu acesso, clique no botão abaixo — ou simplesmente faça um novo login no portal:</p>
+                <p><a href="%s" style="display:inline-block;background:#e2231a;color:#fff;text-decoration:none;font-weight:bold;padding:10px 18px;border-radius:6px;">Quero manter meu acesso</a></p>
+                <p>Caso não haja manifestação dentro deste prazo, seu cadastro poderá ser removido automaticamente do sistema, sendo necessário um novo processo de solicitação caso deseje acessar novamente o portal futuramente.</p>
+                <p>Permanecemos à disposição para quaisquer esclarecimentos.</p>
+                <p>Atenciosamente,<br/>Equipe Book</p>
+                """.formatted(escape(usuario.getNome()), meses, diasUteis, linkManterAcesso);
+        enviar(usuario.getEmail(), assunto, corpo);
+    }
+
+    @Async
+    public void enviarRemocaoOciosidade(Usuario usuario) {
+        String assunto = "Seu acesso ao Portal Book foi removido por inatividade";
+        String corpo = """
+                <p>Olá %s,</p>
+                <p>Como não identificamos manifestação de interesse dentro do prazo informado, seu acesso ao <strong>Portal Book</strong> foi removido por inatividade.</p>
+                <p>Caso deseje acessar novamente, será necessário solicitar um novo cadastro.</p>
+                <p>Atenciosamente,<br/>Equipe Book</p>
+                """.formatted(escape(usuario.getNome()));
+        enviar(usuario.getEmail(), assunto, corpo);
+    }
+
+    @Async
+    public void enviarNovaPublicacao(Usuario usuario, String linkPortal) {
+        String assunto = "Novo arquivo disponível para download";
+        String corpo = """
+                <p>Olá %s,</p>
+                <p>Informamos que um novo arquivo foi disponibilizado em nosso portal de downloads.</p>
+                <p>Para acessar o conteúdo atualizado, basta realizar seu login na plataforma e efetuar o download do material desejado.</p>
+                <p><a href="%s" style="display:inline-block;background:#e2231a;color:#fff;text-decoration:none;font-weight:bold;padding:10px 18px;border-radius:6px;">Acessar o portal</a></p>
+                <p>Recomendamos verificar periodicamente o portal para acompanhar futuras atualizações e publicações.</p>
+                <p>Atenciosamente,<br/>Equipe Book</p>
+                """.formatted(escape(usuario.getNome()), linkPortal);
+        enviar(usuario.getEmail(), assunto, corpo);
+    }
+
     private void enviar(String para, String assunto, String corpoHtml) {
         if (!habilitado) {
             log.info("[email desabilitado] destinatário={} assunto={}", para, assunto);

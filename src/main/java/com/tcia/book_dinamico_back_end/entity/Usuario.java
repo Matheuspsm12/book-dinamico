@@ -87,6 +87,14 @@ public class Usuario implements Serializable {
     @Column(name = "decidido_em")
     private LocalDateTime decididoEm;
 
+    /** Último login bem-sucedido. Base do controle de ociosidade (Item 1). */
+    @Column(name = "ultimo_acesso")
+    private LocalDateTime ultimoAcesso;
+
+    /** Quando o e-mail de aviso de ociosidade foi enviado; null = sem aviso pendente. */
+    @Column(name = "aviso_ociosidade_enviado_em")
+    private LocalDateTime avisoOciosidadeEnviadoEm;
+
     /**
      * Authorities exposed to Spring Security. Mapeia {@link UsuarioRole} para o formato
      * esperado pelo {@code hasRole(...)} (prefixo {@code ROLE_}).

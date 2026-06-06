@@ -1,18 +1,22 @@
 package com.tcia.book_dinamico_back_end.service;
 
+import com.tcia.book_dinamico_back_end.config.PortalLinks;
 import com.tcia.book_dinamico_back_end.controller.mapper.DocumentoMapper;
 import com.tcia.book_dinamico_back_end.controller.request.DocumentoMetadataRequest;
 import com.tcia.book_dinamico_back_end.controller.response.DocumentoResponse;
 import com.tcia.book_dinamico_back_end.entity.Documento;
 import com.tcia.book_dinamico_back_end.entity.DocumentoUploadLog;
 import com.tcia.book_dinamico_back_end.entity.Usuario;
+import com.tcia.book_dinamico_back_end.email.EmailAdapter;
 import com.tcia.book_dinamico_back_end.enums.ExtensaoDocumento;
+import com.tcia.book_dinamico_back_end.enums.UsuarioStatus;
 import com.tcia.book_dinamico_back_end.exception.ArquivoException;
 import com.tcia.book_dinamico_back_end.exception.ErroAutenticacaoException;
 import com.tcia.book_dinamico_back_end.exception.NegocioException;
 import com.tcia.book_dinamico_back_end.exception.ResourceNotFoundException;
 import com.tcia.book_dinamico_back_end.repository.DocumentoRepository;
 import com.tcia.book_dinamico_back_end.repository.DocumentoUploadLogRepository;
+import com.tcia.book_dinamico_back_end.repository.UsuarioRepository;
 import com.tcia.book_dinamico_back_end.utils.AuthUtils;
 import com.tcia.book_dinamico_back_end.utils.IntegridadeArquivoValidator;
 import jakarta.transaction.Transactional;
@@ -41,6 +45,9 @@ public class DocumentoService {
     private final ArquivoStorageService storage;
     private final IntegridadeArquivoValidator integridadeValidator;
     private final AuthUtils authUtils;
+    private final UsuarioRepository usuarioRepository;
+    private final EmailAdapter emailAdapter;
+    private final PortalLinks portalLinks;
 
     // ------------------------------------------------------------------
     // Listagem (US6 — RN16/RN19/RN29) — disponível pra qualquer autenticado
@@ -75,6 +82,12 @@ public class DocumentoService {
 
     @Transactional
     public DocumentoResponse criar(DocumentoMetadataRequest metadata, MultipartFile arquivo) {
+        DocumentoResponse resp = criarInterno(metadata, arquivo);
+        notificarNovaPublicacao();
+        return resp;
+    }
+
+    private DocumentoResponse criarInterno(DocumentoMetadataRequest metadata, MultipartFile arquivo) {
         Usuario admin = adminLogado();
         ExtensaoDocumento ext = integridadeValidator.validar(arquivo);
 
@@ -111,8 +124,9 @@ public class DocumentoService {
         List<DocumentoResponse> respostas = new ArrayList<>(metadatas.size());
         // Falha em um → rollback de todos (transação @Transactional)
         for (int i = 0; i < metadatas.size(); i++) {
-            respostas.add(criar(metadatas.get(i), arquivos.get(i)));
+            respostas.add(criarInterno(metadatas.get(i), arquivos.get(i)));
         }
+        notificarNovaPublicacao();
         return respostas;
     }
 
@@ -141,6 +155,7 @@ public class DocumentoService {
         registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
 
         log.info("Arquivo substituído em documento id={}: novo={}", salvo.getId(), caminhoNovo);
+        notificarNovaPublicacao();
         return documentoMapper.toResponse(salvo);
     }
 
@@ -168,6 +183,16 @@ public class DocumentoService {
     }
 
     // ------------------------------------------------------------------
+
+    /** Notifica todos os usuários APROVADO sobre uma nova publicação (e-mail assíncrono). */
+    private void notificarNovaPublicacao() {
+        List<Usuario> aprovados = usuarioRepository.findByStatus(UsuarioStatus.APROVADO);
+        String linkPortal = portalLinks.portal();
+        for (Usuario u : aprovados) {
+            emailAdapter.enviarNovaPublicacao(u, linkPortal);
+        }
+        log.info("Nova publicação: notificação enfileirada para {} usuário(s) aprovado(s).", aprovados.size());
+    }
 
     private void registrarUploadLog(Documento doc, Usuario admin, String nomeArquivoOriginal) {
         uploadLogRepository.save(DocumentoUploadLog.builder()

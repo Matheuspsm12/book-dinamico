@@ -49,6 +49,9 @@ public class SecurityConfig {
                     auth.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/usuarios/cadastro").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/autenticacao/esqueci-senha").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/autenticacao/redefinir-senha").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/autenticacao/manter-acesso").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .logout(logout -> logout

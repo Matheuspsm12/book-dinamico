@@ -43,10 +43,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   //  - com user em rota de auth → /dashboard (admin) ou /book (usuario)
   useEffect(() => {
     if (loading) return;
-    const isAuthRoute = pathname === "/login" || pathname === "/cadastro";
-    if (!user && !isAuthRoute) {
+    // Rotas acessíveis sem login (inclui fluxos abertos por link de e-mail).
+    const isPublicRoute =
+      pathname === "/login" ||
+      pathname === "/cadastro" ||
+      pathname === "/esqueci-senha" ||
+      pathname === "/redefinir-senha" ||
+      pathname === "/manter-acesso";
+    // Só /login e /cadastro redirecionam um usuário já logado pra dentro do app.
+    const isAuthEntry = pathname === "/login" || pathname === "/cadastro";
+    if (!user && !isPublicRoute) {
       router.replace("/login");
-    } else if (user && isAuthRoute) {
+    } else if (user && isAuthEntry) {
       router.replace(user.role === "ADMIN" ? "/dashboard" : "/book");
     }
   }, [user, pathname, loading, router]);
