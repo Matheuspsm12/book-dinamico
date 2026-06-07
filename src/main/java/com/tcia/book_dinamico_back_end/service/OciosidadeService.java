@@ -53,6 +53,12 @@ public class OciosidadeService {
             log.debug("Controle de ociosidade desabilitado (app.ociosidade.habilitado=false).");
             return;
         }
+        // Sem e-mail ativo não há como avisar antes de remover — não progride o ciclo
+        // (evita desativar usuários silenciosamente quando o SMTP está desligado).
+        if (!emailAdapter.isHabilitado()) {
+            log.warn("Ociosidade: e-mail desabilitado no servidor — ciclo pulado (não removemos sem avisar).");
+            return;
+        }
         LocalDateTime agora = LocalDateTime.now();
         List<Usuario> aprovados = usuarioRepository.findByStatus(UsuarioStatus.APROVADO);
         int avisados = 0;
