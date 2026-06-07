@@ -71,17 +71,18 @@ services:
       # Render Postgres exige SSL — append ao JDBC URL composto via application.yml
       - key: BOOK_DB_PARAMS
         value: "?sslmode=require"
+      # E-mail/SMTP — gerenciado manualmente no dashboard (sync: false) pra que um
+      # re-sync do blueprint NÃO sobrescreva os valores reais (especialmente a senha).
       - key: BOOK_EMAIL_HABILITADO
-        value: "false"
-      # Mail placeholders — só ativar quando configurar SMTP real
+        sync: false
       - key: BOOK_MAIL_HOST
-        value: smtp.gmail.com
+        sync: false
       - key: BOOK_MAIL_PORT
-        value: "587"
+        sync: false
       - key: BOOK_MAIL_USERNAME
-        value: noreply@example.com
+        sync: false
       - key: BOOK_MAIL_PASSWORD
-        value: placeholder
+        sync: false
       # Heap pequena pra caber no free tier (512MB de RAM)
       - key: JAVA_OPTS
         value: "-Xmx400m -Xms128m"
