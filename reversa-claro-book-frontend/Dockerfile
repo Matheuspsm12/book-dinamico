@@ -10,10 +10,9 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # NEXT_PUBLIC_* precisa estar disponível em build time (é embutido no JS estático).
-# Passado via --build-arg no docker build OU envVar no Render (build env).
-# Default aponta pra produção — se o build arg não chegar por algum motivo, ainda funciona em prod.
-# docker-compose local sobrescreve via build.args pra apontar pro localhost.
-ARG NEXT_PUBLIC_API_BASE_URL=https://book-dinamico-backend.onrender.com/book_dinamico
+# Passado via --build-arg no docker build (docker-compose já injeta localhost).
+# Default = localhost (projeto roda 100% local).
+ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8082/book_dinamico
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 
 COPY --from=deps /app/node_modules ./node_modules
