@@ -7,9 +7,9 @@ import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import * as usuariosApi from "@/lib/api/usuarios";
-import type { UsuarioResponse, UsuarioStatus } from "@/lib/api/types";
-import { useAuth } from "@/contexts/AuthContext";
+import * as usuariosApi from "@/services/usuarios";
+import type { UsuarioResponse, UsuarioStatus } from "@/types";
+import { useAuth } from "@/app/contexts/AuthContext";
 import { cn, formatDate } from "@/lib/utils";
 
 const statusBadge: Record<UsuarioStatus, string> = {

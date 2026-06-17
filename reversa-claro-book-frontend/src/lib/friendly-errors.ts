@@ -21,6 +21,10 @@ const FRIENDLY: Record<string, string> = {
   "email-desabilitado":
     "O envio de e-mail está desabilitado no servidor. Peça ao administrador para configurar SMTP ou resetar sua senha manualmente.",
 
+  // Rede / timeout (gerados no interceptor do axios)
+  timeout: "Tempo esgotado. O servidor pode estar acordando — tente novamente em 1 minuto.",
+  network: "Falha de rede. Verifique sua conexão e tente novamente.",
+
   // Upload
   "arquivo-invalido": "Arquivo inválido. Verifique extensão, tamanho e conteúdo.",
   "arquivo-extensao-nao-permitida":

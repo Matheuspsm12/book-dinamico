@@ -12,7 +12,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 type Item = { label: string; href: string; icon: React.ComponentType<{ size?: number }>; roles: ("ADMIN" | "USUARIO")[] };
 

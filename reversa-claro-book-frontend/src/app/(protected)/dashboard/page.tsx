@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { FileText, FileSpreadsheet, Users, CheckCircle2, Clock, X } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import { StatCard } from "@/components/StatCard";
-import * as docsApi from "@/lib/api/documentos";
-import * as usuariosApi from "@/lib/api/usuarios";
-import type { DocumentoResponse } from "@/lib/api/types";
+import * as docsApi from "@/services/documentos";
+import * as usuariosApi from "@/services/usuarios";
+import type { DocumentoResponse } from "@/types";
 
 type Counts = {
   documentos: number;

@@ -18,9 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
-import * as docsApi from "@/lib/api/documentos";
-import type { DocumentoResponse } from "@/lib/api/types";
-import { useAuth } from "@/contexts/AuthContext";
+import * as docsApi from "@/services/documentos";
+import type { DocumentoResponse } from "@/types";
+import { useAuth } from "@/app/contexts/AuthContext";
 import { cn, formatDate, hojeLocal, inferNomeFromFilename } from "@/lib/utils";
 
 const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;

@@ -6,6 +6,11 @@ export type UsuarioRole = "ADMIN" | "USUARIO";
 export type TipoDocumento = "POWERPOINT" | "EXCEL";
 export type ExtensaoDocumento = "XLSM" | "XLSX" | "PPTX";
 
+export interface LoginData {
+  email: string;
+  senha: string;
+}
+
 export interface TokenResponse {
   token: string;
   expiraEm: string; // ISO instant
@@ -79,7 +84,7 @@ export interface PageResponse<T> {
   last: boolean;
 }
 
-export interface ApiErrorBody {
+export interface ApiErroResponse {
   timestamp: string;
   status: number;
   error: string;

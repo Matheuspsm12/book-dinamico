@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Download, Pencil, RefreshCw, Upload, X } from "lucide-react";
-import * as docsApi from "@/lib/api/documentos";
-import type { DocumentoResponse } from "@/lib/api/types";
-import { useAuth } from "@/contexts/AuthContext";
+import * as docsApi from "@/services/documentos";
+import type { DocumentoResponse } from "@/types";
+import { useAuth } from "@/app/contexts/AuthContext";
 import { formatDate, cn, hojeLocal, inferNomeFromFilename } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

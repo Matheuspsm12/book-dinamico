@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, ChevronDown, KeyRound, LogOut, Mail, User as UserIcon } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import * as usuariosApi from "@/lib/api/usuarios";
+import * as usuariosApi from "@/services/usuarios";
 import { cn } from "@/lib/utils";
 
 export function UserMenu() {

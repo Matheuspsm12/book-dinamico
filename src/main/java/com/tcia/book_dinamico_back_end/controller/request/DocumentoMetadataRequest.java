@@ -15,15 +15,15 @@ import java.time.LocalDate;
 @Data
 public class DocumentoMetadataRequest {
 
-    @NotBlank
-    @Size(max = 255)
+    @NotBlank(message = "{documento.nome.not-blank}")
+    @Size(max = 255, message = "{documento.nome.size}")
     private String nome;
 
-    @NotBlank
+    @NotBlank(message = "{documento.descricao.not-blank}")
     private String descricao;
 
     /** Data manual da última atualização, exibida no portal (A6 / RN19). */
-    @NotNull
+    @NotNull(message = "{documento.data-atualizacao.not-null}")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataAtualizacao;
 }

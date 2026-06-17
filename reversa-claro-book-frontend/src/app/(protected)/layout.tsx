@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar } from "@/components/Sidebar";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {

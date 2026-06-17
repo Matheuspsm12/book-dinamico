@@ -1,7 +1,7 @@
 // Persistência do token + perfil mínimo do usuário logado.
 // Modo "permanecerLogado" usa localStorage; senão sessionStorage (some ao fechar a aba).
 
-import type { UsuarioRole } from "./api/types";
+import type { UsuarioRole } from "@/types";
 
 const TOKEN_KEY = "rcb_token";
 const USER_KEY = "rcb_user";

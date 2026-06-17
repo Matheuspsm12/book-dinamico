@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import * as authApi from "@/lib/api/auth";
+import * as authApi from "@/services/auth";
+import { ensureDeviceId } from "@/lib/device-id";
 import {
   AuthSession,
   clearSession,
@@ -32,13 +33,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Carrega sessão persistida ao montar
+  // Carrega sessão persistida e garante o fingerprint do dispositivo ao montar.
   useEffect(() => {
     setUser(getSession());
     setLoading(false);
+    void ensureDeviceId();
   }, []);
 
-  // Guard de rotas. Comportamento original:
+  // Guard de rotas:
   //  - sem user em rota protegida → /login
   //  - com user em rota de auth → /dashboard (admin) ou /book (usuario)
   useEffect(() => {
