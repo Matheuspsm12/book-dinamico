@@ -1,33 +1,17 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
-
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Regras de estilo do padrão TCIA (espelha .eslintrc.json do reversa-claro-devolucao-web):
-  // ponto-e-vírgula obrigatório e aspas duplas. @typescript-eslint já vem via nextTs.
+// O Biome (biome.json) é o linter/formatter principal — padrão do template dashboardclaromm_pm,
+// e cobre os domínios Next + React. As regras nativas do ESLint ficam desativadas aqui para
+// evitar duplicação (mesma estratégia do template, que remove as regras nativas do next).
+// O ESLint segue no pipeline (lint: "eslint . && biome check") por consistência com o template.
+const eslintConfig = [
   {
-    rules: {
-      semi: ["error", "always"],
-      quotes: ["error", "double"],
-      // Next 16 traz esta regra (a referência em Next 15 não tem). Carregar sessão/dados
-      // no mount via efeito é padrão aceito aqui — mantemos como aviso, não erro.
-      "react-hooks/set-state-in-effect": "warn",
-    },
+    ignores: [
+      '.next/**',
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'next-env.d.ts',
+    ],
   },
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    // Arquivos de configuração (não são código de app):
-    "*.config.js",
-    "*.config.mjs",
-    "*.config.ts",
-  ]),
-]);
+]
 
-export default eslintConfig;
+export default eslintConfig
