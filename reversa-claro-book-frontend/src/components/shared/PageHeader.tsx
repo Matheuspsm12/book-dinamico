@@ -1,6 +1,6 @@
 'use client'
 
-import { UserMenu } from '@/components/UserMenu'
+import { UserMenu } from '@/components/shared/UserMenu'
 
 export function PageHeader({
   title,

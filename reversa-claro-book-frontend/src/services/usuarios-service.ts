@@ -1,11 +1,11 @@
-import { api } from './client'
+import { api } from '@/lib/api/client'
 import type {
   PageResponse,
   UsuarioCadastroRequest,
   UsuarioEdicaoRequest,
   UsuarioFiltroRequest,
   UsuarioResponse,
-} from './types'
+} from '@/lib/api/types'
 
 export async function cadastrar(input: UsuarioCadastroRequest) {
   return api.post<UsuarioResponse>('/api/usuarios/cadastro', { body: input })

@@ -13,8 +13,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { useAuth } from '@/contexts/AuthContext'
-import * as usuariosApi from '@/lib/api/usuarios'
 import { cn } from '@/lib/utils'
+import * as usuariosApi from '@/services/usuarios-service'
 
 export function UserMenu() {
   const { user, signOut } = useAuth()

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 
-import { Sidebar } from '@/components/Sidebar'
+import { Sidebar } from '@/components/shared/Sidebar'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function ProtectedLayout({

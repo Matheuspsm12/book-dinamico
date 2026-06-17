@@ -4,9 +4,9 @@ import { usePathname, useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 
-import * as authApi from '@/lib/api/auth'
 import type { AuthSession } from '@/lib/auth-storage'
 import { clearSession, getSession, saveSession } from '@/lib/auth-storage'
+import * as authApi from '@/services/auth-service'
 
 type Ctx = {
   user: AuthSession | null

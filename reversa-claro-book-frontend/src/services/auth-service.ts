@@ -1,5 +1,5 @@
-import { api } from './client'
-import type { TokenResponse } from './types'
+import { api } from '@/lib/api/client'
+import type { TokenResponse } from '@/lib/api/types'
 
 export async function login(email: string, senha: string) {
   return api.post<TokenResponse>('/autenticacao/login', {

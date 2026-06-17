@@ -1,5 +1,8 @@
-import { api } from './client'
-import type { DocumentoMetadataRequest, DocumentoResponse } from './types'
+import { api } from '@/lib/api/client'
+import type {
+  DocumentoMetadataRequest,
+  DocumentoResponse,
+} from '@/lib/api/types'
 
 export async function listar() {
   return api.get<DocumentoResponse[]>('/api/documentos')
