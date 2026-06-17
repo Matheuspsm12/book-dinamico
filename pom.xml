@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.tcia</groupId>
+    <groupId>br.com.tcia.bookdinamico</groupId>
     <artifactId>book_dinamico_backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>book_dinamico_backend</name>
