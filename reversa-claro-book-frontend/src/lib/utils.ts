@@ -1,8 +1,9 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import type { ClassValue } from 'clsx'
+import { clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 /**
@@ -14,17 +15,17 @@ export function cn(...inputs: ClassValue[]) {
  * Aqui parseamos manualmente para tratar como data local.
  */
 export function formatDate(d: string | Date) {
-  if (d instanceof Date) return d.toLocaleDateString("pt-BR");
+  if (d instanceof Date) return d.toLocaleDateString('pt-BR')
 
   // String ISO "YYYY-MM-DD" → constrói como data local (mês é 0-indexado)
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d);
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d)
   if (m) {
-    const local = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-    return local.toLocaleDateString("pt-BR");
+    const local = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]))
+    return local.toLocaleDateString('pt-BR')
   }
 
   // Outros formatos (com hora/timezone) — deixa o Date nativo
-  return new Date(d).toLocaleDateString("pt-BR");
+  return new Date(d).toLocaleDateString('pt-BR')
 }
 
 /**
@@ -37,33 +38,33 @@ export function formatDate(d: string | Date) {
  */
 export function inferNomeFromFilename(filename: string): string {
   // 1) tira extensão
-  let name = filename.replace(/\.(xlsm|xlsx|pptx)$/i, "");
+  let name = filename.replace(/\.(xlsm|xlsx|pptx)$/i, '')
   // 2) tira prefixo "AAAA Mes_" (qualquer combinação de palavras+underscores no início)
-  name = name.replace(/^\d{4}[\s_]+\p{L}+_/iu, "");
+  name = name.replace(/^\d{4}[\s_]+\p{L}+_/iu, '')
   // 3) NORMALIZA: underscores viram espaços (antes dos regex de palavras)
-  name = name.replace(/_/g, " ");
+  name = name.replace(/_/g, ' ')
   // 4) corta sufixo da operadora " Claro..."
-  name = name.replace(/\s+Claro.*$/i, "");
+  name = name.replace(/\s+Claro.*$/i, '')
   // 5) corta sufixo técnico "-HFC..."
-  name = name.replace(/-HFC.*$/i, "");
+  name = name.replace(/-HFC.*$/i, '')
   // 6) corta tudo a partir de hífen (com ou sem espaço): "X-Y" e "X - Y" → "X"
-  name = name.replace(/\s*-.*$/, "");
+  name = name.replace(/\s*-.*$/, '')
   // 7) corta " (N)" de cópias do browser
-  name = name.replace(/\s*\(\d+\)\s*$/, "");
+  name = name.replace(/\s*\(\d+\)\s*$/, '')
   // 8) corta números soltos no fim ("18", "v2")
-  name = name.replace(/\s+v?\d+\s*$/i, "");
-  name = name.trim();
+  name = name.replace(/\s+v?\d+\s*$/i, '')
+  name = name.trim()
 
-  const minusculas = new Set(["de", "da", "do", "das", "dos", "e", "a", "o"]);
+  const minusculas = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'a', 'o'])
   return name
     .split(/\s+/)
     .filter(Boolean)
     .map((w, i) => {
-      const lower = w.toLowerCase();
-      if (i > 0 && minusculas.has(lower)) return lower;
-      return lower.charAt(0).toUpperCase() + lower.slice(1);
+      const lower = w.toLowerCase()
+      if (i > 0 && minusculas.has(lower)) return lower
+      return lower.charAt(0).toUpperCase() + lower.slice(1)
     })
-    .join(" ");
+    .join(' ')
 }
 
 /**
@@ -72,9 +73,9 @@ export function inferNomeFromFilename(filename: string): string {
  * para o backend evitando off-by-one.
  */
 export function hojeLocal(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }

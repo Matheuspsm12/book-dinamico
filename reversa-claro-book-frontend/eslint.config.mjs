@@ -1,18 +1,17 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+// O Biome (biome.json) é o linter/formatter principal — padrão do template dashboardclaromm_pm,
+// e cobre os domínios Next + React. As regras nativas do ESLint ficam desativadas aqui para
+// evitar duplicação (mesma estratégia do template, que remove as regras nativas do next).
+// O ESLint segue no pipeline (lint: "eslint . && biome check") por consistência com o template.
+const eslintConfig = [
+  {
+    ignores: [
+      '.next/**',
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'next-env.d.ts',
+    ],
+  },
+]
 
-const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
-]);
-
-export default eslintConfig;
+export default eslintConfig

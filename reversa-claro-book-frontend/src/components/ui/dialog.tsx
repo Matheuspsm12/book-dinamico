@@ -1,43 +1,50 @@
-"use client";
+'use client'
 
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { X } from 'lucide-react'
+import type { ReactNode } from 'react'
+
+import { cn } from '@/lib/utils'
 
 type Props = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title: ReactNode;
-  description?: ReactNode;
-  children: ReactNode;
-  footer?: ReactNode;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: ReactNode
+  description?: ReactNode
+  children: ReactNode
+  footer?: ReactNode
   /** Max width do conteúdo. Default md. */
-  size?: "sm" | "md" | "lg";
-};
+  size?: 'sm' | 'md' | 'lg'
+}
 
-const sizeClasses: Record<NonNullable<Props["size"]>, string> = {
-  sm: "max-w-sm",
-  md: "max-w-md",
-  lg: "max-w-2xl",
-};
+const sizeClasses: Record<NonNullable<Props['size']>, string> = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-2xl',
+}
 
-export function Dialog({ open, onOpenChange, title, description, children, footer, size = "md" }: Props) {
+export function Dialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  children,
+  footer,
+  size = 'md',
+}: Props) {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-in data-[state=open]:fade-in"
-        />
+        <DialogPrimitive.Overlay className="data-[state=open]:fade-in fixed inset-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-in" />
         <DialogPrimitive.Content
           className={cn(
-            "fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-xl",
+            'fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-xl',
             sizeClasses[size],
           )}
         >
           <div className="mb-4 flex items-start justify-between gap-4">
             <div>
-              <DialogPrimitive.Title className="text-lg font-bold text-zinc-900">
+              <DialogPrimitive.Title className="font-bold text-lg text-zinc-900">
                 {title}
               </DialogPrimitive.Title>
               {description && (
@@ -56,9 +63,11 @@ export function Dialog({ open, onOpenChange, title, description, children, foote
 
           <div>{children}</div>
 
-          {footer && <div className="mt-6 flex justify-end gap-2">{footer}</div>}
+          {footer && (
+            <div className="mt-6 flex justify-end gap-2">{footer}</div>
+          )}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
-  );
+  )
 }

@@ -17,7 +17,7 @@
             <appender-ref ref="CONSOLE"/>
         </root>
 
-        <logger name="com.tcia.book_dinamico_back_end" level="DEBUG"/>
+        <logger name="br.com.tcia.bookdinamico" level="DEBUG"/>
         <logger name="org.springframework.security" level="INFO"/>
         <logger name="org.hibernate.SQL" level="INFO"/>
     </springProfile>
@@ -50,7 +50,7 @@
             <appender-ref ref="FILE"/>
         </root>
 
-        <logger name="com.tcia.book_dinamico_back_end" level="INFO"/>
+        <logger name="br.com.tcia.bookdinamico" level="INFO"/>
         <logger name="org.springframework.security" level="INFO"/>
         <logger name="org.hibernate.SQL" level="WARN"/>
     </springProfile>
