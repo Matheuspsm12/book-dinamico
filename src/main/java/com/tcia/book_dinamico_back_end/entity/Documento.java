@@ -8,9 +8,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
@@ -29,9 +29,7 @@ import java.time.LocalDateTime;
  * @version 1.0
  * @since 1.0
  */
-@Getter
-@Setter
-@ToString(onlyExplicitlyIncluded = true)
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -50,7 +48,6 @@ public class Documento implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "documento_id_seq")
     @SequenceGenerator(name = "documento_id_seq", sequenceName = "documento_seq", allocationSize = 1)
     @Column(name = "id", nullable = false, unique = true)
-    @ToString.Include
     private Long id;
 
     /**
@@ -59,7 +56,6 @@ public class Documento implements Serializable {
     @Column(name = "nome", nullable = false, length = 255)
     @NotBlank(message = "{documento.nome.not-blank}")
     @Size(max = 255, message = "{documento.nome.size}")
-    @ToString.Include
     private String nome;
 
     /**
@@ -113,6 +109,8 @@ public class Documento implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "criado_por", nullable = false, updatable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Usuario criadoPor;
 
     @LastModifiedDate
@@ -121,6 +119,8 @@ public class Documento implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "atualizado_por", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Usuario atualizadoPor;
 
     @Column(name = "ativo", nullable = false)

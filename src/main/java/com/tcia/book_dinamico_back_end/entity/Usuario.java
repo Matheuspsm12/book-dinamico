@@ -9,9 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -34,9 +34,7 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-@Getter
-@Setter
-@ToString(onlyExplicitlyIncluded = true)
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -54,7 +52,6 @@ public class Usuario implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuario_id_seq")
     @SequenceGenerator(name = "usuario_id_seq", sequenceName = "usuario_seq", allocationSize = 1)
     @Column(name = "id", nullable = false, unique = true)
-    @ToString.Include
     private Long id;
 
     /**
@@ -80,7 +77,6 @@ public class Usuario implements Serializable {
     @NotBlank(message = "{usuario.email.not-blank}")
     @Email(message = "{usuario.email.invalido}")
     @Size(max = 200, message = "{usuario.email.size}")
-    @ToString.Include
     private String email;
 
     /**
@@ -132,6 +128,8 @@ public class Usuario implements Serializable {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aprovado_por")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Usuario aprovadoPor;
 
     /**

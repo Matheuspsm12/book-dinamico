@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -20,9 +20,7 @@ import java.time.LocalDateTime;
  * @version 1.0
  * @since 1.0
  */
-@Getter
-@Setter
-@ToString(onlyExplicitlyIncluded = true)
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,7 +38,6 @@ public class DocumentoUploadLog implements Serializable {
     @SequenceGenerator(name = "documento_upload_log_id_seq",
             sequenceName = "documento_upload_log_seq", allocationSize = 1)
     @Column(name = "id", nullable = false, unique = true)
-    @ToString.Include
     private Long id;
 
     /**
@@ -49,6 +46,8 @@ public class DocumentoUploadLog implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "documento_id", nullable = false)
     @NotNull(message = "{upload-log.documento.not-null}")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Documento documento;
 
     /**
@@ -57,6 +56,8 @@ public class DocumentoUploadLog implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     @NotNull(message = "{upload-log.usuario.not-null}")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Usuario usuario;
 
     /**
@@ -64,7 +65,6 @@ public class DocumentoUploadLog implements Serializable {
      */
     @Column(name = "nome_arquivo", nullable = false, length = 500)
     @NotBlank(message = "{upload-log.nome-arquivo.not-blank}")
-    @ToString.Include
     private String nomeArquivo;
 
     /**
