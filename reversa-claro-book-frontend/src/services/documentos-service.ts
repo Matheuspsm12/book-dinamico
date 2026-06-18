@@ -1,45 +1,54 @@
-import { api } from '@/lib/api/client'
+import api from "src/services/api";
 import type {
   DocumentoMetadataRequest,
   DocumentoResponse,
-} from '@/lib/api/types'
+} from "src/lib/api/types";
 
 export async function listar() {
-  return api.get<DocumentoResponse[]>('/api/documentos')
+  const { data } = await api.get<DocumentoResponse[]>("/api/documentos");
+  return data;
 }
 
 export async function buscar(id: number) {
-  return api.get<DocumentoResponse>(`/api/documentos/${id}`)
+  const { data } = await api.get<DocumentoResponse>(`/api/documentos/${id}`);
+  return data;
 }
 
 export async function criar(metadata: DocumentoMetadataRequest, arquivo: File) {
-  const form = new FormData()
+  const form = new FormData();
   // Spring exige metadata como part JSON — anexamos como Blob com tipo correto
   form.append(
-    'metadata',
-    new Blob([JSON.stringify(metadata)], { type: 'application/json' }),
-  )
-  form.append('arquivo', arquivo)
-  return api.post<DocumentoResponse>('/api/documentos', { body: form })
+    "metadata",
+    new Blob([JSON.stringify(metadata)], { type: "application/json" }),
+  );
+  form.append("arquivo", arquivo);
+  const { data } = await api.post<DocumentoResponse>("/api/documentos", form);
+  return data;
 }
 
 export async function substituirArquivo(id: number, arquivo: File) {
-  const form = new FormData()
-  form.append('arquivo', arquivo)
-  return api.put<DocumentoResponse>(`/api/documentos/${id}/arquivo`, {
-    body: form,
-  })
+  const form = new FormData();
+  form.append("arquivo", arquivo);
+  const { data } = await api.put<DocumentoResponse>(
+    `/api/documentos/${id}/arquivo`,
+    form,
+  );
+  return data;
 }
 
 export async function atualizarMetadados(
   id: number,
   metadata: DocumentoMetadataRequest,
 ) {
-  return api.put<DocumentoResponse>(`/api/documentos/${id}`, { body: metadata })
+  const { data } = await api.put<DocumentoResponse>(
+    `/api/documentos/${id}`,
+    metadata,
+  );
+  return data;
 }
 
 export async function deletar(id: number) {
-  return api.delete<void>(`/api/documentos/${id}`)
+  await api.delete(`/api/documentos/${id}`);
 }
 
 /**
@@ -47,19 +56,22 @@ export async function deletar(id: number) {
  * cabeçalho Authorization (não dá pra usar <a href> simples).
  */
 export async function baixar(id: number): Promise<Blob> {
-  return api.get<Blob>(`/api/documentos/${id}/download`, { asBlob: true })
+  const { data } = await api.get(`/api/documentos/${id}/download`, {
+    responseType: "blob",
+  });
+  return data as Blob;
 }
 
 /**
  * Dispara o download no navegador a partir de um Blob.
  */
 export function salvarBlob(blob: Blob, nomeArquivo: string) {
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = nomeArquivo
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  URL.revokeObjectURL(url)
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nomeArquivo;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }

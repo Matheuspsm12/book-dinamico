@@ -1,27 +1,27 @@
-'use client'
+"use client";
 
-import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { X } from 'lucide-react'
-import type { ReactNode } from 'react'
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
+import type { ReactNode } from "react";
 
-import { cn } from '@/lib/utils'
+import { cn } from "src/lib/utils";
 
 type Props = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  title: ReactNode
-  description?: ReactNode
-  children: ReactNode
-  footer?: ReactNode
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: ReactNode;
+  description?: ReactNode;
+  children: ReactNode;
+  footer?: ReactNode;
   /** Max width do conteúdo. Default md. */
-  size?: 'sm' | 'md' | 'lg'
-}
+  size?: "sm" | "md" | "lg";
+};
 
-const sizeClasses: Record<NonNullable<Props['size']>, string> = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-2xl',
-}
+const sizeClasses: Record<NonNullable<Props["size"]>, string> = {
+  sm: "max-w-sm",
+  md: "max-w-md",
+  lg: "max-w-2xl",
+};
 
 export function Dialog({
   open,
@@ -30,7 +30,7 @@ export function Dialog({
   description,
   children,
   footer,
-  size = 'md',
+  size = "md",
 }: Props) {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
@@ -38,7 +38,7 @@ export function Dialog({
         <DialogPrimitive.Overlay className="data-[state=open]:fade-in fixed inset-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-in" />
         <DialogPrimitive.Content
           className={cn(
-            'fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-xl',
+            "fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-xl",
             sizeClasses[size],
           )}
         >
@@ -69,5 +69,5 @@ export function Dialog({
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
-  )
+  );
 }

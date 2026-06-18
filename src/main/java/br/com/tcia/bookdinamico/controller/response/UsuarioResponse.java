@@ -1,7 +1,6 @@
 package br.com.tcia.bookdinamico.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import br.com.tcia.bookdinamico.enums.UsuarioRole;
 import br.com.tcia.bookdinamico.enums.UsuarioStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +21,8 @@ public class UsuarioResponse {
     private String email;
     private String justificativa;
     private UsuarioStatus status;
-    private UsuarioRole role;
+    /** Nome do perfil (ADMIN/USUARIO) — mantém o campo "role" para o frontend. */
+    private String role;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
     private LocalDateTime decididoEm;

@@ -58,7 +58,7 @@ public class JwtTokenProvider {
                 .withExpiresAt(Date.from(expira))
                 .withJWTId(jti)
                 .withClaim("nome", usuario.getNome())
-                .withClaim("role", usuario.getRole().name())
+                .withClaim("perfil", usuario.getPerfil().getNomePerfil())
                 .withClaim("status", usuario.getStatus().name())
                 .withClaim("fp", fingerprint)
                 .sign(algorithm);

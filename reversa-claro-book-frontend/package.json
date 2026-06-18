@@ -3,34 +3,48 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS=--max-old-space-size=2048 next dev --turbopack",
+    "dev": "dotenv -e .env.local -- next dev -p 3001",
+    "start": "dotenv -e .env.local -- next start -p 3001",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint . && biome check"
+    "lint": "next lint"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
   },
   "dependencies": {
+    "@fingerprintjs/fingerprintjs": "^4.6.2",
     "@radix-ui/react-dialog": "^1.1.15",
-    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-select": "^2.2.6",
-    "@radix-ui/react-separator": "^1.1.8",
-    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@tanstack/react-query": "^5.83.0",
+    "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.16.0",
-    "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "tailwind-merge": "^3.6.0"
+    "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.474.0",
+    "next": "^15.5.9",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sonner": "^1.7.4",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.15",
-    "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
-    "@types/react": "^19",
+    "@types/react": "^19.0.8",
     "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.6",
-    "tailwindcss": "^4",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "autoprefixer": "^10.4.20",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.1.6",
+    "postcss": "^8.5.10",
+    "prettier": "^3.4.2",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }
 }

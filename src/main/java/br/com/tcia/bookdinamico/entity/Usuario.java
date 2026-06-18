@@ -1,6 +1,5 @@
 package br.com.tcia.bookdinamico.entity;
 
-import br.com.tcia.bookdinamico.enums.UsuarioRole;
 import br.com.tcia.bookdinamico.enums.UsuarioStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -21,14 +20,15 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Entidade que representa um usuário do Book Dinâmico.
  *
  * <p>O ciclo de vida segue {@link UsuarioStatus} (PENDENTE → APROVADO/REJEITADO → DESATIVADO)
- * e o papel de acesso é definido por {@link UsuarioRole}. A auto-relação {@code aprovadoPor}
- * registra qual admin decidiu o cadastro.</p>
+ * e o papel de acesso é definido pelo {@link Perfil} (base padrão TCIA). A auto-relação
+ * {@code aprovadoPor} registra qual admin decidiu o cadastro.</p>
  *
  * @author TCIA
  * @version 1.0
@@ -102,12 +102,14 @@ public class Usuario implements Serializable {
     private UsuarioStatus status;
 
     /**
-     * Papel de acesso do usuário.
+     * Perfil de acesso (base padrão TCIA). Substitui o antigo enum {@code role}.
      */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false, length = 20)
-    @NotNull(message = "{usuario.role.not-null}")
-    private UsuarioRole role;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_perfil", nullable = false)
+    @NotNull(message = "{usuario.perfil.not-null}")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Perfil perfil;
 
     /**
      * Data de criação do registro (preenchida pela auditoria JPA).
@@ -139,11 +141,21 @@ public class Usuario implements Serializable {
     private LocalDateTime decididoEm;
 
     /**
-     * Authorities expostas ao Spring Security. Mapeia {@link UsuarioRole} para o formato
-     * esperado pelo {@code hasRole(...)} (prefixo {@code ROLE_}).
+     * Authorities expostas ao Spring Security (padrão TCIA): {@code ROLE_<nomePerfil>}
+     * mais cada permissão do perfil.
      */
     @Transient
     public List<GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        if (perfil != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + perfil.getNomePerfil().toUpperCase()));
+            if (perfil.getPerfilPermissao() != null) {
+                perfil.getPerfilPermissao().stream()
+                        .filter(pp -> pp.getPermissao() != null)
+                        .map(pp -> new SimpleGrantedAuthority(pp.getPermissao().getNomePermissao()))
+                        .forEach(authorities::add);
+            }
+        }
+        return authorities;
     }
 }

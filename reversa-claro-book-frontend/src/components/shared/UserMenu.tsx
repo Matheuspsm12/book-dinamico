@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   CheckCircle2,
@@ -7,31 +7,31 @@ import {
   LogOut,
   Mail,
   User as UserIcon,
-} from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-import { Button } from '@/components/ui/button'
-import { Dialog } from '@/components/ui/dialog'
-import { useAuth } from '@/contexts/AuthContext'
-import { cn } from '@/lib/utils'
-import * as usuariosApi from '@/services/usuarios-service'
+import { Button } from "src/components/ui/button";
+import { Dialog } from "src/components/ui/dialog";
+import { useAuth } from "src/app/contexts/AuthContext";
+import { cn } from "src/lib/utils";
+import * as usuariosApi from "src/services/usuarios-service";
 
 export function UserMenu() {
-  const { user, signOut } = useAuth()
-  const [open, setOpen] = useState(false)
-  const [showSenha, setShowSenha] = useState(false)
-  const wrapRef = useRef<HTMLDivElement>(null)
+  const { user, signOut } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [showSenha, setShowSenha] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   // Fecha ao clicar fora
   useEffect(() => {
     function onDoc(ev: MouseEvent) {
-      if (!wrapRef.current?.contains(ev.target as Node)) setOpen(false)
+      if (!wrapRef.current?.contains(ev.target as Node)) setOpen(false);
     }
-    if (open) document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
-  }, [open])
+    if (open) document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <>
@@ -49,12 +49,12 @@ export function UserMenu() {
               {user.nome}
             </p>
             <p className="text-xs text-zinc-500 leading-tight">
-              {user.role === 'ADMIN' ? 'Administrador' : 'Usuário'}
+              {user.role === "ADMIN" ? "Administrador" : "Usuário"}
             </p>
           </div>
           <ChevronDown
             size={16}
-            className={cn('text-zinc-400 transition', open && 'rotate-180')}
+            className={cn("text-zinc-400 transition", open && "rotate-180")}
           />
         </button>
 
@@ -69,8 +69,8 @@ export function UserMenu() {
             <button
               type="button"
               onClick={() => {
-                setOpen(false)
-                setShowSenha(true)
+                setOpen(false);
+                setShowSenha(true);
               }}
               className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-zinc-700 hover:bg-zinc-50"
             >
@@ -79,8 +79,8 @@ export function UserMenu() {
             <button
               type="button"
               onClick={() => {
-                setOpen(false)
-                void signOut()
+                setOpen(false);
+                void signOut();
               }}
               className="flex w-full items-center gap-2 border-zinc-100 border-t px-4 py-2.5 text-left text-red-600 text-sm hover:bg-red-50"
             >
@@ -97,30 +97,30 @@ export function UserMenu() {
         />
       )}
     </>
-  )
+  );
 }
 
 function AlterarSenhaModal({
   email,
   onClose,
 }: {
-  email: string
-  onClose: () => void
+  email: string;
+  onClose: () => void;
 }) {
-  const [submitting, setSubmitting] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
-  const [enviado, setEnviado] = useState(false)
+  const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [enviado, setEnviado] = useState(false);
 
   async function enviar() {
-    setErr(null)
-    setSubmitting(true)
+    setErr(null);
+    setSubmitting(true);
     try {
-      await usuariosApi.resetarMinhaSenhaPorEmail()
-      setEnviado(true)
+      await usuariosApi.resetarMinhaSenhaPorEmail();
+      setEnviado(true);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Erro ao solicitar nova senha.')
+      setErr(e instanceof Error ? e.message : "Erro ao solicitar nova senha.");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
   }
 
@@ -169,12 +169,12 @@ function AlterarSenhaModal({
               Cancelar
             </Button>
             <Button onClick={enviar} disabled={submitting}>
-              <KeyRound size={14} />{' '}
-              {submitting ? 'Enviando…' : 'Enviar nova senha'}
+              <KeyRound size={14} />{" "}
+              {submitting ? "Enviando…" : "Enviar nova senha"}
             </Button>
           </div>
         </div>
       )}
     </Dialog>
-  )
+  );
 }

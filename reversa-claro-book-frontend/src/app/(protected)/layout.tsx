@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import { usePathname } from 'next/navigation'
+import { usePathname } from "next/navigation";
 
-import { Sidebar } from '@/components/shared/Sidebar'
-import { useAuth } from '@/contexts/AuthContext'
+import { Sidebar } from "src/components/shared/Sidebar";
+import { useAuth } from "src/app/contexts/AuthContext";
 
 export default function ProtectedLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth()
-  const pathname = usePathname()
-  const fullBleed = pathname === '/book'
+  const { user, loading } = useAuth();
+  const pathname = usePathname();
+  const fullBleed = pathname === "/book";
 
-  if (loading || !user) return null
+  if (loading || !user) return null;
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -26,5 +26,5 @@ export default function ProtectedLayout({
         )}
       </main>
     </div>
-  )
+  );
 }

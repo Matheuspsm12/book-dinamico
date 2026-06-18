@@ -1,6 +1,7 @@
 package br.com.tcia.bookdinamico.exception;
 
 import br.com.tcia.bookdinamico.controller.response.ApiErroResponse;
+import br.com.tcia.bookdinamico.security.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
