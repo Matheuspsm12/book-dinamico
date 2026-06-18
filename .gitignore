@@ -34,8 +34,6 @@ Thumbs.db
 .spring-boot-devtools.properties
 
 # Arquivos uploadados em dev (não commitar binários)
-book-dinamico-arquivos/*
-!book-dinamico-arquivos/.gitkeep
 
 # Python venv usado pelos smoke tests
 .venv/
@@ -51,3 +49,9 @@ reversa-claro-book-frontend/.env.*
 reversa-claro-book-frontend/.idea/
 reversa-claro-book-frontend/*.tsbuildinfo
 reversa-claro-book-frontend/next-env.d.ts
+
+# Config local de IDE/IA — não versionar
+.claude/
+
+# Uploads NÃO ficam dentro do projeto (caminho externo via BOOK_DIRETORIO)
+book-dinamico-arquivos/
