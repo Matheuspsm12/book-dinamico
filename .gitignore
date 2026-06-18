@@ -53,3 +53,5 @@ reversa-claro-book-frontend/next-env.d.ts
 
 # Uploads NÃO ficam dentro do projeto (caminho externo via BOOK_DIRETORIO)
 book-dinamico-arquivos/
+
+.claude/
