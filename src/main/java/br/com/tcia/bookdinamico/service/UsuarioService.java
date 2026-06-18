@@ -9,7 +9,7 @@ import br.com.tcia.bookdinamico.controller.response.TokenResponse;
 import br.com.tcia.bookdinamico.controller.response.UsuarioResponse;
 import br.com.tcia.bookdinamico.email.EmailAdapter;
 import br.com.tcia.bookdinamico.entity.Usuario;
-import br.com.tcia.bookdinamico.enums.UsuarioRole;
+import br.com.tcia.bookdinamico.repository.PerfilRepository;
 import br.com.tcia.bookdinamico.enums.UsuarioStatus;
 import br.com.tcia.bookdinamico.exception.ErroAutenticacaoException;
 import br.com.tcia.bookdinamico.exception.NegocioException;
@@ -38,7 +38,10 @@ public class UsuarioService {
     /** Cap de usuários APROVADO simultaneamente (RN15 / A10 / N2). */
     public static final long CAP_USUARIOS_APROVADOS = 40L;
 
+    private static final String PERFIL_USUARIO = "USUARIO";
+
     private final UsuarioRepository usuarioRepository;
+    private final PerfilRepository perfilRepository;
     private final UsuarioMapper usuarioMapper;
     private final UsuarioSpecifications usuarioSpecifications;
     private final PasswordEncoder passwordEncoder;
@@ -69,7 +72,7 @@ public class UsuarioService {
                 .expiraEm(jwtTokenProvider.obterExpiracao(token))
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
-                .role(usuario.getRole())
+                .role(usuario.getPerfil() != null ? usuario.getPerfil().getNomePerfil() : null)
                 .build();
     }
 
@@ -93,7 +96,8 @@ public class UsuarioService {
         Usuario usuario = usuarioMapper.toEntity(request);
         usuario.setSenhaHash(passwordEncoder.encode(request.getSenha()));
         usuario.setStatus(UsuarioStatus.PENDENTE);
-        usuario.setRole(UsuarioRole.USUARIO);
+        usuario.setPerfil(perfilRepository.findByNomePerfil(PERFIL_USUARIO)
+                .orElseThrow(() -> new NegocioException("erro-inesperado")));
 
         Usuario salvo = usuarioRepository.save(usuario);
         log.info("Novo cadastro PENDENTE: id={} email={}", salvo.getId(), salvo.getEmail());

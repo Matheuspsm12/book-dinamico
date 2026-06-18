@@ -22,7 +22,7 @@ public interface UsuarioMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "senhaHash", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "perfil", ignore = true)
     @Mapping(target = "criadoEm", ignore = true)
     @Mapping(target = "atualizadoEm", ignore = true)
     @Mapping(target = "aprovadoPor", ignore = true)
@@ -30,6 +30,7 @@ public interface UsuarioMapper {
     Usuario toEntity(UsuarioCadastroRequest request);
 
     @Mapping(target = "aprovadoPorId", source = "aprovadoPor.id")
+    @Mapping(target = "role", source = "perfil.nomePerfil")
     UsuarioResponse toResponse(Usuario usuario);
 
     List<UsuarioResponse> toResponseList(List<Usuario> usuarios);
@@ -43,7 +44,7 @@ public interface UsuarioMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "senhaHash", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "perfil", ignore = true)
     @Mapping(target = "criadoEm", ignore = true)
     @Mapping(target = "atualizadoEm", ignore = true)
     @Mapping(target = "aprovadoPor", ignore = true)

@@ -1,7 +1,6 @@
 package br.com.tcia.bookdinamico.utils;
 
 import br.com.tcia.bookdinamico.entity.Usuario;
-import br.com.tcia.bookdinamico.enums.UsuarioRole;
 import br.com.tcia.bookdinamico.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -40,6 +39,7 @@ public class AuthUtils {
 
     public boolean isUsuarioLogadoAdmin() {
         Usuario usuario = getUsuarioLogado();
-        return usuario != null && usuario.getRole() == UsuarioRole.ADMIN;
+        return usuario != null && usuario.getPerfil() != null
+                && "ADMIN".equalsIgnoreCase(usuario.getPerfil().getNomePerfil());
     }
 }
