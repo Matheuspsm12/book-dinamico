@@ -37,6 +37,7 @@ public class DocumentoService {
     private final ArquivoStorageService storage;
     private final IntegridadeArquivoValidator integridadeValidator;
     private final AuthUtils authUtils;
+    private final ProcessamentoService processamentoService;
 
     public List<DocumentoResponse> listar() {
         return documentoMapper.toResponseList(
@@ -85,6 +86,7 @@ public class DocumentoService {
         salvo = documentoRepository.save(salvo);
 
         registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
+        processamentoService.registrarDocumentoProcessado(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
 
         log.info("Documento criado: id={} nome={} tipo={} ext={} tamanho={}",
                 salvo.getId(), salvo.getNome(), salvo.getTipo(), salvo.getExtensao(), salvo.getTamanhoBytes());
@@ -121,6 +123,7 @@ public class DocumentoService {
         Documento salvo = documentoRepository.save(doc);
         storage.deletarSeExistir(caminhoAntigo);
         registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
+        processamentoService.registrarDocumentoProcessado(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
 
         log.info("Arquivo substituído em documento id={}: novo={}", salvo.getId(), caminhoNovo);
         return documentoMapper.toResponse(salvo);
