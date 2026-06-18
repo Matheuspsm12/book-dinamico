@@ -1,0 +1,67 @@
+app:
+  ambiente: ${BOOK_AMBIENTE}
+  jwt-secret: lQ3V4s9F8d7J3kL2aH6rP1zX0vY8tQ5wN1bR9sU2eM0=
+  jwt-secure-cookie: true
+  empresa: TCIA
+  nome-sistema: ${BOOK_NOME_SISTEMA}
+  url-site: ${BOOK_URL_SITE}
+  url-front-end: ${BOOK_URL_FRONT_END}
+  diretorio: ${BOOK_DIRETORIO}
+  email:
+    habilitado: ${BOOK_EMAIL_HABILITADO}
+    remetente: ${BOOK_MAIL_USERNAME}
+
+server:
+  port: ${BOOK_APP_PORT}
+  max-http-request-header-size: 512000
+  servlet:
+    context-path: ${BOOK_APP_CONTEXT_PATH}
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  session:
+    store-type: none
+  profiles:
+    default: dev
+  application:
+    name: ${BOOK_APP_NAME}
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  messages:
+    basename: ValidationMessages
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  datasource:
+    url: ${BOOK_DB_URL}
+    username: ${BOOK_DB_USERNAME}
+    password: ${BOOK_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 60
+      minimum-idle: 20
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-timeout: 60000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 1
+  mail:
+    host: ${BOOK_MAIL_HOST}
+    port: ${BOOK_MAIL_PORT}
+    username: ${BOOK_MAIL_USERNAME}
+    password: ${BOOK_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

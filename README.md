@@ -1,109 +1,129 @@
-# Claro Book Dinâmico
+# Book Dinâmico
 
-Portal para distribuição controlada de _books_ dinâmicos (planilhas e apresentações) da Claro/Logística.
-Usuários se cadastram, um administrador aprova o acesso, e os aprovados visualizam e baixam os documentos
-publicados. O administrador faz o upload, a substituição de versões e a curadoria dos arquivos.
-
-Monorepo com **backend Spring Boot** (raiz) e **frontend Next.js** (`reversa-claro-book-frontend/`),
-seguindo o padrão dos projetos `reversa-claro-devolucao` da TCIA.
+Este repositório é composto por **Backend (Spring Boot)** e **Frontend (Next.js)**, cada um com suas próprias variáveis de ambiente e formas de configuração.
 
 ---
 
-## Arquitetura
+## Backend – Spring Boot
 
-```
-backend-upload-book/
-├── src/main/java/com/tcia/book_dinamico_back_end/   # Backend Spring Boot
-│   ├── config/        # SecurityConfig, JwtFilter, AppConfig
-│   ├── controller/    # REST + request/response/mapper (MapStruct)
-│   ├── service/       # Regras de negócio
-│   ├── repository/    # Spring Data JPA + specifications
-│   ├── entity/        # Entidades JPA
-│   ├── jwt/ security/ # Emissão/validação de JWT, UserDetails
-│   ├── exception/     # Exceções de domínio + GlobalExceptionHandler
-│   └── email/ enums/ utils/ annotations/
-├── src/main/resources/
-│   ├── db/migration/  # Flyway (V1..V6)
-│   ├── application.yml application-dev.yml
-│   └── ValidationMessages / messages / errors .properties  # i18n pt-BR
-├── reversa-claro-book-frontend/    # Frontend Next.js (ver README próprio)
-├── docker-compose.yml  Dockerfile  render.yaml
-└── .env.example
-```
+### Tecnologias Utilizadas
 
-## Stack
+- **Java:** 17
+- **Framework:** Spring Boot
+- **Banco de Dados:** PostgreSQL
 
-**Backend** — Java 17 · Spring Boot 3.4 · PostgreSQL · Flyway · Spring Security + JWT (auth0 `java-jwt`,
-HMAC256, expiry 30 min) · MapStruct · springdoc-openapi (Swagger) · Lombok.
 
-**Frontend** — Next.js 16 · React 19 · TypeScript · Tailwind CSS v3 (shadcn) · axios + interceptors ·
-`@tanstack/react-query` · `sonner`.
 
-## Funcionalidades
-
-- **Autocadastro** (status inicial `PENDENTE`) e **login** com mensagens distintas por status
-  (`PENDENTE` / `REJEITADO` / `DESATIVADO` / credenciais inválidas).
-- **Aprovação/rejeição** de cadastros pelo admin, com e-mail de notificação e _cap_ de **40 usuários aprovados**.
-- **Gerenciamento de usuários** (listar/filtrar/editar/ativar/desativar).
-- **Upload de documentos** (`.xlsm`, `.xlsx`, `.pptx`) com validação de extensão, _magic bytes_ e tamanho (≤ 60 MB),
-  substituição de versão, edição de metadados, _soft delete_ e log de upload.
-- **Catálogo e download** para usuários autenticados.
+Este projeto utiliza **variáveis de ambiente** para configuração da aplicação Spring Boot. Este README descreve cada variável utilizada e fornece um **exemplo de configuração para ambiente DEV**.
 
 ---
 
-## Rodando localmente
+## Configurações da Aplicação (`app`)
 
-> Pré-requisitos: **JDK 17**, **Node 20+**, **PostgreSQL** e **Maven** (ou Docker).
+| Variável de Ambiente | Descrição | Exemplo (DEV) |
+|---------------------|-----------|---------------|
+| `BOOK_AMBIENTE` | Ambiente de execução da aplicação | `DEV` |
+| `BOOK_NOME_SISTEMA` | Nome do sistema | `Book Dinâmico` |
+| `BOOK_URL_SITE` | URL do backend | `http://localhost:8082/book_dinamico` |
+| `BOOK_URL_FRONT_END` | URL do frontend | `http://localhost:3001` |
+| `BOOK_DIRETORIO` | Diretório de armazenamento dos uploads (externo ao projeto) | `/var/dados/book-dinamico-arquivos` |
 
-### 1. Banco de dados
-
-Crie o banco `book_dinamico` no PostgreSQL local. O Flyway aplica as migrations (`V1..V6`) no boot,
-incluindo o seed do admin.
-
-### 2. Variáveis de ambiente
-
-Copie `.env.example` para `.env` e ajuste (URL/usuário/senha do banco, `BOOK_DIRETORIO`, `BOOK_JWT_SECRET`,
-SMTP). **Nunca** commite o `.env` — ele já está no `.gitignore`.
-
-### 3. Backend
-
-```bash
-mvn clean package -DskipTests
-java -jar target/book_dinamico_backend-0.0.1-SNAPSHOT.jar
-```
-
-- API: `http://localhost:8082/book_dinamico`
-- Swagger: `http://localhost:8082/book_dinamico/swagger-ui.html`
-
-### 4. Frontend
-
-```bash
-cd reversa-claro-book-frontend
-npm install
-npm run dev      # http://localhost:3000
-```
-
-O frontend consome a API em `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8082/book_dinamico`).
-
-### Docker (alternativa)
-
-```bash
-docker compose up --build
-```
-
-Sobe Postgres + backend + frontend já configurados.
-
-### Admin inicial (seed)
-
-| E-mail | Senha | Papel |
-| --- | --- | --- |
-| `admin@claro.com.br` | `admin` | `ADMIN` |
-
-> Credencial de desenvolvimento — **trocar antes de produção**.
+> **JWT Secret**
+>
+> Definido via variável de ambiente (string longa e aleatória):
+>
+> ```
+> BOOK_JWT_SECRET=substitua-por-string-longa-aleatoria
+> ```
 
 ---
 
-## Branches
+## Configurações do Servidor (`server`)
 
-- `master` — estável.
-- `develop` — integração contínua do desenvolvimento.
+| Variável de Ambiente | Descrição | Exemplo (DEV) |
+|---------------------|-----------|---------------|
+| `BOOK_APP_PORT` | Porta da aplicação | `8082` |
+| `BOOK_APP_CONTEXT_PATH` | Context path da aplicação | `/book_dinamico` |
+| `BOOK_APP_NAME` | Nome da aplicação Spring | `book_dinamico_backend` |
+
+---
+
+## Configurações de Banco de Dados (`datasource`)
+
+| Variável de Ambiente | Descrição | Exemplo (DEV) |
+|---------------------|-----------|---------------|
+| `BOOK_DB_URL` | URL de conexão com o PostgreSQL | `jdbc:postgresql://localhost:5432/book_dinamico` |
+| `BOOK_DB_USERNAME` | Usuário do banco | `postgres` |
+| `BOOK_DB_PASSWORD` | Senha do banco | `1234` |
+
+O pool de conexões utiliza **HikariCP** com parâmetros já definidos em configuração.
+
+---
+
+## Configurações de E-mail (`spring.mail`)
+
+| Variável de Ambiente | Descrição | Exemplo (DEV) |
+|---------------------|-----------|---------------|
+| `BOOK_EMAIL_HABILITADO` | Liga/desliga o envio de e-mail | `false` |
+| `BOOK_MAIL_HOST` | Servidor SMTP | `smtp.gmail.com` |
+| `BOOK_MAIL_PORT` | Porta SMTP | `587` |
+| `BOOK_MAIL_USERNAME` | Usuário do e-mail | `contato@tcia.com.br` |
+| `BOOK_MAIL_PASSWORD` | Senha do e-mail | `#########` |
+
+---
+
+## Perfil Spring
+
+- Flyway habilitado com `baseline-on-migrate=true` e `out-of-order=true`
+
+---
+
+## Frontend – Next.js
+
+### Configurações do Frontend (`.env.local`)
+
+O frontend utiliza apenas um arquivo `.env.local` com as variáveis abaixo:
+
+```env
+PORT=3001
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8082/book_dinamico
+```
+
+- `PORT`: Porta em que o frontend será executado
+- `NEXT_PUBLIC_API_BASE_URL`: URL base da API do backend
+
+> Variáveis iniciadas com `NEXT_PUBLIC_` ficam expostas no browser.
+
+---
+
+## Exemplo de Configuração (application.yaml – DEV)
+
+```env
+BOOK_AMBIENTE=DEV
+BOOK_APP_CONTEXT_PATH=/book_dinamico
+BOOK_APP_NAME=book_dinamico_backend
+BOOK_APP_PORT=8082
+
+BOOK_DB_URL=jdbc:postgresql://localhost:5432/book_dinamico
+BOOK_DB_USERNAME=postgres
+BOOK_DB_PASSWORD=1234
+
+BOOK_EMAIL_HABILITADO=false
+BOOK_MAIL_HOST=smtp.gmail.com
+BOOK_MAIL_PORT=587
+BOOK_MAIL_USERNAME=contato@tcia.com.br
+BOOK_MAIL_PASSWORD=#########
+
+BOOK_NOME_SISTEMA=Book Dinâmico
+BOOK_URL_FRONT_END=http://localhost:3001
+BOOK_URL_SITE=http://localhost:8082/book_dinamico
+BOOK_DIRETORIO=/var/dados/book-dinamico-arquivos
+BOOK_JWT_SECRET=substitua-por-string-longa-aleatoria
+```
+
+---
+
+## Observações
+
+- Nunca versionar arquivos `.env` com senhas reais.
+- Para produção, utilize variáveis de ambiente configuradas no servidor ou orquestrador (Docker/Kubernetes).

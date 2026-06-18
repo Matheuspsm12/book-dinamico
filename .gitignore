@@ -1,53 +1,76 @@
+############################
+# ===== Frontend (Node / Next.js) =====
+############################
+
+Frontend/node_modules/
+Frontend/.pnp
+Frontend/.pnp.*
+Frontend/coverage/
+Frontend/.next/
+Frontend/out/
+Frontend/build/
+Frontend/.env
+Frontend/.env.*
+!Frontend/.env.example
+Frontend/.vercel
+Frontend/*.tsbuildinfo
+Frontend/next-env.d.ts
+Frontend/npm-debug.log*
+Frontend/yarn-debug.log*
+Frontend/yarn-error.log*
+
+############################
+# ===== Backend (Java / Maven) =====
+############################
+
+Backend/target/
+Backend/build/
+!Backend/**/src/main/**/target/
+!Backend/**/src/test/**/target/
+
+Backend/.mvn/wrapper/maven-wrapper.jar
+
+Backend/*.log
+Backend/logs/
+Backend/HELP.md
+
 # Env / segredos
-.env
-.env.*
-!.env.example
-
-# Maven
-target/
-*.jar
-*.war
-
-# Logs
-logs/
-*.log
-
-# IntelliJ
-.idea/
-*.iml
-*.ipr
-*.iws
-
-# Eclipse
-.classpath
-.project
-.settings/
-
-# VS Code
-.vscode/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Spring Boot devtools
-.spring-boot-devtools.properties
-
-# Arquivos uploadados em dev (não commitar binários)
-book-dinamico-arquivos/*
-!book-dinamico-arquivos/.gitkeep
+Backend/.env
+Backend/.env.*
+!Backend/.env.example
 
 # Python venv usado pelos smoke tests
-.venv/
+Backend/.venv/
 __pycache__/
 *.pyc
 
-# ===== Frontend (Next.js) =====
-reversa-claro-book-frontend/node_modules/
-reversa-claro-book-frontend/.next/
-reversa-claro-book-frontend/.env
-reversa-claro-book-frontend/.env.*
-!reversa-claro-book-frontend/.env.example
-reversa-claro-book-frontend/.idea/
-reversa-claro-book-frontend/*.tsbuildinfo
-reversa-claro-book-frontend/next-env.d.ts
+# Uploads NÃO ficam dentro do projeto (caminho externo via BOOK_DIRETORIO)
+Backend/book-dinamico-arquivos/
+
+# STS / Spring Tool Suite
+Backend/.apt_generated
+Backend/.classpath
+Backend/.factorypath
+Backend/.project
+Backend/.settings
+Backend/.springBeans
+Backend/.sts4-cache
+
+############################
+# ===== IDEs =====
+############################
+
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+
+############################
+# ===== MISC =====
+############################
+
+.DS_Store
+Thumbs.db
+*.pem
+HELP.md
