@@ -19,12 +19,13 @@ backend-upload-book/
 │   │   ├── core/            # annotation / enums / util (transversal)
 │   │   ├── domain/          # model / repository / service / specification / exception
 │   │   └── infrastructure/  # config / security / mapper / adapter
+│   ├── src/test/java/...    # JUnit 5
 │   ├── src/main/resources/
 │   │   ├── db/migration/    # Flyway (V1..V8)
 │   │   ├── application.yaml application-dev.yaml
 │   │   └── ValidationMessages / messages / errors .properties  # i18n pt-BR
 │   ├── mvnw mvnw.cmd .mvn/
-│   └── .env.example
+│   └── README.md
 └── Frontend/            # Frontend Next.js (ver README próprio)
 ```
 
@@ -59,8 +60,8 @@ incluindo o seed do admin.
 
 ### 2. Variáveis de ambiente
 
-Copie `.env.example` para `.env` e ajuste (URL/usuário/senha do banco, `BOOK_DIRETORIO`, `BOOK_JWT_SECRET`,
-SMTP). **Nunca** commite o `.env` — ele já está no `.gitignore`.
+Configure as variáveis de ambiente (URL/usuário/senha do banco, `BOOK_DIRETORIO`, `BOOK_JWT_SECRET`,
+SMTP). A lista completa está em [`Backend/README.md`](Backend/README.md).
 
 ### 3. Backend
 
