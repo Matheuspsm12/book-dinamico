@@ -21,7 +21,6 @@ public class UsuarioResponse {
     private String email;
     private String justificativa;
     private UsuarioStatus status;
-    /** Nome do perfil (ADMIN/USUARIO) — mantém o campo "role" para o frontend. */
     private String role;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;

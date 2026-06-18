@@ -6,11 +6,9 @@ type Props = {
   label: string;
   value: number | string;
   icon: LucideIcon;
-  /** Texto pequeno acima do label (default: "DOWNLOADS"). */
   supraLabel?: string;
   meta?: { label: string; value: number | string }[];
   className?: string;
-  /** Override do tamanho da fonte do "value" (texto longo precisa reduzir). */
   valueClassName?: string;
 };
 

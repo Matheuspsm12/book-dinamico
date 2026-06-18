@@ -1,5 +1,3 @@
-// Tipos espelhando os DTOs do backend. Use SEMPRE estes — não invente shapes paralelas.
-
 export type UsuarioStatus =
   | "PENDENTE"
   | "APROVADO"
@@ -12,7 +10,7 @@ export type ExtensaoDocumento = "XLSM" | "XLSX" | "PPTX";
 
 export interface TokenResponse {
   token: string;
-  expiraEm: string; // ISO instant
+  expiraEm: string;
   nome: string;
   email: string;
   role: UsuarioRole;
@@ -59,7 +57,7 @@ export interface DocumentoResponse {
   tipo: TipoDocumento;
   extensao: ExtensaoDocumento;
   tamanhoBytes: number;
-  dataAtualizacao: string; // yyyy-MM-dd
+  dataAtualizacao: string;
   criadoEm: string;
   atualizadoEm: string;
   criadoPorId: number;
@@ -70,7 +68,7 @@ export interface DocumentoResponse {
 export interface DocumentoMetadataRequest {
   nome: string;
   descricao: string;
-  dataAtualizacao: string; // yyyy-MM-dd
+  dataAtualizacao: string;
 }
 
 export interface PageResponse<T> {

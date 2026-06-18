@@ -50,8 +50,6 @@ reversa-claro-book-frontend/.idea/
 reversa-claro-book-frontend/*.tsbuildinfo
 reversa-claro-book-frontend/next-env.d.ts
 
-# Config local de IDE/IA — não versionar
-.claude/
 
 # Uploads NÃO ficam dentro do projeto (caminho externo via BOOK_DIRETORIO)
 book-dinamico-arquivos/

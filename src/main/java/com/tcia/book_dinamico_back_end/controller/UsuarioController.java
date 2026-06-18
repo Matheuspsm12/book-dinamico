@@ -27,8 +27,6 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    // -- Público --------------------------------------------------------
-
     @Operation(summary = "Autocadastro", description = "Cria usuário com status PENDENTE (US2 / RN05–RN08).")
     @DocumentarAPI
     @PostMapping("/cadastro")
@@ -36,8 +34,6 @@ public class UsuarioController {
         UsuarioResponse response = usuarioService.cadastrar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-    // -- Usuário autenticado --------------------------------------------
 
     @Operation(summary = "Resetar minha senha por e-mail",
             description = "Gera uma nova senha temporária para o usuário autenticado e envia por e-mail.")
@@ -48,8 +44,6 @@ public class UsuarioController {
         usuarioService.resetarMinhaSenhaPorEmail();
         return ResponseEntity.noContent().build();
     }
-
-    // -- Admin (US3 / RN09–RN11) ----------------------------------------
 
     @Operation(summary = "Aprovar usuário pendente",
             description = "Transição PENDENTE→APROVADO. Aplica cap de 40 (RN15/A10/N2). Dispara e-mail.")
@@ -68,8 +62,6 @@ public class UsuarioController {
     public ResponseEntity<UsuarioResponse> rejeitar(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.rejeitar(id));
     }
-
-    // -- Admin (US4 / RN12-RN15) ---------------------------------------
 
     @Operation(summary = "Paginar usuários",
             description = "Lista paginada com filtros opcionais por status, empresa e nome (RN12/RN13).")

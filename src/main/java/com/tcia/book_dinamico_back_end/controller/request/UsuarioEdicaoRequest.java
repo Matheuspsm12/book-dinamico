@@ -4,11 +4,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/**
- * Edição admin de usuário (US4 / RN14 / A3).
- * Campos permitidos: nome, empresa, email. NÃO edita role/senha/status.
- * Todos opcionais — só os campos enviados são alterados.
- */
 @Data
 public class UsuarioEdicaoRequest {
 

@@ -6,7 +6,6 @@ export default function AuthLayout({
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#EFEFEF] p-4 md:p-8">
       <div className="flex w-full max-w-[1090px] flex-col overflow-hidden rounded-xl bg-white shadow-lg md:max-h-[90vh] md:min-h-[70vh] md:flex-row">
-        {/* Logo Section */}
         <div className="relative flex min-h-[160px] w-full flex-shrink-0 flex-col items-center justify-center bg-zinc-100 p-6 md:min-h-0 md:w-1/2 md:p-10">
           <img
             src="/img/logo_claro.svg"
@@ -25,7 +24,6 @@ export default function AuthLayout({
           </div>
         </div>
 
-        {/* Form Section */}
         <div className="flex w-full flex-col justify-center overflow-y-auto p-5 md:w-1/2 md:p-8 lg:p-10">
           {children}
         </div>

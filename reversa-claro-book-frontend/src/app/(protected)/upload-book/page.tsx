@@ -59,8 +59,6 @@ function validarArquivo(f: File | null): string | null {
   return null;
 }
 
-// ---------------------------------------------------------------------------
-
 export default function UploadBookPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -217,10 +215,6 @@ export default function UploadBookPage() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Card de cada documento
-// ---------------------------------------------------------------------------
-
 function DocCard({
   doc,
   onSubstituir,
@@ -290,10 +284,6 @@ function DocCard({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Drop-zone reusável
-// ---------------------------------------------------------------------------
-
 function FilePicker({
   file,
   onPick,
@@ -329,10 +319,6 @@ function FilePicker({
     </>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Modal: novo documento
-// ---------------------------------------------------------------------------
 
 function NovoModal({
   open,
@@ -443,7 +429,6 @@ function NovoModal({
               file={file}
               onPick={(f) => {
                 setFile(f);
-                // Auto-preenche o nome a partir do filename se ainda estiver vazio
                 if (f && !nome.trim()) setNome(inferNomeFromFilename(f.name));
               }}
             />
@@ -470,10 +455,6 @@ function NovoModal({
     </Dialog>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Modal: substituir arquivo
-// ---------------------------------------------------------------------------
 
 function SubstituirArquivoModal({
   doc,
@@ -508,9 +489,7 @@ function SubstituirArquivoModal({
     if (!file) return;
     setSubmitting(true);
     try {
-      // 1) substitui o binário
       await docsApi.substituirArquivo(doc.id, file);
-      // 2) atualiza dataAtualizacao pra hoje (backend não faz isso sozinho — vide DocumentoService.substituirArquivo)
       const hoje = hojeLocal();
       const updated = await docsApi.atualizarMetadados(doc.id, {
         nome: doc.nome,
@@ -576,10 +555,6 @@ function SubstituirArquivoModal({
     </Dialog>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Modal: editar metadados
-// ---------------------------------------------------------------------------
 
 function EditarMetadadosModal({
   doc,
@@ -697,10 +672,6 @@ function EditarMetadadosModal({
     </Dialog>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Modal: excluir (soft delete)
-// ---------------------------------------------------------------------------
 
 function ExcluirModal({
   doc,

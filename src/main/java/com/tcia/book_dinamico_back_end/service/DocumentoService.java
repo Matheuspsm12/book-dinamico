@@ -26,10 +26,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Phase 5 — US6 + US7. Upload/edit/replace/listagem/download de documentos.
- * Endpoints admin gateados por {@code @PreAuthorize("hasRole('ADMIN')")} no controller.
- */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -41,10 +37,6 @@ public class DocumentoService {
     private final ArquivoStorageService storage;
     private final IntegridadeArquivoValidator integridadeValidator;
     private final AuthUtils authUtils;
-
-    // ------------------------------------------------------------------
-    // Listagem (US6 — RN16/RN19/RN29) — disponível pra qualquer autenticado
-    // ------------------------------------------------------------------
 
     public List<DocumentoResponse> listar() {
         return documentoMapper.toResponseList(
@@ -69,10 +61,6 @@ public class DocumentoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Documento não encontrado: " + id));
     }
 
-    // ------------------------------------------------------------------
-    // Upload (US7 — RN20-RN32) — admin only
-    // ------------------------------------------------------------------
-
     @Transactional
     public DocumentoResponse criar(DocumentoMetadataRequest metadata, MultipartFile arquivo) {
         Usuario admin = adminLogado();
@@ -85,7 +73,7 @@ public class DocumentoService {
                 .tipo(ext.getTipo())
                 .extensao(ext)
                 .tamanhoBytes(arquivo.getSize())
-                .caminhoArmazenamento("__placeholder__") // gravado abaixo após ter id
+                .caminhoArmazenamento("__placeholder__")
                 .criadoPor(admin)
                 .atualizadoPor(admin)
                 .ativo(true)
@@ -109,17 +97,12 @@ public class DocumentoService {
             throw new NegocioException("erro-lote-quantidades-divergentes");
         }
         List<DocumentoResponse> respostas = new ArrayList<>(metadatas.size());
-        // Falha em um → rollback de todos (transação @Transactional)
         for (int i = 0; i < metadatas.size(); i++) {
             respostas.add(criar(metadatas.get(i), arquivos.get(i)));
         }
         return respostas;
     }
 
-    /**
-     * Substituição de versão (RN25/RN26/N1). Apenas o binário muda; metadata é preservada.
-     * O arquivo antigo é apagado do filesystem após o novo ser gravado com sucesso.
-     */
     @Transactional
     public DocumentoResponse substituirArquivo(Long id, MultipartFile arquivo) {
         Usuario admin = adminLogado();
@@ -134,7 +117,6 @@ public class DocumentoService {
         doc.setExtensao(novaExt);
         doc.setTipo(novaExt.getTipo());
         doc.setAtualizadoPor(admin);
-        // dataAtualizacao NÃO é tocada — é campo manual do admin (A6).
 
         Documento salvo = documentoRepository.save(doc);
         storage.deletarSeExistir(caminhoAntigo);
@@ -144,7 +126,6 @@ public class DocumentoService {
         return documentoMapper.toResponse(salvo);
     }
 
-    /** Edita só metadata — não toca no binário (PUT /{id}). */
     @Transactional
     public DocumentoResponse atualizarMetadados(Long id, DocumentoMetadataRequest request) {
         Documento doc = buscarOuFalhar(id);
@@ -163,11 +144,9 @@ public class DocumentoService {
     @Transactional
     public void deletar(Long id) {
         Documento doc = buscarOuFalhar(id);
-        documentoRepository.delete(doc); // dispara @SQLDelete (soft delete)
+        documentoRepository.delete(doc);
         log.info("Documento soft-deletado id={}", id);
     }
-
-    // ------------------------------------------------------------------
 
     private void registrarUploadLog(Documento doc, Usuario admin, String nomeArquivoOriginal) {
         uploadLogRepository.save(DocumentoUploadLog.builder()

@@ -241,10 +241,6 @@ export default function BookDownloadPage() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Modal: editar metadata (nome/descricao/data)
-// ---------------------------------------------------------------------------
-
 function QuickEditModal({
   doc,
   onClose,
@@ -332,10 +328,6 @@ function QuickEditModal({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Modal: trocar arquivo (também atualiza data pra hoje)
-// ---------------------------------------------------------------------------
-
 function QuickReplaceModal({
   doc,
   onClose,
@@ -358,9 +350,7 @@ function QuickReplaceModal({
     if (!file) return;
     setSubmitting(true);
     try {
-      // 1) substitui o binário
       await docsApi.substituirArquivo(doc.id, file);
-      // 2) ajusta a data de atualização pra hoje (backend não faz isso sozinho)
       const hoje = hojeLocal();
       await docsApi.atualizarMetadados(doc.id, {
         nome: doc.nome,

@@ -45,7 +45,6 @@ public class UsuarioSpecifications {
         };
     }
 
-    /** Lowercase + remove acentos no lado do Java; espelhamos com unaccent() no lado do DB. */
     private String normalizar(String s) {
         return Normalizer.normalize(s, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")

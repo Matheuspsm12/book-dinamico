@@ -2,9 +2,6 @@ package com.tcia.book_dinamico_back_end.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/**
- * Utilitário para extrair o IP real do cliente, levando em conta proxies/load balancers.
- */
 public final class RecuperarIpUtils {
 
     private static final String[] HEADERS_PROXY = {

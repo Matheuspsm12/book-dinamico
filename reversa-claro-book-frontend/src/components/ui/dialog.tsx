@@ -13,7 +13,6 @@ type Props = {
   description?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
-  /** Max width do conteúdo. Default md. */
   size?: "sm" | "md" | "lg";
 };
 

@@ -1,6 +1,3 @@
-// Persistência do token + perfil mínimo do usuário logado.
-// Modo "permanecerLogado" usa localStorage; senão sessionStorage (some ao fechar a aba).
-
 import type { UsuarioRole } from "./api/types";
 
 const TOKEN_KEY = "rcb_token";
@@ -16,7 +13,6 @@ export interface AuthSession {
 
 function pickStorage(): Storage | null {
   if (typeof window === "undefined") return null;
-  // Se a chave existir em localStorage, usar localStorage; senão sessionStorage.
   if (window.localStorage.getItem(TOKEN_KEY)) return window.localStorage;
   return window.sessionStorage;
 }

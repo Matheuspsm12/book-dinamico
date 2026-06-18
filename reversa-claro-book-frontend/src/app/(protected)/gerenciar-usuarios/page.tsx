@@ -50,12 +50,10 @@ export default function GerenciarUsuariosPage() {
     }
   }, [statusFilter, empresaFilter, q]);
 
-  // Redireciona não-admin
   useEffect(() => {
     if (!loading && user && user.role !== "ADMIN") router.replace("/book");
   }, [user, loading, router]);
 
-  // Recarrega quando filtros mudam (debounce simples no nome)
   useEffect(() => {
     if (user?.role !== "ADMIN") return;
     const t = setTimeout(() => {
@@ -237,7 +235,6 @@ export default function GerenciarUsuariosPage() {
                               Reativar
                             </Button>
                           )}
-                          {/* REJEITADO: backend não permite reversão direta. */}
                         </div>
                       </td>
                     </tr>

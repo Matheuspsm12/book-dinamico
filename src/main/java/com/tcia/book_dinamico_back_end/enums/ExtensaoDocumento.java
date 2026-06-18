@@ -3,9 +3,6 @@ package com.tcia.book_dinamico_back_end.enums;
 import java.util.Locale;
 import java.util.Optional;
 
-/**
- * Extensão whitelist (RN21 / A5). XLSM e XLSX mapeiam pra EXCEL; PPTX pra POWERPOINT.
- */
 public enum ExtensaoDocumento {
     XLSM(TipoDocumento.EXCEL),
     XLSX(TipoDocumento.EXCEL),
@@ -21,7 +18,6 @@ public enum ExtensaoDocumento {
         return tipo;
     }
 
-    /** Resolve uma string como "xlsm" / ".XLSX" / "pptx" pra um enum, se válida. */
     public static Optional<ExtensaoDocumento> fromString(String raw) {
         if (raw == null) return Optional.empty();
         String normalizada = raw.toUpperCase(Locale.ROOT).trim();
@@ -35,7 +31,6 @@ public enum ExtensaoDocumento {
         }
     }
 
-    /** Extrai a extensão de um nome de arquivo e tenta resolver. */
     public static Optional<ExtensaoDocumento> fromFilename(String filename) {
         if (filename == null) return Optional.empty();
         int dot = filename.lastIndexOf('.');

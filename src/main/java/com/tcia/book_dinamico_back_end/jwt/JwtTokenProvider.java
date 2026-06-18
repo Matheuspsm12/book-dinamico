@@ -20,11 +20,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * Emissão e validação de JWT. HMAC256, issuer fixo, expiry 30 min (D4).
- * Claims: subject=email, nome, role, status, fp (fingerprint IP+UA — D3), jti.
- * Sem permissoes/lojas como em TCIA — não se aplica ao escopo Book Dinâmico.
- */
 @Log4j2
 @Service
 @RequiredArgsConstructor

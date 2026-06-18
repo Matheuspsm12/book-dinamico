@@ -66,7 +66,6 @@ export async function desativar(id: number) {
   return data;
 }
 
-/** Solicita reset de senha do usuário autenticado — backend envia nova senha por e-mail. */
 export async function resetarMinhaSenhaPorEmail() {
   await api.post("/api/usuarios/me/resetar-senha");
 }

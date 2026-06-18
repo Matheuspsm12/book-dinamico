@@ -18,10 +18,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Persiste binários de documentos no filesystem em {@code ${app.diretorio}} (D7).
- * Convenção de nome: {@code documento_{id}_{yyyyMMddHHmmss}.{ext}} — não colide entre versões.
- */
 @Log4j2
 @Service
 public class ArquivoStorageService {
@@ -44,13 +40,6 @@ public class ArquivoStorageService {
         }
     }
 
-    /**
-     * Grava o arquivo no filesystem e devolve o caminho absoluto.
-     *
-     * @param documentoId id do documento (usado no nome do arquivo)
-     * @param extensao    extensão em lowercase (xlsm/xlsx/pptx)
-     * @param arquivo     binário recebido
-     */
     public String gravar(Long documentoId, String extensao, MultipartFile arquivo) {
         String nome = "documento_%d_%s.%s".formatted(
                 documentoId,
@@ -66,7 +55,6 @@ public class ArquivoStorageService {
         return destino.toString();
     }
 
-    /** Apaga arquivo físico anterior — usado em substituição (RN25/RN26). */
     public void deletarSeExistir(String caminho) {
         if (caminho == null || caminho.isBlank()) return;
         try {

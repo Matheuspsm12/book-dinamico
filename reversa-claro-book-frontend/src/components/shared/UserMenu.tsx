@@ -22,7 +22,6 @@ export function UserMenu() {
   const [showSenha, setShowSenha] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  // Fecha ao clicar fora
   useEffect(() => {
     function onDoc(ev: MouseEvent) {
       if (!wrapRef.current?.contains(ev.target as Node)) setOpen(false);

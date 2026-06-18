@@ -15,10 +15,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
 
-    /**
-     * Cadastro → Entity. Campos sensíveis (id, status, role, senha_hash, auditoria,
-     * decisão de aprovação) NÃO vêm do cliente — são preenchidos pelo service.
-     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "senhaHash", ignore = true)
     @Mapping(target = "status", ignore = true)
@@ -35,11 +31,6 @@ public interface UsuarioMapper {
 
     List<UsuarioResponse> toResponseList(List<Usuario> usuarios);
 
-    /**
-     * Atualização parcial (Phase 4 — RN14 / A3): admin edita nome/empresa/email.
-     * Demais campos são ignorados independentemente do payload. Campos nulos no DTO
-     * NÃO sobrescrevem a entidade (NullValuePropertyMappingStrategy.IGNORE).
-     */
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "senhaHash", ignore = true)

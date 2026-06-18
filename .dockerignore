@@ -11,7 +11,6 @@ logs/
 book-dinamico-arquivos/
 tests/
 reversa-claro-book-frontend/
-.claude/
 .env
 .env.*
 *.md

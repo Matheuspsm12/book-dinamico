@@ -12,7 +12,5 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 *.log
-.claude/
 README.md
 AGENTS.md
-CLAUDE.md

@@ -14,6 +14,5 @@ public class TokenResponse {
     private Instant expiraEm;
     private String nome;
     private String email;
-    /** Nome do perfil (ADMIN/USUARIO) — mantém o campo "role" para o frontend. */
     private String role;
 }

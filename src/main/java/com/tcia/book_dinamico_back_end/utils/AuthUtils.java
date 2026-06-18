@@ -19,10 +19,6 @@ public class AuthUtils {
         this.usuarioRepository = usuarioRepository;
     }
 
-    /**
-     * Retorna o usuário logado a partir do {@link SecurityContextHolder}.
-     * Retorna {@code null} se não houver autenticação válida.
-     */
     public Usuario getUsuarioLogado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof User user) {

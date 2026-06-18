@@ -34,15 +34,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Carrega sessão persistida ao montar
   useEffect(() => {
     setUser(getSession());
     setLoading(false);
   }, []);
 
-  // Guard de rotas. Comportamento original:
-  //  - sem user em rota protegida → /login
-  //  - com user em rota de auth → /dashboard (admin) ou /book (usuario)
   useEffect(() => {
     if (loading) return;
     const isAuthRoute = pathname === "/login" || pathname === "/cadastro";
@@ -70,9 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function signOut() {
     try {
       await authApi.logout();
-    } catch {
-      // ignore — limpa sessão local de qualquer jeito
-    }
+    } catch {}
     clearSession();
     setUser(null);
     router.replace("/login");

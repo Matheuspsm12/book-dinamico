@@ -18,7 +18,6 @@ const api = axios.create({
   },
 });
 
-// Injeta token + fingerprint do dispositivo (padrão TCIA / D3).
 api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
@@ -32,7 +31,6 @@ api.interceptors.request.use((config) => {
     }
   }
 
-  // Uploads (FormData) podem demorar — estende o timeout só para eles.
   if (typeof FormData !== "undefined" && config.data instanceof FormData) {
     config.timeout = MULTIPART_TIMEOUT_MS;
   }
@@ -40,7 +38,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Desempacota o envelope ApiErrorBody do GlobalExceptionHandler em mensagem amigável.
 api.interceptors.response.use(
   (response) => response,
   (error) => {

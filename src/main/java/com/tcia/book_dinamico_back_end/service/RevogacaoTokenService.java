@@ -9,11 +9,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Blacklist de tokens JWT revogados (logout).
- * In-memory via Caffeine — match padrão TCIA. Entradas expiram automaticamente após 30 min
- * (mesmo TTL do JWT — D4). Risco aceito: tokens revogados ressuscitam após restart do app.
- */
 @Service
 @Log4j2
 public class RevogacaoTokenService {

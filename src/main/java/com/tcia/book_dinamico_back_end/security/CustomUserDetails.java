@@ -7,10 +7,6 @@ import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
 
-/**
- * Wrapper sobre {@link Usuario} para integrar com Spring Security.
- * Padrão TCIA: estende {@link User} e mantém a entidade acessível via {@link #getUsuario()}.
- */
 public class CustomUserDetails extends User {
 
     private static final long serialVersionUID = 1L;

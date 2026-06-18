@@ -27,8 +27,6 @@ public class DocumentoController {
 
     private final DocumentoService documentoService;
 
-    // -- Usuários autenticados (US5 — RN16/RN17) ------------------------
-
     @Operation(summary = "Listar documentos", description = "Documentos ativos ordenados por última atualização.")
     @DocumentarAPI
     @GetMapping
@@ -57,8 +55,6 @@ public class DocumentoController {
                         ContentDisposition.attachment().filename(filename).build().toString())
                 .body(r);
     }
-
-    // -- Admin (US7 — RN20-RN32) ---------------------------------------
 
     @Operation(summary = "Upload de um documento",
             description = "Multipart: 'metadata' (JSON) + 'arquivo' (binário). Valida extensão, magic bytes, tamanho. Admin only.")

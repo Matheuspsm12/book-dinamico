@@ -35,7 +35,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    /** Cap de usuários APROVADO simultaneamente (RN15 / A10 / N2). */
     public static final long CAP_USUARIOS_APROVADOS = 40L;
 
     private static final String PERFIL_USUARIO = "USUARIO";
@@ -48,10 +47,6 @@ public class UsuarioService {
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailAdapter emailAdapter;
     private final AuthUtils authUtils;
-
-    // ------------------------------------------------------------------
-    // Autenticação (Phase 1 — US1)
-    // ------------------------------------------------------------------
 
     public TokenResponse autenticar(LoginRequest request, HttpServletRequest httpRequest) {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
@@ -85,10 +80,6 @@ public class UsuarioService {
         }
     }
 
-    // ------------------------------------------------------------------
-    // Autocadastro (Phase 2 — US2)
-    // ------------------------------------------------------------------
-
     @Transactional
     public UsuarioResponse cadastrar(UsuarioCadastroRequest request) {
         validarEmailUnico(request.getEmail());
@@ -110,10 +101,6 @@ public class UsuarioService {
             throw new NegocioException("erro-email-duplicado");
         }
     }
-
-    // ------------------------------------------------------------------
-    // Aprovação / rejeição (Phase 3 — US3 / RN09-RN11)
-    // ------------------------------------------------------------------
 
     @Transactional
     public UsuarioResponse aprovar(Long usuarioId) {
@@ -170,27 +157,17 @@ public class UsuarioService {
     private Usuario adminLogado() {
         Usuario admin = authUtils.getUsuarioLogado();
         if (admin == null) {
-            // não deveria acontecer: endpoint exige hasRole(ADMIN), mas defesa em profundidade
             throw new ErroAutenticacaoException("erro-credenciais-invalidas");
         }
         return admin;
     }
 
-    // ------------------------------------------------------------------
-    // Reset de senha por e-mail (usuário logado solicita nova senha)
-    // ------------------------------------------------------------------
-
-    /**
-     * Gera uma senha temporária aleatória para o usuário autenticado, persiste
-     * o hash e dispara e-mail com a senha em texto plano. Idempotente.
-     */
     @Transactional
     public void resetarMinhaSenhaPorEmail() {
         Usuario usuario = authUtils.getUsuarioLogado();
         if (usuario == null) {
             throw new ErroAutenticacaoException("erro-credenciais-invalidas");
         }
-        // Sem e-mail ativo a nova senha ficaria perdida e o usuário fora do sistema.
         if (!emailAdapter.isHabilitado()) {
             throw new NegocioException("email-desabilitado");
         }
@@ -202,17 +179,12 @@ public class UsuarioService {
     }
 
     private static String gerarSenhaTemporaria() {
-        // 10 chars: letras maiúsculas + minúsculas + dígitos (sem ambíguos 0/O/1/l/I)
         final String alfabeto = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
         java.security.SecureRandom rnd = new java.security.SecureRandom();
         StringBuilder sb = new StringBuilder(10);
         for (int i = 0; i < 10; i++) sb.append(alfabeto.charAt(rnd.nextInt(alfabeto.length())));
         return sb.toString();
     }
-
-    // ------------------------------------------------------------------
-    // Gerenciamento (Phase 4 — US4 / RN12-RN15 / A3)
-    // ------------------------------------------------------------------
 
     public Page<UsuarioResponse> paginar(UsuarioFiltroRequest filtro, Pageable pageable) {
         Specification<Usuario> spec = usuarioSpecifications.comFiltros(filtro);
@@ -252,7 +224,6 @@ public class UsuarioService {
         if (usuario.getStatus() != UsuarioStatus.DESATIVADO) {
             throw new NegocioException("erro-usuario-nao-desativado");
         }
-        // Reativação reentra no cap de 40 APROVADOs.
         validarCapAprovados();
         usuario.setStatus(UsuarioStatus.APROVADO);
         Usuario salvo = usuarioRepository.save(usuario);

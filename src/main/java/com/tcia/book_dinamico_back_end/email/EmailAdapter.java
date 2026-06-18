@@ -14,10 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
-/**
- * Envio de e-mails do portal. @Async — falha não bloqueia o request HTTP.
- * Gate {@code app.email.habilitado} permite desligar SMTP em DEV/teste sem alterar código.
- */
 @Log4j2
 @Component
 @RequiredArgsConstructor
@@ -31,7 +27,6 @@ public class EmailAdapter {
     @Value("${app.email.remetente}")
     private String remetente;
 
-    /** Indica se o envio de e-mails está ativo (configurado em {@code app.email.habilitado}). */
     public boolean isHabilitado() {
         return habilitado;
     }

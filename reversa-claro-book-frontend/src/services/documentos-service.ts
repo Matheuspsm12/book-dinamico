@@ -16,7 +16,6 @@ export async function buscar(id: number) {
 
 export async function criar(metadata: DocumentoMetadataRequest, arquivo: File) {
   const form = new FormData();
-  // Spring exige metadata como part JSON — anexamos como Blob com tipo correto
   form.append(
     "metadata",
     new Blob([JSON.stringify(metadata)], { type: "application/json" }),
@@ -51,10 +50,6 @@ export async function deletar(id: number) {
   await api.delete(`/api/documentos/${id}`);
 }
 
-/**
- * Baixa o binário do documento como Blob. Necessário porque o endpoint exige
- * cabeçalho Authorization (não dá pra usar <a href> simples).
- */
 export async function baixar(id: number): Promise<Blob> {
   const { data } = await api.get(`/api/documentos/${id}/download`, {
     responseType: "blob",
@@ -62,9 +57,6 @@ export async function baixar(id: number): Promise<Blob> {
   return data as Blob;
 }
 
-/**
- * Dispara o download no navegador a partir de um Blob.
- */
 export function salvarBlob(blob: Blob, nomeArquivo: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

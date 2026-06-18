@@ -9,13 +9,6 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * Permissão (base padrão TCIA — definida pelo Efren).
- *
- * @author TCIA
- * @version 1.0
- * @since 1.0
- */
 @Data
 @Builder
 @AllArgsConstructor

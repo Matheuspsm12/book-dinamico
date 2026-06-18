@@ -13,14 +13,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Perfil de acesso (base padrão TCIA — definida pelo Efren). No Book Dinâmico os perfis
- * são ADMIN e USUARIO, substituindo o antigo enum {@code role}.
- *
- * @author TCIA
- * @version 1.0
- * @since 1.0
- */
 @Data
 @Builder
 @AllArgsConstructor

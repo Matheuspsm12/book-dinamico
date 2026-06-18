@@ -33,5 +33,4 @@ public class DocumentoResponse {
     private Long criadoPorId;
     private Long atualizadoPorId;
     private Boolean ativo;
-    // Nunca exposto: caminhoArmazenamento (caminho interno do filesystem).
 }
