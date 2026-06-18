@@ -52,13 +52,13 @@ spring:
     username: ${BOOK_DB_USERNAME}
     password: ${BOOK_DB_PASSWORD}
     hikari:
-      maximum-pool-size: 15
-      minimum-idle: 5
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      connection-timeout: 60000
-      validation-timeout: 5000
-      connection-test-query: SELECT 1
+      maximum-pool-size: 60           # Número máximo de conexões simultâneas no pool
+      minimum-idle: 20                # Conexões mínimas ociosas mantidas no pool
+      idle-timeout: 600000            # (ms) Tempo que uma conexão ociosa pode ficar no pool antes de ser removida (10 min)
+      max-lifetime: 1800000           # (ms) Vida máxima de uma conexão no pool (30 min)
+      connection-timeout: 60000       # (ms) Tempo máximo para aguardar uma conexão antes de lançar exceção (30s)
+      validation-timeout: 5000        # (ms) Tempo de timeout para validação da conexão
+      connection-test-query: SELECT 1 # Consulta de teste usada para validar conexões
   flyway:
     baseline-on-migrate: true
     baseline-version: 1
