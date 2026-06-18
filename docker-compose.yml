@@ -30,7 +30,7 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ./Backend
       dockerfile: Dockerfile
     depends_on:
       db:
@@ -60,7 +60,7 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./Frontend
       dockerfile: Dockerfile
       args:
         # API URL precisa ser build-time pra ser embutida no bundle estático

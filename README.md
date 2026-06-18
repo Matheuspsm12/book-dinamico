@@ -4,7 +4,7 @@ Portal para distribuição controlada de _books_ dinâmicos (planilhas e apresen
 Usuários se cadastram, um administrador aprova o acesso, e os aprovados visualizam e baixam os documentos
 publicados. O administrador faz o upload, a substituição de versões e a curadoria dos arquivos.
 
-Monorepo com **backend Spring Boot** (`backend/`) e **frontend Next.js** (`frontend/`),
+Monorepo com **backend Spring Boot** (`Backend/`) e **frontend Next.js** (`Frontend/`),
 seguindo o padrão dos projetos `reversa-claro-devolucao` da TCIA.
 
 ---
@@ -13,23 +13,20 @@ seguindo o padrão dos projetos `reversa-claro-devolucao` da TCIA.
 
 ```
 backend-upload-book/
-├── backend/                                         # Backend Spring Boot
+├── Backend/                                         # Backend Spring Boot
 │   ├── src/main/java/com/tcia/book_dinamico_back_end/
-│   │   ├── config/        # SecurityConfig, JwtFilter, AppConfig
-│   │   ├── controller/    # REST + request/response/mapper (MapStruct)
-│   │   ├── service/       # Regras de negócio
-│   │   ├── repository/    # Spring Data JPA + specifications
-│   │   ├── entity/        # Entidades JPA
-│   │   ├── jwt/ security/ # Emissão/validação de JWT, UserDetails
-│   │   ├── exception/     # Exceções de domínio + GlobalExceptionHandler
-│   │   └── email/ enums/ utils/ annotations/
+│   │   ├── api/             # controller / request / response (camada de entrada)
+│   │   ├── core/            # annotation / enums / util (transversal)
+│   │   ├── domain/          # model / repository / service / specification / exception
+│   │   └── infrastructure/  # config / security / mapper / adapter
 │   ├── src/main/resources/
-│   │   ├── db/migration/  # Flyway (V1..V8)
-│   │   ├── application.yml application-dev.yml
+│   │   ├── db/migration/    # Flyway (V1..V8)
+│   │   ├── application.yaml application-dev.yaml
 │   │   └── ValidationMessages / messages / errors .properties  # i18n pt-BR
+│   ├── mvnw mvnw.cmd .mvn/
 │   ├── Dockerfile
 │   └── .env.example
-├── frontend/             # Frontend Next.js (ver README próprio)
+├── Frontend/             # Frontend Next.js (ver README próprio)
 ├── docker-compose.yml
 └── render.yaml
 ```
@@ -71,7 +68,7 @@ SMTP). **Nunca** commite o `.env` — ele já está no `.gitignore`.
 ### 3. Backend
 
 ```bash
-cd backend
+cd Backend
 mvn clean package -DskipTests
 java -jar target/book_dinamico_backend-0.0.1-SNAPSHOT.jar
 ```
@@ -82,7 +79,7 @@ java -jar target/book_dinamico_backend-0.0.1-SNAPSHOT.jar
 ### 4. Frontend
 
 ```bash
-cd frontend
+cd Frontend
 npm install
 npm run dev      # http://localhost:3000
 ```
