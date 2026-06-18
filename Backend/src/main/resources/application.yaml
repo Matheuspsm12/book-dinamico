@@ -46,8 +46,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: true
   datasource:
-    # BOOK_DB_URL completo (local/docker-compose) > composto a partir das partes (Render)
-    # BOOK_DB_PARAMS opcional (ex: "?sslmode=require" no Render; vazio localmente)
     url: ${BOOK_DB_URL:jdbc:postgresql://${BOOK_DB_HOST:localhost}:${BOOK_DB_PORT:5432}/${BOOK_DB_NAME:book_dinamico}${BOOK_DB_PARAMS:}}
     username: ${BOOK_DB_USERNAME}
     password: ${BOOK_DB_PASSWORD}

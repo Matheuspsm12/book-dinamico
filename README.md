@@ -24,11 +24,8 @@ backend-upload-book/
 │   │   ├── application.yaml application-dev.yaml
 │   │   └── ValidationMessages / messages / errors .properties  # i18n pt-BR
 │   ├── mvnw mvnw.cmd .mvn/
-│   ├── Dockerfile
 │   └── .env.example
-├── Frontend/             # Frontend Next.js (ver README próprio)
-├── docker-compose.yml
-└── render.yaml
+└── Frontend/            # Frontend Next.js (ver README próprio)
 ```
 
 ## Stack
@@ -53,7 +50,7 @@ HMAC256, expiry 30 min) · MapStruct · springdoc-openapi (Swagger) · Lombok.
 
 ## Rodando localmente
 
-> Pré-requisitos: **JDK 17**, **Node 20+**, **PostgreSQL** e **Maven** (ou Docker).
+> Pré-requisitos: **JDK 17**, **Node 20+**, **PostgreSQL** e **Maven**.
 
 ### 1. Banco de dados
 
@@ -85,14 +82,6 @@ npm run dev      # http://localhost:3000
 ```
 
 O frontend consome a API em `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8082/book_dinamico`).
-
-### Docker (alternativa)
-
-```bash
-docker compose up --build
-```
-
-Sobe Postgres + backend + frontend já configurados.
 
 ### Admin inicial (seed)
 
