@@ -1,36 +1,36 @@
-'use client'
+"use client";
 
-import { Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/contexts/AuthContext'
+import { Button } from "src/components/ui/button";
+import { Input } from "src/components/ui/input";
+import { Label } from "src/components/ui/label";
+import { useAuth } from "src/contexts/AuthContext";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { signIn } = useAuth()
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
-  const [permanecerLogado, setPermanecerLogado] = useState(false)
-  const [mostrarSenha, setMostrarSenha] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const { signIn } = useAuth();
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [permanecerLogado, setPermanecerLogado] = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setErr(null)
-    setLoading(true)
+    e.preventDefault();
+    setErr(null);
+    setLoading(true);
     try {
-      const session = await signIn(email, senha, permanecerLogado)
-      router.replace(session.role === 'ADMIN' ? '/dashboard' : '/book')
+      const session = await signIn(email, senha, permanecerLogado);
+      router.replace(session.role === "ADMIN" ? "/dashboard" : "/book");
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Erro ao entrar.')
+      setErr(e instanceof Error ? e.message : "Erro ao entrar.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -67,7 +67,7 @@ export default function LoginPage() {
           <div className="relative">
             <Input
               id="password"
-              type={mostrarSenha ? 'text' : 'password'}
+              type={mostrarSenha ? "text" : "password"}
               autoComplete="current-password"
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
@@ -78,7 +78,7 @@ export default function LoginPage() {
               type="button"
               onClick={() => setMostrarSenha(!mostrarSenha)}
               className="absolute top-1/2 right-2 flex h-8 w-8 -translate-y-1/2 items-center justify-center text-zinc-400 transition-colors hover:text-zinc-700"
-              aria-label={mostrarSenha ? 'Esconder senha' : 'Mostrar senha'}
+              aria-label={mostrarSenha ? "Esconder senha" : "Mostrar senha"}
             >
               {mostrarSenha ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
@@ -106,7 +106,7 @@ export default function LoginPage() {
           className="h-auto w-full bg-zinc-900 py-3 text-base text-white hover:bg-zinc-800"
           disabled={loading}
         >
-          {loading ? 'Carregando...' : 'Login'}
+          {loading ? "Carregando..." : "Login"}
         </Button>
       </form>
 
@@ -128,5 +128,5 @@ export default function LoginPage() {
         <p>admin@claro.com.br / admin</p>
       </div>
     </>
-  )
+  );
 }

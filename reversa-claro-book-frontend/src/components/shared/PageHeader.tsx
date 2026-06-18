@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import { UserMenu } from '@/components/shared/UserMenu'
+import { UserMenu } from "src/components/shared/UserMenu";
 
 export function PageHeader({
   title,
   subtitle,
 }: {
-  title: string
-  subtitle?: string
+  title: string;
+  subtitle?: string;
 }) {
   return (
     <header className="flex items-start justify-between pb-6">
@@ -17,5 +17,5 @@ export function PageHeader({
       </div>
       <UserMenu />
     </header>
-  )
+  );
 }

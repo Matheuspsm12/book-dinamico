@@ -1,24 +1,24 @@
-import type { LucideIcon } from 'lucide-react'
+import type { LucideIcon } from "lucide-react";
 
-import { cn } from '@/lib/utils'
+import { cn } from "src/lib/utils";
 
 type Props = {
-  label: string
-  value: number | string
-  icon: LucideIcon
+  label: string;
+  value: number | string;
+  icon: LucideIcon;
   /** Texto pequeno acima do label (default: "DOWNLOADS"). */
-  supraLabel?: string
-  meta?: { label: string; value: number | string }[]
-  className?: string
+  supraLabel?: string;
+  meta?: { label: string; value: number | string }[];
+  className?: string;
   /** Override do tamanho da fonte do "value" (texto longo precisa reduzir). */
-  valueClassName?: string
-}
+  valueClassName?: string;
+};
 
 export function StatCard({
   label,
   value,
   icon: Icon,
-  supraLabel = 'DOWNLOADS',
+  supraLabel = "DOWNLOADS",
   meta,
   className,
   valueClassName,
@@ -26,8 +26,8 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm',
-        'min-w-[200px]',
+        "flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm",
+        "min-w-[200px]",
         className,
       )}
     >
@@ -42,7 +42,7 @@ export function StatCard({
           {label}
         </p>
       </div>
-      <p className={cn('font-bold text-4xl text-zinc-900', valueClassName)}>
+      <p className={cn("font-bold text-4xl text-zinc-900", valueClassName)}>
         {value}
       </p>
       {meta && meta.length > 0 && (
@@ -52,11 +52,11 @@ export function StatCard({
               key={m.label}
               className="inline-flex rounded-md bg-zinc-100 px-2 py-1 font-medium text-[11px] text-zinc-600"
             >
-              {m.value === '' ? m.label : `${m.label}: ${m.value}`}
+              {m.value === "" ? m.label : `${m.label}: ${m.value}`}
             </span>
           ))}
         </div>
       )}
     </div>
-  )
+  );
 }

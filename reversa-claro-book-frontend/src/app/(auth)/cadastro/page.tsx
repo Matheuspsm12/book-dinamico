@@ -1,1 +1,1 @@
-export { default } from '@/features/auth/cadastro-view'
+export { default } from "src/features/auth/cadastro-view";

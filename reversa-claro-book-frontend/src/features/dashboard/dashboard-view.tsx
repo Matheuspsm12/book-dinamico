@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   CheckCircle2,
@@ -7,62 +7,64 @@ import {
   FileText,
   Users,
   X,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
-import { PageHeader } from '@/components/shared/PageHeader'
-import { StatCard } from '@/components/shared/StatCard'
-import type { DocumentoResponse } from '@/lib/api/types'
-import * as docsApi from '@/services/documentos-service'
-import * as usuariosApi from '@/services/usuarios-service'
+import { PageHeader } from "src/components/shared/PageHeader";
+import { StatCard } from "src/components/shared/StatCard";
+import type { DocumentoResponse } from "src/lib/api/types";
+import * as docsApi from "src/services/documentos-service";
+import * as usuariosApi from "src/services/usuarios-service";
 
 type Counts = {
-  documentos: number
-  pendentes: number
-  aprovados: number
-  rejeitados: number
-}
+  documentos: number;
+  pendentes: number;
+  aprovados: number;
+  rejeitados: number;
+};
 
 export default function DashboardPage() {
-  const [docs, setDocs] = useState<DocumentoResponse[]>([])
+  const [docs, setDocs] = useState<DocumentoResponse[]>([]);
   const [counts, setCounts] = useState<Counts>({
     documentos: 0,
     pendentes: 0,
     aprovados: 0,
     rejeitados: 0,
-  })
-  const [loading, setLoading] = useState(true)
-  const [err, setErr] = useState<string | null>(null)
+  });
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    let mounted = true
+    let mounted = true;
     Promise.all([
       docsApi.listar(),
-      usuariosApi.paginar({ status: 'PENDENTE' }, 0, 1),
-      usuariosApi.paginar({ status: 'APROVADO' }, 0, 1),
-      usuariosApi.paginar({ status: 'REJEITADO' }, 0, 1),
+      usuariosApi.paginar({ status: "PENDENTE" }, 0, 1),
+      usuariosApi.paginar({ status: "APROVADO" }, 0, 1),
+      usuariosApi.paginar({ status: "REJEITADO" }, 0, 1),
     ])
       .then(([documentos, pend, aprov, rej]) => {
-        if (!mounted) return
-        setDocs(documentos)
+        if (!mounted) return;
+        setDocs(documentos);
         setCounts({
           documentos: documentos.length,
           pendentes: pend.totalElements,
           aprovados: aprov.totalElements,
           rejeitados: rej.totalElements,
-        })
+        });
       })
       .catch((e) => {
         if (mounted)
-          setErr(e instanceof Error ? e.message : 'Erro ao carregar dashboard.')
+          setErr(
+            e instanceof Error ? e.message : "Erro ao carregar dashboard.",
+          );
       })
       .finally(() => {
-        if (mounted) setLoading(false)
-      })
+        if (mounted) setLoading(false);
+      });
     return () => {
-      mounted = false
-    }
-  }, [])
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div>
@@ -83,25 +85,25 @@ export default function DashboardPage() {
           <StatCard
             supraLabel="USUÁRIOS"
             label="Aprovados"
-            value={loading ? '…' : counts.aprovados}
+            value={loading ? "…" : counts.aprovados}
             icon={CheckCircle2}
           />
           <StatCard
             supraLabel="USUÁRIOS"
             label="Pendentes"
-            value={loading ? '…' : counts.pendentes}
+            value={loading ? "…" : counts.pendentes}
             icon={Clock}
           />
           <StatCard
             supraLabel="USUÁRIOS"
             label="Rejeitados"
-            value={loading ? '…' : counts.rejeitados}
+            value={loading ? "…" : counts.rejeitados}
             icon={X}
           />
           <StatCard
             supraLabel="CATÁLOGO"
             label="Documentos publicados"
-            value={loading ? '…' : counts.documentos}
+            value={loading ? "…" : counts.documentos}
             icon={Users}
           />
         </div>
@@ -115,7 +117,7 @@ export default function DashboardPage() {
           <p className="text-sm text-zinc-500">Carregando…</p>
         ) : docs.length === 0 ? (
           <p className="text-sm text-zinc-500">
-            Nenhum documento publicado ainda. Vá em <strong>Upload Book</strong>{' '}
+            Nenhum documento publicado ainda. Vá em <strong>Upload Book</strong>{" "}
             para criar o primeiro.
           </p>
         ) : (
@@ -127,12 +129,12 @@ export default function DashboardPage() {
                 label="Documento"
                 value={d.nome}
                 valueClassName="text-2xl leading-tight"
-                icon={d.extensao === 'PPTX' ? FileText : FileSpreadsheet}
+                icon={d.extensao === "PPTX" ? FileText : FileSpreadsheet}
               />
             ))}
           </div>
         )}
       </section>
     </div>
-  )
+  );
 }

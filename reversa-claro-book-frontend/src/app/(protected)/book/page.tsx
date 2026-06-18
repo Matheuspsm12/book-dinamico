@@ -1,1 +1,1 @@
-export { default } from '@/features/book/book-view'
+export { default } from "src/features/book/book-view";

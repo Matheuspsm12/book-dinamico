@@ -1,1 +1,1 @@
-export { default } from '@/features/usuarios/gerenciar-usuarios-view'
+export { default } from "src/features/usuarios/gerenciar-usuarios-view";

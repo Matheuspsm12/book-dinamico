@@ -1,33 +1,38 @@
-'use client'
+"use client";
 
-import { Download, Pencil, RefreshCw, Upload, X } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Download, Pencil, RefreshCw, Upload, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { Button } from '@/components/ui/button'
-import { Dialog } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/contexts/AuthContext'
-import type { DocumentoResponse } from '@/lib/api/types'
-import { cn, formatDate, hojeLocal, inferNomeFromFilename } from '@/lib/utils'
-import * as docsApi from '@/services/documentos-service'
+import { Button } from "src/components/ui/button";
+import { Dialog } from "src/components/ui/dialog";
+import { Input } from "src/components/ui/input";
+import { Label } from "src/components/ui/label";
+import { useAuth } from "src/contexts/AuthContext";
+import type { DocumentoResponse } from "src/lib/api/types";
+import {
+  cn,
+  formatDate,
+  hojeLocal,
+  inferNomeFromFilename,
+} from "src/lib/utils";
+import * as docsApi from "src/services/documentos-service";
 
-const ALLOWED = ['.xlsm', '.xlsx', '.pptx'] as const
-const MAX_BYTES = 60 * 1024 * 1024
+const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
+const MAX_BYTES = 60 * 1024 * 1024;
 
-function formatoLabel(ext: DocumentoResponse['extensao']) {
-  if (ext === 'XLSM' || ext === 'XLSX') return 'EXCEL'
-  return 'POWER POINT'
+function formatoLabel(ext: DocumentoResponse["extensao"]) {
+  if (ext === "XLSM" || ext === "XLSX") return "EXCEL";
+  return "POWER POINT";
 }
 
 function validarArquivo(f: File | null): string | null {
-  if (!f) return 'Selecione um arquivo.'
-  const ext = `.${f.name.split('.').pop()?.toLowerCase() ?? ''}`
+  if (!f) return "Selecione um arquivo.";
+  const ext = `.${f.name.split(".").pop()?.toLowerCase() ?? ""}`;
   if (!ALLOWED.includes(ext as (typeof ALLOWED)[number])) {
-    return `Extensão inválida (${ext}). Permitidas: ${ALLOWED.join(', ')}`
+    return `Extensão inválida (${ext}). Permitidas: ${ALLOWED.join(", ")}`;
   }
-  if (f.size > MAX_BYTES) return 'Arquivo maior que 60 MB.'
-  return null
+  if (f.size > MAX_BYTES) return "Arquivo maior que 60 MB.";
+  return null;
 }
 
 function BookCard({
@@ -35,9 +40,9 @@ function BookCard({
   onDownload,
   baixando,
 }: {
-  doc: DocumentoResponse
-  onDownload: (d: DocumentoResponse) => void
-  baixando: boolean
+  doc: DocumentoResponse;
+  onDownload: (d: DocumentoResponse) => void;
+  baixando: boolean;
 }) {
   return (
     <div className="flex flex-col items-center">
@@ -57,7 +62,7 @@ function BookCard({
           className="baixar-arrow mt-4 flex items-center gap-2 bg-white px-6 py-2 pl-7 font-bold text-sm text-zinc-800 uppercase tracking-wide transition hover:bg-zinc-100 disabled:opacity-50"
         >
           <Download size={14} />
-          {baixando ? 'Baixando...' : 'Baixar'}
+          {baixando ? "Baixando..." : "Baixar"}
         </button>
       </div>
       <div className="mt-3 text-center text-[11px] text-zinc-500 uppercase">
@@ -68,53 +73,52 @@ function BookCard({
         </p>
       </div>
     </div>
-  )
+  );
 }
 
 export default function BookDownloadPage() {
-  const { user } = useAuth()
-  const isAdmin = user?.role === 'ADMIN'
-  const [docs, setDocs] = useState<DocumentoResponse[]>([])
-  const [loading, setLoading] = useState(true)
-  const [err, setErr] = useState<string | null>(null)
-  const [baixandoId, setBaixandoId] = useState<number | null>(null)
-  const [editando, setEditando] = useState<DocumentoResponse | null>(null)
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
+  const [docs, setDocs] = useState<DocumentoResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+  const [baixandoId, setBaixandoId] = useState<number | null>(null);
+  const [editando, setEditando] = useState<DocumentoResponse | null>(null);
   const [substituindo, setSubstituindo] = useState<DocumentoResponse | null>(
     null,
-  )
+  );
 
   const carregar = useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      setDocs(await docsApi.listar())
+      setDocs(await docsApi.listar());
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Erro ao carregar documentos.')
+      setErr(e instanceof Error ? e.message : "Erro ao carregar documentos.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    void carregar()
-  }, [carregar])
+    void carregar();
+  }, [carregar]);
 
   async function handleDownload(doc: DocumentoResponse) {
-    setErr(null)
-    setBaixandoId(doc.id)
+    setErr(null);
+    setBaixandoId(doc.id);
     try {
-      const blob = await docsApi.baixar(doc.id)
-      const filename = `${doc.nome.replace(/\s+/g, '_')}.${doc.extensao.toLowerCase()}`
-      docsApi.salvarBlob(blob, filename)
+      const blob = await docsApi.baixar(doc.id);
+      const filename = `${doc.nome.replace(/\s+/g, "_")}.${doc.extensao.toLowerCase()}`;
+      docsApi.salvarBlob(blob, filename);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Erro ao baixar.')
+      setErr(e instanceof Error ? e.message : "Erro ao baixar.");
     } finally {
-      setBaixandoId(null)
+      setBaixandoId(null);
     }
   }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white">
-      {/* biome-ignore lint/performance/noImgElement: arte SVG decorativa de fundo — next/image não se aplica */}
       <img
         src="/img/bg_claro.svg"
         alt=""
@@ -125,7 +129,6 @@ export default function BookDownloadPage() {
       <div className="relative z-10 grid min-h-screen grid-cols-[1fr_320px]">
         <div className="flex flex-col px-12 py-10">
           <div className="flex justify-center">
-            {/* biome-ignore lint/performance/noImgElement: logo SVG responsivo — next/image não se aplica */}
             <img
               src="/img/logo_claro.svg"
               alt="Claro"
@@ -219,8 +222,8 @@ export default function BookDownloadPage() {
           doc={editando}
           onClose={() => setEditando(null)}
           onSaved={async () => {
-            setEditando(null)
-            await carregar()
+            setEditando(null);
+            await carregar();
           }}
         />
       )}
@@ -229,13 +232,13 @@ export default function BookDownloadPage() {
           doc={substituindo}
           onClose={() => setSubstituindo(null)}
           onSaved={async () => {
-            setSubstituindo(null)
-            await carregar()
+            setSubstituindo(null);
+            await carregar();
           }}
         />
       )}
     </div>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -247,30 +250,30 @@ function QuickEditModal({
   onClose,
   onSaved,
 }: {
-  doc: DocumentoResponse
-  onClose: () => void
-  onSaved: () => Promise<void>
+  doc: DocumentoResponse;
+  onClose: () => void;
+  onSaved: () => Promise<void>;
 }) {
-  const [nome, setNome] = useState(doc.nome)
-  const [descricao, setDescricao] = useState(doc.descricao)
-  const [data, setData] = useState(doc.dataAtualizacao)
-  const [err, setErr] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const [nome, setNome] = useState(doc.nome);
+  const [descricao, setDescricao] = useState(doc.descricao);
+  const [data, setData] = useState(doc.dataAtualizacao);
+  const [err, setErr] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   async function submit(e: React.FormEvent) {
-    e.preventDefault()
-    setErr(null)
-    setSubmitting(true)
+    e.preventDefault();
+    setErr(null);
+    setSubmitting(true);
     try {
       await docsApi.atualizarMetadados(doc.id, {
         nome: nome.trim(),
         descricao: descricao.trim(),
         dataAtualizacao: data,
-      })
-      await onSaved()
+      });
+      await onSaved();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Erro ao salvar.')
-      setSubmitting(false)
+      setErr(e instanceof Error ? e.message : "Erro ao salvar.");
+      setSubmitting(false);
     }
   }
 
@@ -321,12 +324,12 @@ function QuickEditModal({
             Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            <Pencil size={14} /> {submitting ? 'Salvando…' : 'Salvar'}
+            <Pencil size={14} /> {submitting ? "Salvando…" : "Salvar"}
           </Button>
         </div>
       </form>
     </Dialog>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -338,36 +341,36 @@ function QuickReplaceModal({
   onClose,
   onSaved,
 }: {
-  doc: DocumentoResponse
-  onClose: () => void
-  onSaved: () => Promise<void>
+  doc: DocumentoResponse;
+  onClose: () => void;
+  onSaved: () => Promise<void>;
 }) {
-  const [file, setFile] = useState<File | null>(null)
-  const [err, setErr] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [file, setFile] = useState<File | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   async function submit(e: React.FormEvent) {
-    e.preventDefault()
-    setErr(null)
-    const v = validarArquivo(file)
-    if (v) return setErr(v)
-    if (!file) return
-    setSubmitting(true)
+    e.preventDefault();
+    setErr(null);
+    const v = validarArquivo(file);
+    if (v) return setErr(v);
+    if (!file) return;
+    setSubmitting(true);
     try {
       // 1) substitui o binário
-      await docsApi.substituirArquivo(doc.id, file)
+      await docsApi.substituirArquivo(doc.id, file);
       // 2) ajusta a data de atualização pra hoje (backend não faz isso sozinho)
-      const hoje = hojeLocal()
+      const hoje = hojeLocal();
       await docsApi.atualizarMetadados(doc.id, {
         nome: doc.nome,
         descricao: doc.descricao,
         dataAtualizacao: hoje,
-      })
-      await onSaved()
+      });
+      await onSaved();
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Erro ao substituir.')
-      setSubmitting(false)
+      setErr(e instanceof Error ? e.message : "Erro ao substituir.");
+      setSubmitting(false);
     }
   }
 
@@ -378,9 +381,9 @@ function QuickReplaceModal({
       title="Trocar arquivo"
       description={
         <>
-          Documento: <strong>{doc.nome}</strong> será substituído pelo documento{' '}
+          Documento: <strong>{doc.nome}</strong> será substituído pelo documento{" "}
           <strong>
-            {file ? inferNomeFromFilename(file.name) : 'selecionado'}
+            {file ? inferNomeFromFilename(file.name) : "selecionado"}
           </strong>
           . A data de atualização será marcada como hoje automaticamente.
         </>
@@ -392,8 +395,8 @@ function QuickReplaceModal({
           <label
             htmlFor="qr-file"
             className={cn(
-              'mt-1 flex cursor-pointer items-center justify-center gap-3 rounded-md border-2 border-zinc-300 border-dashed bg-zinc-50 px-4 py-6 text-sm text-zinc-500',
-              'hover:border-[var(--claro-red)] hover:bg-red-50/50',
+              "mt-1 flex cursor-pointer items-center justify-center gap-3 rounded-md border-2 border-zinc-300 border-dashed bg-zinc-50 px-4 py-6 text-sm text-zinc-500",
+              "hover:border-[var(--claro-red)] hover:bg-red-50/50",
             )}
           >
             <Upload size={20} />
@@ -401,7 +404,7 @@ function QuickReplaceModal({
               <span className="font-semibold text-zinc-800">{file.name}</span>
             ) : (
               <span>
-                Clique para escolher — <strong>{ALLOWED.join(', ')}</strong>{' '}
+                Clique para escolher — <strong>{ALLOWED.join(", ")}</strong>{" "}
                 (até 60 MB)
               </span>
             )}
@@ -410,7 +413,7 @@ function QuickReplaceModal({
             ref={inputRef}
             id="qr-file"
             type="file"
-            accept={ALLOWED.join(',')}
+            accept={ALLOWED.join(",")}
             className="sr-only"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
@@ -425,10 +428,10 @@ function QuickReplaceModal({
             <X size={14} /> Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            <RefreshCw size={14} /> {submitting ? 'Enviando…' : 'Substituir'}
+            <RefreshCw size={14} /> {submitting ? "Enviando…" : "Substituir"}
           </Button>
         </div>
       </form>
     </Dialog>
-  )
+  );
 }

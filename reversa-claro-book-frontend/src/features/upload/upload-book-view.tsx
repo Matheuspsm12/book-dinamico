@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {
   CheckCircle2,
@@ -9,97 +9,102 @@ import {
   RefreshCw,
   Trash2,
   Upload,
-} from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { PageHeader } from '@/components/shared/PageHeader'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Dialog } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/contexts/AuthContext'
-import type { DocumentoResponse } from '@/lib/api/types'
-import { cn, formatDate, hojeLocal, inferNomeFromFilename } from '@/lib/utils'
-import * as docsApi from '@/services/documentos-service'
+import { PageHeader } from "src/components/shared/PageHeader";
+import { Button } from "src/components/ui/button";
+import { Card, CardContent } from "src/components/ui/card";
+import { Dialog } from "src/components/ui/dialog";
+import { Input } from "src/components/ui/input";
+import { Label } from "src/components/ui/label";
+import { useAuth } from "src/contexts/AuthContext";
+import type { DocumentoResponse } from "src/lib/api/types";
+import {
+  cn,
+  formatDate,
+  hojeLocal,
+  inferNomeFromFilename,
+} from "src/lib/utils";
+import * as docsApi from "src/services/documentos-service";
 
-const ALLOWED = ['.xlsm', '.xlsx', '.pptx'] as const
-const MAX_BYTES = 60 * 1024 * 1024
+const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
+const MAX_BYTES = 60 * 1024 * 1024;
 
 type Modal =
-  | { kind: 'none' }
-  | { kind: 'novo' }
-  | { kind: 'substituir'; doc: DocumentoResponse }
-  | { kind: 'editar'; doc: DocumentoResponse }
-  | { kind: 'excluir'; doc: DocumentoResponse }
+  | { kind: "none" }
+  | { kind: "novo" }
+  | { kind: "substituir"; doc: DocumentoResponse }
+  | { kind: "editar"; doc: DocumentoResponse }
+  | { kind: "excluir"; doc: DocumentoResponse };
 
-function extLabel(ext: DocumentoResponse['extensao']) {
-  return ext
+function extLabel(ext: DocumentoResponse["extensao"]) {
+  return ext;
 }
 
 function formatBytes(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 function validarArquivo(f: File | null): string | null {
-  if (!f) return 'Selecione um arquivo.'
-  const ext = `.${f.name.split('.').pop()?.toLowerCase() ?? ''}`
+  if (!f) return "Selecione um arquivo.";
+  const ext = `.${f.name.split(".").pop()?.toLowerCase() ?? ""}`;
   if (!ALLOWED.includes(ext as (typeof ALLOWED)[number])) {
-    return `Extensão inválida (${ext}). Permitidas: ${ALLOWED.join(', ')}`
+    return `Extensão inválida (${ext}). Permitidas: ${ALLOWED.join(", ")}`;
   }
-  if (f.size > MAX_BYTES) return 'Arquivo maior que 60 MB.'
-  return null
+  if (f.size > MAX_BYTES) return "Arquivo maior que 60 MB.";
+  return null;
 }
 
 // ---------------------------------------------------------------------------
 
 export default function UploadBookPage() {
-  const router = useRouter()
-  const { user, loading } = useAuth()
-  const [docs, setDocs] = useState<DocumentoResponse[]>([])
-  const [carregando, setCarregando] = useState(true)
-  const [modal, setModal] = useState<Modal>({ kind: 'none' })
+  const router = useRouter();
+  const { user, loading } = useAuth();
+  const [docs, setDocs] = useState<DocumentoResponse[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [modal, setModal] = useState<Modal>({ kind: "none" });
   const [flash, setFlash] = useState<{
-    tipo: 'ok' | 'err'
-    msg: string
-  } | null>(null)
+    tipo: "ok" | "err";
+    msg: string;
+  } | null>(null);
 
   const carregar = useCallback(async () => {
-    setCarregando(true)
+    setCarregando(true);
     try {
-      setDocs(await docsApi.listar())
+      setDocs(await docsApi.listar());
     } catch (e) {
       setFlash({
-        tipo: 'err',
-        msg: e instanceof Error ? e.message : 'Erro ao listar.',
-      })
+        tipo: "err",
+        msg: e instanceof Error ? e.message : "Erro ao listar.",
+      });
     } finally {
-      setCarregando(false)
+      setCarregando(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    if (!loading && user && user.role !== 'ADMIN') router.replace('/book')
-    void carregar()
-  }, [user, loading, router, carregar])
+    if (!loading && user && user.role !== "ADMIN") router.replace("/book");
+    void carregar();
+  }, [user, loading, router, carregar]);
 
   function showOk(msg: string) {
-    setFlash({ tipo: 'ok', msg })
-    setTimeout(() => setFlash(null), 5000)
+    setFlash({ tipo: "ok", msg });
+    setTimeout(() => setFlash(null), 5000);
   }
   function showErr(msg: string) {
-    setFlash({ tipo: 'err', msg })
+    setFlash({ tipo: "err", msg });
   }
 
   async function onClosed() {
-    setModal({ kind: 'none' })
-    await carregar()
+    setModal({ kind: "none" });
+    await carregar();
   }
 
-  if (loading || !user) return null
+  if (loading || !user) return null;
 
   return (
     <div>
@@ -111,10 +116,10 @@ export default function UploadBookPage() {
       <div className="mb-5 flex items-center justify-between">
         <p className="text-sm text-zinc-500">
           {carregando
-            ? 'Carregando…'
+            ? "Carregando…"
             : `${docs.length} documento(s) publicado(s)`}
         </p>
-        <Button onClick={() => setModal({ kind: 'novo' })}>
+        <Button onClick={() => setModal({ kind: "novo" })}>
           <Plus size={16} /> Novo documento
         </Button>
       </div>
@@ -122,13 +127,13 @@ export default function UploadBookPage() {
       {flash && (
         <div
           className={cn(
-            'mb-4 flex items-center gap-2 rounded-md border px-3 py-2 text-sm',
-            flash.tipo === 'ok'
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-              : 'border-red-200 bg-red-50 text-red-700',
+            "mb-4 flex items-center gap-2 rounded-md border px-3 py-2 text-sm",
+            flash.tipo === "ok"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-red-200 bg-red-50 text-red-700",
           )}
         >
-          {flash.tipo === 'ok' && <CheckCircle2 size={16} />}
+          {flash.tipo === "ok" && <CheckCircle2 size={16} />}
           <span>{flash.msg}</span>
         </div>
       )}
@@ -142,7 +147,7 @@ export default function UploadBookPage() {
       ) : docs.length === 0 ? (
         <Card>
           <CardContent className="py-10 text-center text-sm text-zinc-500">
-            Nenhum documento publicado ainda. Clique em{' '}
+            Nenhum documento publicado ainda. Clique em{" "}
             <strong>Novo documento</strong> para criar o primeiro.
           </CardContent>
         </Card>
@@ -152,64 +157,64 @@ export default function UploadBookPage() {
             <DocCard
               key={d.id}
               doc={d}
-              onSubstituir={() => setModal({ kind: 'substituir', doc: d })}
-              onEditar={() => setModal({ kind: 'editar', doc: d })}
-              onExcluir={() => setModal({ kind: 'excluir', doc: d })}
+              onSubstituir={() => setModal({ kind: "substituir", doc: d })}
+              onEditar={() => setModal({ kind: "editar", doc: d })}
+              onExcluir={() => setModal({ kind: "excluir", doc: d })}
             />
           ))}
         </div>
       )}
 
       <NovoModal
-        open={modal.kind === 'novo'}
-        onClose={() => setModal({ kind: 'none' })}
+        open={modal.kind === "novo"}
+        onClose={() => setModal({ kind: "none" })}
         onSuccess={async (d) => {
-          showOk(`Documento "${d.nome}" criado.`)
-          await onClosed()
+          showOk(`Documento "${d.nome}" criado.`);
+          await onClosed();
         }}
         onError={showErr}
       />
 
-      {modal.kind === 'substituir' && (
+      {modal.kind === "substituir" && (
         <SubstituirArquivoModal
           doc={modal.doc}
           open
-          onClose={() => setModal({ kind: 'none' })}
+          onClose={() => setModal({ kind: "none" })}
           onSuccess={async (d) => {
-            showOk(`Arquivo de "${d.nome}" substituído.`)
-            await onClosed()
+            showOk(`Arquivo de "${d.nome}" substituído.`);
+            await onClosed();
           }}
           onError={showErr}
         />
       )}
 
-      {modal.kind === 'editar' && (
+      {modal.kind === "editar" && (
         <EditarMetadadosModal
           doc={modal.doc}
           open
-          onClose={() => setModal({ kind: 'none' })}
+          onClose={() => setModal({ kind: "none" })}
           onSuccess={async (d) => {
-            showOk(`Metadados de "${d.nome}" atualizados.`)
-            await onClosed()
+            showOk(`Metadados de "${d.nome}" atualizados.`);
+            await onClosed();
           }}
           onError={showErr}
         />
       )}
 
-      {modal.kind === 'excluir' && (
+      {modal.kind === "excluir" && (
         <ExcluirModal
           doc={modal.doc}
           open
-          onClose={() => setModal({ kind: 'none' })}
+          onClose={() => setModal({ kind: "none" })}
           onSuccess={async () => {
-            showOk(`Documento "${modal.doc.nome}" excluído.`)
-            await onClosed()
+            showOk(`Documento "${modal.doc.nome}" excluído.`);
+            await onClosed();
           }}
           onError={showErr}
         />
       )}
     </div>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -222,12 +227,12 @@ function DocCard({
   onEditar,
   onExcluir,
 }: {
-  doc: DocumentoResponse
-  onSubstituir: () => void
-  onEditar: () => void
-  onExcluir: () => void
+  doc: DocumentoResponse;
+  onSubstituir: () => void;
+  onEditar: () => void;
+  onExcluir: () => void;
 }) {
-  const Icon = doc.extensao === 'PPTX' ? FileText : FileSpreadsheet
+  const Icon = doc.extensao === "PPTX" ? FileText : FileSpreadsheet;
   return (
     <Card>
       <CardContent className="flex h-full flex-col pt-6">
@@ -282,7 +287,7 @@ function DocCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -293,10 +298,10 @@ function FilePicker({
   file,
   onPick,
 }: {
-  file: File | null
-  onPick: (f: File | null) => void
+  file: File | null;
+  onPick: (f: File | null) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null);
   return (
     <>
       <label
@@ -308,7 +313,7 @@ function FilePicker({
           <span className="font-semibold text-zinc-800">{file.name}</span>
         ) : (
           <span>
-            Clique para escolher — <strong>{ALLOWED.join(', ')}</strong> (até 60
+            Clique para escolher — <strong>{ALLOWED.join(", ")}</strong> (até 60
             MB)
           </span>
         )}
@@ -317,12 +322,12 @@ function FilePicker({
         ref={inputRef}
         id="modal-file"
         type="file"
-        accept={ALLOWED.join(',')}
+        accept={ALLOWED.join(",")}
         className="sr-only"
         onChange={(e) => onPick(e.target.files?.[0] ?? null)}
       />
     </>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -335,45 +340,45 @@ function NovoModal({
   onSuccess,
   onError,
 }: {
-  open: boolean
-  onClose: () => void
-  onSuccess: (d: DocumentoResponse) => void | Promise<void>
-  onError: (msg: string) => void
+  open: boolean;
+  onClose: () => void;
+  onSuccess: (d: DocumentoResponse) => void | Promise<void>;
+  onError: (msg: string) => void;
 }) {
-  const [nome, setNome] = useState('')
-  const [descricao, setDescricao] = useState('')
-  const [data, setData] = useState(() => hojeLocal())
-  const [file, setFile] = useState<File | null>(null)
-  const [erroLocal, setErroLocal] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const [nome, setNome] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [data, setData] = useState(() => hojeLocal());
+  const [file, setFile] = useState<File | null>(null);
+  const [erroLocal, setErroLocal] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   function reset() {
-    setNome('')
-    setDescricao('')
-    setData(hojeLocal())
-    setFile(null)
-    setErroLocal(null)
-    setSubmitting(false)
+    setNome("");
+    setDescricao("");
+    setData(hojeLocal());
+    setFile(null);
+    setErroLocal(null);
+    setSubmitting(false);
   }
 
   function handleOpenChange(o: boolean) {
     if (!o) {
-      reset()
-      onClose()
+      reset();
+      onClose();
     }
   }
 
   async function submit(e: React.FormEvent) {
-    e.preventDefault()
-    setErroLocal(null)
-    if (!nome.trim()) return setErroLocal('Informe o nome.')
-    if (!descricao.trim()) return setErroLocal('Informe a descrição.')
-    if (!data) return setErroLocal('Informe a data de atualização.')
-    const arquivoErr = validarArquivo(file)
-    if (arquivoErr) return setErroLocal(arquivoErr)
-    if (!file) return
+    e.preventDefault();
+    setErroLocal(null);
+    if (!nome.trim()) return setErroLocal("Informe o nome.");
+    if (!descricao.trim()) return setErroLocal("Informe a descrição.");
+    if (!data) return setErroLocal("Informe a data de atualização.");
+    const arquivoErr = validarArquivo(file);
+    if (arquivoErr) return setErroLocal(arquivoErr);
+    if (!file) return;
 
-    setSubmitting(true)
+    setSubmitting(true);
     try {
       const created = await docsApi.criar(
         {
@@ -382,14 +387,14 @@ function NovoModal({
           dataAtualizacao: data,
         },
         file,
-      )
-      reset()
-      await onSuccess(created)
+      );
+      reset();
+      await onSuccess(created);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Erro ao criar.'
-      setErroLocal(msg)
-      onError(msg)
-      setSubmitting(false)
+      const msg = e instanceof Error ? e.message : "Erro ao criar.";
+      setErroLocal(msg);
+      onError(msg);
+      setSubmitting(false);
     }
   }
 
@@ -437,9 +442,9 @@ function NovoModal({
             <FilePicker
               file={file}
               onPick={(f) => {
-                setFile(f)
+                setFile(f);
                 // Auto-preenche o nome a partir do filename se ainda estiver vazio
-                if (f && !nome.trim()) setNome(inferNomeFromFilename(f.name))
+                if (f && !nome.trim()) setNome(inferNomeFromFilename(f.name));
               }}
             />
           </div>
@@ -458,12 +463,12 @@ function NovoModal({
             Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            <Upload size={14} /> {submitting ? 'Criando…' : 'Criar documento'}
+            <Upload size={14} /> {submitting ? "Criando…" : "Criar documento"}
           </Button>
         </div>
       </form>
     </Dialog>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -477,47 +482,47 @@ function SubstituirArquivoModal({
   onSuccess,
   onError,
 }: {
-  doc: DocumentoResponse
-  open: boolean
-  onClose: () => void
-  onSuccess: (d: DocumentoResponse) => void | Promise<void>
-  onError: (msg: string) => void
+  doc: DocumentoResponse;
+  open: boolean;
+  onClose: () => void;
+  onSuccess: (d: DocumentoResponse) => void | Promise<void>;
+  onError: (msg: string) => void;
 }) {
-  const [file, setFile] = useState<File | null>(null)
-  const [erroLocal, setErroLocal] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const [file, setFile] = useState<File | null>(null);
+  const [erroLocal, setErroLocal] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   function handleOpenChange(o: boolean) {
     if (!o) {
-      setFile(null)
-      setErroLocal(null)
-      setSubmitting(false)
-      onClose()
+      setFile(null);
+      setErroLocal(null);
+      setSubmitting(false);
+      onClose();
     }
   }
 
   async function submit(e: React.FormEvent) {
-    e.preventDefault()
-    const err = validarArquivo(file)
-    if (err) return setErroLocal(err)
-    if (!file) return
-    setSubmitting(true)
+    e.preventDefault();
+    const err = validarArquivo(file);
+    if (err) return setErroLocal(err);
+    if (!file) return;
+    setSubmitting(true);
     try {
       // 1) substitui o binário
-      await docsApi.substituirArquivo(doc.id, file)
+      await docsApi.substituirArquivo(doc.id, file);
       // 2) atualiza dataAtualizacao pra hoje (backend não faz isso sozinho — vide DocumentoService.substituirArquivo)
-      const hoje = hojeLocal()
+      const hoje = hojeLocal();
       const updated = await docsApi.atualizarMetadados(doc.id, {
         nome: doc.nome,
         descricao: doc.descricao,
         dataAtualizacao: hoje,
-      })
-      await onSuccess(updated)
+      });
+      await onSuccess(updated);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Erro ao substituir.'
-      setErroLocal(msg)
-      onError(msg)
-      setSubmitting(false)
+      const msg = e instanceof Error ? e.message : "Erro ao substituir.";
+      setErroLocal(msg);
+      onError(msg);
+      setSubmitting(false);
     }
   }
 
@@ -528,9 +533,9 @@ function SubstituirArquivoModal({
       title="Substituir arquivo"
       description={
         <>
-          Documento: <strong>{doc.nome}</strong> será substituído pelo documento{' '}
+          Documento: <strong>{doc.nome}</strong> será substituído pelo documento{" "}
           <strong>
-            {file ? inferNomeFromFilename(file.name) : 'selecionado'}
+            {file ? inferNomeFromFilename(file.name) : "selecionado"}
           </strong>
           .
         </>
@@ -540,7 +545,7 @@ function SubstituirArquivoModal({
         <div>
           <Label>Versão atual</Label>
           <div className="mt-1 rounded-md bg-zinc-50 px-3 py-2 text-xs text-zinc-700">
-            {doc.extensao} · {formatBytes(doc.tamanhoBytes)} · atualizado{' '}
+            {doc.extensao} · {formatBytes(doc.tamanhoBytes)} · atualizado{" "}
             {formatDate(doc.atualizadoEm)}
           </div>
         </div>
@@ -564,12 +569,12 @@ function SubstituirArquivoModal({
             Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            <RefreshCw size={14} /> {submitting ? 'Enviando…' : 'Substituir'}
+            <RefreshCw size={14} /> {submitting ? "Enviando…" : "Substituir"}
           </Button>
         </div>
       </form>
     </Dialog>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -583,48 +588,48 @@ function EditarMetadadosModal({
   onSuccess,
   onError,
 }: {
-  doc: DocumentoResponse
-  open: boolean
-  onClose: () => void
-  onSuccess: (d: DocumentoResponse) => void | Promise<void>
-  onError: (msg: string) => void
+  doc: DocumentoResponse;
+  open: boolean;
+  onClose: () => void;
+  onSuccess: (d: DocumentoResponse) => void | Promise<void>;
+  onError: (msg: string) => void;
 }) {
-  const [nome, setNome] = useState(doc.nome)
-  const [descricao, setDescricao] = useState(doc.descricao)
-  const [data, setData] = useState(doc.dataAtualizacao)
-  const [erroLocal, setErroLocal] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const [nome, setNome] = useState(doc.nome);
+  const [descricao, setDescricao] = useState(doc.descricao);
+  const [data, setData] = useState(doc.dataAtualizacao);
+  const [erroLocal, setErroLocal] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   function handleOpenChange(o: boolean) {
     if (!o) {
-      setNome(doc.nome)
-      setDescricao(doc.descricao)
-      setData(doc.dataAtualizacao)
-      setErroLocal(null)
-      setSubmitting(false)
-      onClose()
+      setNome(doc.nome);
+      setDescricao(doc.descricao);
+      setData(doc.dataAtualizacao);
+      setErroLocal(null);
+      setSubmitting(false);
+      onClose();
     }
   }
 
   async function submit(e: React.FormEvent) {
-    e.preventDefault()
-    setErroLocal(null)
-    if (!nome.trim()) return setErroLocal('Informe o nome.')
-    if (!descricao.trim()) return setErroLocal('Informe a descrição.')
-    if (!data) return setErroLocal('Informe a data de atualização.')
-    setSubmitting(true)
+    e.preventDefault();
+    setErroLocal(null);
+    if (!nome.trim()) return setErroLocal("Informe o nome.");
+    if (!descricao.trim()) return setErroLocal("Informe a descrição.");
+    if (!data) return setErroLocal("Informe a data de atualização.");
+    setSubmitting(true);
     try {
       const updated = await docsApi.atualizarMetadados(doc.id, {
         nome: nome.trim(),
         descricao: descricao.trim(),
         dataAtualizacao: data,
-      })
-      await onSuccess(updated)
+      });
+      await onSuccess(updated);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Erro ao atualizar.'
-      setErroLocal(msg)
-      onError(msg)
-      setSubmitting(false)
+      const msg = e instanceof Error ? e.message : "Erro ao atualizar.";
+      setErroLocal(msg);
+      onError(msg);
+      setSubmitting(false);
     }
   }
 
@@ -685,12 +690,12 @@ function EditarMetadadosModal({
             Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            <Pencil size={14} /> {submitting ? 'Salvando…' : 'Salvar'}
+            <Pencil size={14} /> {submitting ? "Salvando…" : "Salvar"}
           </Button>
         </div>
       </form>
     </Dialog>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -704,29 +709,29 @@ function ExcluirModal({
   onSuccess,
   onError,
 }: {
-  doc: DocumentoResponse
-  open: boolean
-  onClose: () => void
-  onSuccess: () => void | Promise<void>
-  onError: (msg: string) => void
+  doc: DocumentoResponse;
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void | Promise<void>;
+  onError: (msg: string) => void;
 }) {
-  const [submitting, setSubmitting] = useState(false)
+  const [submitting, setSubmitting] = useState(false);
 
   function handleOpenChange(o: boolean) {
     if (!o) {
-      setSubmitting(false)
-      onClose()
+      setSubmitting(false);
+      onClose();
     }
   }
 
   async function excluir() {
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      await docsApi.deletar(doc.id)
-      await onSuccess()
+      await docsApi.deletar(doc.id);
+      await onSuccess();
     } catch (e) {
-      onError(e instanceof Error ? e.message : 'Erro ao excluir.')
-      setSubmitting(false)
+      onError(e instanceof Error ? e.message : "Erro ao excluir.");
+      setSubmitting(false);
     }
   }
 
@@ -752,15 +757,15 @@ function ExcluirModal({
             disabled={submitting}
             className="bg-red-600 text-white hover:bg-red-700"
           >
-            <Trash2 size={14} /> {submitting ? 'Excluindo…' : 'Excluir'}
+            <Trash2 size={14} /> {submitting ? "Excluindo…" : "Excluir"}
           </Button>
         </>
       }
     >
       <p className="text-sm text-zinc-600">
-        {formatDate(doc.dataAtualizacao)} · {doc.extensao} ·{' '}
+        {formatDate(doc.dataAtualizacao)} · {doc.extensao} ·{" "}
         {formatBytes(doc.tamanhoBytes)}
       </p>
     </Dialog>
-  )
+  );
 }

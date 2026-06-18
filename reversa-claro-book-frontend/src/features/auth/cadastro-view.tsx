@@ -1,41 +1,41 @@
-'use client'
+"use client";
 
-import { CheckCircle2 } from 'lucide-react'
-import Link from 'next/link'
-import { useState } from 'react'
+import { CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import * as usuariosApi from '@/services/usuarios-service'
+import { Button } from "src/components/ui/button";
+import { Input } from "src/components/ui/input";
+import { Label } from "src/components/ui/label";
+import * as usuariosApi from "src/services/usuarios-service";
 
 export default function CadastroPage() {
   const [form, setForm] = useState({
-    nome: '',
-    empresa: '',
-    email: '',
-    justificativa: '',
-    senha: '',
-  })
-  const [err, setErr] = useState<string | null>(null)
-  const [ok, setOk] = useState(false)
-  const [loading, setLoading] = useState(false)
+    nome: "",
+    empresa: "",
+    email: "",
+    justificativa: "",
+    senha: "",
+  });
+  const [err, setErr] = useState<string | null>(null);
+  const [ok, setOk] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   function set<K extends keyof typeof form>(k: K, v: string) {
-    setForm((f) => ({ ...f, [k]: v }))
+    setForm((f) => ({ ...f, [k]: v }));
   }
 
   async function onSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setErr(null)
-    setLoading(true)
+    e.preventDefault();
+    setErr(null);
+    setLoading(true);
     try {
-      await usuariosApi.cadastrar(form)
-      setOk(true)
+      await usuariosApi.cadastrar(form);
+      setOk(true);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'Erro ao cadastrar.')
+      setErr(e instanceof Error ? e.message : "Erro ao cadastrar.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -58,7 +58,7 @@ export default function CadastroPage() {
           Voltar para o login
         </Link>
       </div>
-    )
+    );
   }
 
   return (
@@ -76,7 +76,7 @@ export default function CadastroPage() {
             required
             className="mt-1"
             value={form.nome}
-            onChange={(e) => set('nome', e.target.value)}
+            onChange={(e) => set("nome", e.target.value)}
           />
         </div>
         <div>
@@ -86,7 +86,7 @@ export default function CadastroPage() {
             required
             className="mt-1"
             value={form.empresa}
-            onChange={(e) => set('empresa', e.target.value)}
+            onChange={(e) => set("empresa", e.target.value)}
           />
         </div>
         <div>
@@ -97,7 +97,7 @@ export default function CadastroPage() {
             required
             className="mt-1"
             value={form.email}
-            onChange={(e) => set('email', e.target.value)}
+            onChange={(e) => set("email", e.target.value)}
           />
         </div>
         <div>
@@ -110,7 +110,7 @@ export default function CadastroPage() {
             maxLength={72}
             className="mt-1"
             value={form.senha}
-            onChange={(e) => set('senha', e.target.value)}
+            onChange={(e) => set("senha", e.target.value)}
           />
         </div>
         <div>
@@ -120,7 +120,7 @@ export default function CadastroPage() {
             required
             rows={3}
             value={form.justificativa}
-            onChange={(e) => set('justificativa', e.target.value)}
+            onChange={(e) => set("justificativa", e.target.value)}
             className="mt-1 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm outline-none focus:border-[var(--claro-red)] focus:ring-2 focus:ring-[var(--claro-red)]/20"
             placeholder="Descreva por que você precisa de acesso aos books técnicos."
           />
@@ -133,11 +133,11 @@ export default function CadastroPage() {
         )}
 
         <Button type="submit" size="lg" className="w-full" disabled={loading}>
-          {loading ? 'Enviando...' : 'Solicitar acesso'}
+          {loading ? "Enviando..." : "Solicitar acesso"}
         </Button>
 
         <p className="text-center text-sm text-zinc-500">
-          Já tem conta?{' '}
+          Já tem conta?{" "}
           <Link
             href="/login"
             className="font-semibold text-[var(--claro-red)] hover:underline"
@@ -147,5 +147,5 @@ export default function CadastroPage() {
         </p>
       </form>
     </div>
-  )
+  );
 }

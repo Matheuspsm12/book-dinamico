@@ -1,1 +1,1 @@
-export { default } from '@/features/upload/upload-book-view'
+export { default } from "src/features/upload/upload-book-view";

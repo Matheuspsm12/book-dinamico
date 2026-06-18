@@ -1,1 +1,1 @@
-export { default } from '@/features/dashboard/dashboard-view'
+export { default } from "src/features/dashboard/dashboard-view";
