@@ -1,4 +1,4 @@
-import { api } from "src/lib/api/client";
+import api from "src/services/api";
 import type {
   PageResponse,
   UsuarioCadastroRequest,
@@ -8,7 +8,11 @@ import type {
 } from "src/lib/api/types";
 
 export async function cadastrar(input: UsuarioCadastroRequest) {
-  return api.post<UsuarioResponse>("/api/usuarios/cadastro", { body: input });
+  const { data } = await api.post<UsuarioResponse>(
+    "/api/usuarios/cadastro",
+    input,
+  );
+  return data;
 }
 
 export async function paginar(
@@ -22,33 +26,47 @@ export async function paginar(
     size: String(size),
   });
   if (sort) params.set("sort", sort);
-  return api.post<PageResponse<UsuarioResponse>>(
+  const { data } = await api.post<PageResponse<UsuarioResponse>>(
     `/api/usuarios/paginar?${params.toString()}`,
-    { body: filtro ?? {} },
+    filtro ?? {},
   );
+  return data;
 }
 
 export async function aprovar(id: number) {
-  return api.post<UsuarioResponse>(`/api/usuarios/${id}/aprovar`);
+  const { data } = await api.post<UsuarioResponse>(
+    `/api/usuarios/${id}/aprovar`,
+  );
+  return data;
 }
 
 export async function rejeitar(id: number) {
-  return api.post<UsuarioResponse>(`/api/usuarios/${id}/rejeitar`);
+  const { data } = await api.post<UsuarioResponse>(
+    `/api/usuarios/${id}/rejeitar`,
+  );
+  return data;
 }
 
 export async function atualizar(id: number, patch: UsuarioEdicaoRequest) {
-  return api.put<UsuarioResponse>(`/api/usuarios/${id}`, { body: patch });
+  const { data } = await api.put<UsuarioResponse>(`/api/usuarios/${id}`, patch);
+  return data;
 }
 
 export async function ativar(id: number) {
-  return api.post<UsuarioResponse>(`/api/usuarios/${id}/ativar`);
+  const { data } = await api.post<UsuarioResponse>(
+    `/api/usuarios/${id}/ativar`,
+  );
+  return data;
 }
 
 export async function desativar(id: number) {
-  return api.post<UsuarioResponse>(`/api/usuarios/${id}/desativar`);
+  const { data } = await api.post<UsuarioResponse>(
+    `/api/usuarios/${id}/desativar`,
+  );
+  return data;
 }
 
 /** Solicita reset de senha do usuário autenticado — backend envia nova senha por e-mail. */
 export async function resetarMinhaSenhaPorEmail() {
-  return api.post<void>("/api/usuarios/me/resetar-senha");
+  await api.post("/api/usuarios/me/resetar-senha");
 }
