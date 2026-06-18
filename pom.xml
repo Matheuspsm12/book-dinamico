@@ -21,6 +21,11 @@
         <java-jwt.version>4.4.0</java-jwt.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <lombok.version>1.18.36</lombok.version>
+        <flyway-maven-plugin.version>10.20.1</flyway-maven-plugin.version>
+        <!-- Lidos do ambiente (mesmas BOOK_DB_* do app). NÃO commitar credenciais aqui. -->
+        <flyway.url>${env.BOOK_DB_URL}</flyway.url>
+        <flyway.user>${env.BOOK_DB_USERNAME}</flyway.user>
+        <flyway.password>${env.BOOK_DB_PASSWORD}</flyway.password>
     </properties>
 
     <dependencies>
@@ -171,6 +176,18 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>${flyway-maven-plugin.version}</version>
+                <configuration>
+                    <url>${flyway.url}</url>
+                    <user>${flyway.user}</user>
+                    <password>${flyway.password}</password>
+                    <cleanDisabled>false</cleanDisabled>
                 </configuration>
             </plugin>
         </plugins>
