@@ -1,78 +1,67 @@
-# application.yml — config base.
-# Suporta dev (local) e cloud (Render) via fallbacks de env var.
-#
-# Render injeta PORT dinamicamente em runtime; localmente caímos em BOOK_APP_PORT.
-# BOOK_DB_URL é usado direto quando setado; senão é composto a partir de HOST/PORT/NAME.
-
 app:
-  ambiente: ${BOOK_AMBIENTE:DEV}
-  jwt-secret: ${BOOK_JWT_SECRET}
+  ambiente: ${BOOK_AMBIENTE}
+  jwt-secret: lQ3V4s9F8d7J3kL2aH6rP1zX0vY8tQ5wN1bR9sU2eM0=
+  jwt-secure-cookie: true
   empresa: TCIA
-  nome-sistema: ${BOOK_NOME_SISTEMA:Book Dinâmico}
-  url-site: ${BOOK_URL_SITE:http://localhost:8082/book_dinamico}
-  url-front-end: ${BOOK_URL_FRONT_END:http://localhost:3000}
-  diretorio: ${BOOK_DIRETORIO:/data/book-dinamico}
+  nome-sistema: ${BOOK_NOME_SISTEMA}
+  url-site: ${BOOK_URL_SITE}
+  url-front-end: ${BOOK_URL_FRONT_END}
+  diretorio: ${BOOK_DIRETORIO}
   email:
-    habilitado: ${BOOK_EMAIL_HABILITADO:false}
-    remetente: ${BOOK_MAIL_USERNAME:noreply@example.com}
+    habilitado: ${BOOK_EMAIL_HABILITADO}
+    remetente: ${BOOK_MAIL_USERNAME}
 
 server:
-  # PORT (injetado pelo Render) > BOOK_APP_PORT (local) > 8082
-  port: ${PORT:${BOOK_APP_PORT:8082}}
-  address: 0.0.0.0
+  port: ${BOOK_APP_PORT}
   max-http-request-header-size: 512000
-  forward-headers-strategy: native
   servlet:
-    context-path: ${BOOK_APP_CONTEXT_PATH:/book_dinamico}
+    context-path: ${BOOK_APP_CONTEXT_PATH}
     encoding:
       charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   session:
     store-type: none
+  profiles:
+    default: dev
   application:
-    name: ${BOOK_APP_NAME:book_dinamico_backend}
+    name: ${BOOK_APP_NAME}
   servlet:
     multipart:
-      max-file-size: 60MB
-      max-request-size: 60MB
+      max-file-size: 500MB
+      max-request-size: 500MB
   messages:
     basename: ValidationMessages
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: true
+    open-in-view: false
   datasource:
-    url: ${BOOK_DB_URL:jdbc:postgresql://${BOOK_DB_HOST:localhost}:${BOOK_DB_PORT:5432}/${BOOK_DB_NAME:book_dinamico}${BOOK_DB_PARAMS:}}
+    url: ${BOOK_DB_URL}
     username: ${BOOK_DB_USERNAME}
     password: ${BOOK_DB_PASSWORD}
     hikari:
-      maximum-pool-size: 60           # Número máximo de conexões simultâneas no pool
-      minimum-idle: 20                # Conexões mínimas ociosas mantidas no pool
-      idle-timeout: 600000            # (ms) Tempo que uma conexão ociosa pode ficar no pool antes de ser removida (10 min)
-      max-lifetime: 1800000           # (ms) Vida máxima de uma conexão no pool (30 min)
-      connection-timeout: 60000       # (ms) Tempo máximo para aguardar uma conexão antes de lançar exceção (30s)
-      validation-timeout: 5000        # (ms) Tempo de timeout para validação da conexão
-      connection-test-query: SELECT 1 # Consulta de teste usada para validar conexões
+      maximum-pool-size: 60
+      minimum-idle: 20
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-timeout: 60000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1
   flyway:
     baseline-on-migrate: true
     baseline-version: 1
-    out-of-order: true
   mail:
-    host: ${BOOK_MAIL_HOST:smtp.example.com}
-    port: ${BOOK_MAIL_PORT:587}
-    username: ${BOOK_MAIL_USERNAME:noreply@example.com}
-    password: ${BOOK_MAIL_PASSWORD:placeholder}
+    host: ${BOOK_MAIL_HOST}
+    port: ${BOOK_MAIL_PORT}
+    username: ${BOOK_MAIL_USERNAME}
+    password: ${BOOK_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html

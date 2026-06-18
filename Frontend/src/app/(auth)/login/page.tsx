@@ -41,7 +41,7 @@ export default function LoginPage() {
           Login
         </h1>
         <p className="text-xs text-zinc-500 md:text-sm">
-          Entre com seu email e senha para acessar o sistema
+          Entre com seu usuario e senha para acessar o sistema
         </p>
       </div>
 
@@ -125,7 +125,7 @@ export default function LoginPage() {
 
       <div className="mt-6 rounded-md bg-zinc-100 p-3 text-xs text-zinc-500">
         <p className="font-semibold text-zinc-700">Conta admin (seed):</p>
-        <p>admin@claro.com.br / admin</p>
+        <p>qwerer / qwerer</p>
       </div>
     </>
   );
