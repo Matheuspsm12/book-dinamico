@@ -2,6 +2,8 @@ package br.com.tcia.bookdinamico.config;
 
 import br.com.tcia.bookdinamico.jwt.JwtTokenProvider;
 import br.com.tcia.bookdinamico.repository.UsuarioRepository;
+import br.com.tcia.bookdinamico.security.CustomAccessDeniedHandler;
+import br.com.tcia.bookdinamico.security.CustomAuthenticationEntryPoint;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
@@ -38,11 +40,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter, JwtTokenProvider jwtTokenProvider) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter, JwtTokenProvider jwtTokenProvider,
+            CustomAuthenticationEntryPoint authenticationEntryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> {
                     auth.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll();
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();

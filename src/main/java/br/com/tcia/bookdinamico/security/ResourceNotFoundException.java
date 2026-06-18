@@ -1,4 +1,4 @@
-package br.com.tcia.bookdinamico.exception;
+package br.com.tcia.bookdinamico.security;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

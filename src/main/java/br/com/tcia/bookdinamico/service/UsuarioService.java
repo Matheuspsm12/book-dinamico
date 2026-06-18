@@ -13,7 +13,7 @@ import br.com.tcia.bookdinamico.repository.PerfilRepository;
 import br.com.tcia.bookdinamico.enums.UsuarioStatus;
 import br.com.tcia.bookdinamico.exception.ErroAutenticacaoException;
 import br.com.tcia.bookdinamico.exception.NegocioException;
-import br.com.tcia.bookdinamico.exception.ResourceNotFoundException;
+import br.com.tcia.bookdinamico.security.ResourceNotFoundException;
 import br.com.tcia.bookdinamico.jwt.JwtTokenProvider;
 import br.com.tcia.bookdinamico.repository.UsuarioRepository;
 import br.com.tcia.bookdinamico.repository.specification.UsuarioSpecifications;

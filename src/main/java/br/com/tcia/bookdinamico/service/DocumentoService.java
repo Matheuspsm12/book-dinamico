@@ -10,7 +10,7 @@ import br.com.tcia.bookdinamico.enums.ExtensaoDocumento;
 import br.com.tcia.bookdinamico.exception.ArquivoException;
 import br.com.tcia.bookdinamico.exception.ErroAutenticacaoException;
 import br.com.tcia.bookdinamico.exception.NegocioException;
-import br.com.tcia.bookdinamico.exception.ResourceNotFoundException;
+import br.com.tcia.bookdinamico.security.ResourceNotFoundException;
 import br.com.tcia.bookdinamico.repository.DocumentoRepository;
 import br.com.tcia.bookdinamico.repository.DocumentoUploadLogRepository;
 import br.com.tcia.bookdinamico.utils.AuthUtils;
