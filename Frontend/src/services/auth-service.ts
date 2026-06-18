@@ -1,0 +1,14 @@
+import api from "src/services/api";
+import type { TokenResponse } from "src/lib/api/types";
+
+export async function login(email: string, senha: string) {
+  const { data } = await api.post<TokenResponse>("/autenticacao/login", {
+    email,
+    senha,
+  });
+  return data;
+}
+
+export async function logout() {
+  await api.post("/autenticacao/logout");
+}
