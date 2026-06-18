@@ -71,6 +71,22 @@ export interface DocumentoMetadataRequest {
   dataAtualizacao: string;
 }
 
+export type ProcessamentoTipo = "DOCUMENTO";
+
+export interface ProcessamentoResponse {
+  id: number;
+  nomeArquivo: string;
+  tipoProcessamento: ProcessamentoTipo | string;
+  nomeProcessamento?: string;
+  resultadoAmigavel?: string;
+  tamanho?: string;
+  usuario?: string;
+  documentoId?: number;
+  dataStart?: string;
+  dataInicio?: string;
+  dataFim?: string;
+}
+
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
