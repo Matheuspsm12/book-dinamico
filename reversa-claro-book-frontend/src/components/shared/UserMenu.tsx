@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button } from "src/components/ui/button";
 import { Dialog } from "src/components/ui/dialog";
-import { useAuth } from "src/contexts/AuthContext";
+import { useAuth } from "src/app/contexts/AuthContext";
 import { cn } from "src/lib/utils";
 import * as usuariosApi from "src/services/usuarios-service";
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AuthProvider } from "src/contexts/AuthContext";
+import { AuthProvider } from "src/app/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: "Book Dinâmico Claro",

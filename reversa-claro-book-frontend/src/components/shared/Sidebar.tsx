@@ -12,7 +12,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { useAuth } from "src/contexts/AuthContext";
+import { useAuth } from "src/app/contexts/AuthContext";
 import { cn } from "src/lib/utils";
 
 type Item = {
