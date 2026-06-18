@@ -41,37 +41,37 @@ public class Usuario implements Serializable {
     private Long id;
 
     @Column(name = "nome", nullable = false, length = 200)
-    @NotBlank(message = "{usuario.nome.not-blank}")
-    @Size(max = 200, message = "{usuario.nome.size}")
+    @NotBlank(message = "Nome não pode estar vazio!")
+    @Size(max = 200, message = "Nome deve ter no máximo {max} caracteres!")
     private String nome;
 
     @Column(name = "empresa", nullable = false, length = 200)
-    @NotBlank(message = "{usuario.empresa.not-blank}")
-    @Size(max = 200, message = "{usuario.empresa.size}")
+    @NotBlank(message = "Empresa não pode estar vazia!")
+    @Size(max = 200, message = "Empresa deve ter no máximo {max} caracteres!")
     private String empresa;
 
     @Column(name = "email", nullable = false, length = 200, unique = true)
-    @NotBlank(message = "{usuario.email.not-blank}")
-    @Email(message = "{usuario.email.invalido}")
-    @Size(max = 200, message = "{usuario.email.size}")
+    @NotBlank(message = "E-mail não pode estar vazio!")
+    @Email(message = "E-mail inválido!")
+    @Size(max = 200, message = "E-mail deve ter no máximo {max} caracteres!")
     private String email;
 
     @Column(name = "senha_hash", nullable = false, length = 255)
-    @NotBlank(message = "{usuario.senha.not-blank}")
+    @NotBlank(message = "Senha não pode estar vazia!")
     private String senhaHash;
 
     @Column(name = "justificativa", nullable = false, columnDefinition = "TEXT")
-    @NotBlank(message = "{usuario.justificativa.not-blank}")
+    @NotBlank(message = "Justificativa não pode estar vazia!")
     private String justificativa;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    @NotNull(message = "{usuario.status.not-null}")
+    @NotNull(message = "Status não pode ser nulo!")
     private UsuarioStatus status;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_perfil", nullable = false)
-    @NotNull(message = "{usuario.perfil.not-null}")
+    @NotNull(message = "Perfil não pode ser nulo!")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Perfil perfil;

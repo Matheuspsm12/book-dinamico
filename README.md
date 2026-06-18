@@ -22,8 +22,9 @@ backend-upload-book/
 │   ├── src/test/java/...    # JUnit 5
 │   ├── src/main/resources/
 │   │   ├── db/migration/    # Flyway (V1..V8)
-│   │   ├── application.yaml application-dev.yaml
-│   │   └── ValidationMessages / messages / errors .properties  # i18n pt-BR
+│   │   ├── application.yaml
+│   │   ├── banner.txt
+│   │   └── logback-spring.xml
 │   ├── mvnw mvnw.cmd .mvn/
 │   └── README.md
 └── Frontend/            # Frontend Next.js (ver README próprio)

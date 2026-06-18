@@ -8,23 +8,23 @@ import lombok.Data;
 @Data
 public class UsuarioCadastroRequest {
 
-    @NotBlank(message = "{usuario.nome.not-blank}")
-    @Size(max = 200, message = "{usuario.nome.size}")
+    @NotBlank(message = "Nome não pode estar vazio!")
+    @Size(max = 200, message = "Nome deve ter no máximo {max} caracteres!")
     private String nome;
 
-    @NotBlank(message = "{usuario.empresa.not-blank}")
-    @Size(max = 200, message = "{usuario.empresa.size}")
+    @NotBlank(message = "Empresa não pode estar vazia!")
+    @Size(max = 200, message = "Empresa deve ter no máximo {max} caracteres!")
     private String empresa;
 
-    @NotBlank(message = "{usuario.email.not-blank}")
-    @Email(message = "{usuario.email.invalido}")
-    @Size(max = 200, message = "{usuario.email.size}")
+    @NotBlank(message = "E-mail não pode estar vazio!")
+    @Email(message = "E-mail inválido!")
+    @Size(max = 200, message = "E-mail deve ter no máximo {max} caracteres!")
     private String email;
 
-    @NotBlank(message = "{usuario.senha.not-blank}")
-    @Size(min = 8, max = 72, message = "{usuario.senha.size}")
+    @NotBlank(message = "Senha não pode estar vazia!")
+    @Size(min = 8, max = 72, message = "Senha deve ter entre {min} e {max} caracteres!")
     private String senha;
 
-    @NotBlank(message = "{usuario.justificativa.not-blank}")
+    @NotBlank(message = "Justificativa não pode estar vazia!")
     private String justificativa;
 }

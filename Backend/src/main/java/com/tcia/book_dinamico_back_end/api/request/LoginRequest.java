@@ -7,10 +7,10 @@ import lombok.Data;
 @Data
 public class LoginRequest {
 
-    @NotBlank(message = "{usuario.email.not-blank}")
-    @Email(message = "{usuario.email.invalido}")
+    @NotBlank(message = "E-mail não pode estar vazio!")
+    @Email(message = "E-mail inválido!")
     private String email;
 
-    @NotBlank(message = "{usuario.senha.not-blank}")
+    @NotBlank(message = "Senha não pode estar vazia!")
     private String senha;
 }

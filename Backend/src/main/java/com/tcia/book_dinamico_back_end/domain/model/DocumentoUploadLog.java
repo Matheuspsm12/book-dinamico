@@ -32,24 +32,24 @@ public class DocumentoUploadLog implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "documento_id", nullable = false)
-    @NotNull(message = "{upload-log.documento.not-null}")
+    @NotNull(message = "Documento do log não pode ser nulo!")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Documento documento;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
-    @NotNull(message = "{upload-log.usuario.not-null}")
+    @NotNull(message = "Usuário do log não pode ser nulo!")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Usuario usuario;
 
     @Column(name = "nome_arquivo", nullable = false, length = 500)
-    @NotBlank(message = "{upload-log.nome-arquivo.not-blank}")
+    @NotBlank(message = "Nome do arquivo não pode estar vazio!")
     private String nomeArquivo;
 
     @Column(name = "datetime", nullable = false)
-    @NotNull(message = "{upload-log.datetime.not-null}")
+    @NotNull(message = "Data/hora do upload não pode ser nula!")
     private LocalDateTime datetime;
 
     @PrePersist

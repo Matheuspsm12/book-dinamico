@@ -40,35 +40,35 @@ public class Documento implements Serializable {
     private Long id;
 
     @Column(name = "nome", nullable = false, length = 255)
-    @NotBlank(message = "{documento.nome.not-blank}")
-    @Size(max = 255, message = "{documento.nome.size}")
+    @NotBlank(message = "Nome do documento não pode estar vazio!")
+    @Size(max = 255, message = "Nome do documento deve ter no máximo {max} caracteres!")
     private String nome;
 
     @Column(name = "descricao", nullable = false, columnDefinition = "TEXT")
-    @NotBlank(message = "{documento.descricao.not-blank}")
+    @NotBlank(message = "Descrição não pode estar vazia!")
     private String descricao;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 20)
-    @NotNull(message = "{documento.tipo.not-null}")
+    @NotNull(message = "Tipo do documento não pode ser nulo!")
     private TipoDocumento tipo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "extensao", nullable = false, length = 10)
-    @NotNull(message = "{documento.extensao.not-null}")
+    @NotNull(message = "Extensão do documento não pode ser nula!")
     private ExtensaoDocumento extensao;
 
     @Column(name = "caminho_armazenamento", nullable = false, length = 500)
-    @NotBlank(message = "{documento.caminho.not-blank}")
-    @Size(max = 500, message = "{documento.caminho.size}")
+    @NotBlank(message = "Caminho de armazenamento não pode estar vazio!")
+    @Size(max = 500, message = "Caminho de armazenamento deve ter no máximo {max} caracteres!")
     private String caminhoArmazenamento;
 
     @Column(name = "tamanho_bytes", nullable = false)
-    @NotNull(message = "{documento.tamanho.not-null}")
+    @NotNull(message = "Tamanho do arquivo não pode ser nulo!")
     private Long tamanhoBytes;
 
     @Column(name = "data_atualizacao", nullable = false)
-    @NotNull(message = "{documento.data-atualizacao.not-null}")
+    @NotNull(message = "Data de atualização não pode ser nula!")
     private LocalDate dataAtualizacao;
 
     @CreatedDate
