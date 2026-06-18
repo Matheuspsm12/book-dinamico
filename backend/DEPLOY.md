@@ -127,8 +127,8 @@ Para parar: `docker compose down` (ou `-v` pra zerar volumes).
 
 ## Arquivos relevantes
 
-- `Dockerfile` — backend (multi-stage Maven 3.9 → JRE 17)
-- `reversa-claro-book-frontend/Dockerfile` — frontend (multi-stage Node 20 → standalone)
+- `backend/Dockerfile` — backend (multi-stage Maven 3.9 → JRE 17)
+- `frontend/Dockerfile` — frontend (multi-stage Node 20 → standalone)
 - `docker-compose.yml` — desenvolvimento local (3 containers)
 - `render.yaml` — blueprint do deploy no Render
 - `.dockerignore` (em ambos) — exclui o que não vai pra imagem

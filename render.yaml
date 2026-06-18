@@ -26,8 +26,8 @@ services:
     runtime: docker
     plan: free
     region: ohio
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     healthCheckPath: /book_dinamico/v3/api-docs
     envVars:
       - key: BOOK_AMBIENTE
@@ -94,8 +94,8 @@ services:
     runtime: docker
     plan: free
     region: ohio
-    dockerfilePath: ./reversa-claro-book-frontend/Dockerfile
-    dockerContext: ./reversa-claro-book-frontend
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
     healthCheckPath: /login
     envVars:
       # Embutido no bundle pelo Dockerfile via ARG → ENV. Render passa em build.
