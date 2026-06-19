@@ -491,8 +491,9 @@ function SubstituirArquivoModal({
     try {
       await docsApi.substituirArquivo(doc.id, file);
       const hoje = hojeLocal();
+      const nomeArquivo = inferNomeFromFilename(file.name);
       const updated = await docsApi.atualizarMetadados(doc.id, {
-        nome: doc.nome,
+        nome: nomeArquivo,
         descricao: doc.descricao,
         dataAtualizacao: hoje,
       });
