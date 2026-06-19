@@ -22,6 +22,8 @@ server:
       force: true
 
 spring:
+  config:
+    import: optional:file:.env[.properties]
   session:
     store-type: none
   profiles:

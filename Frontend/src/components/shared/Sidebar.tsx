@@ -4,6 +4,7 @@ import {
   ChevronRight,
   Download,
   LayoutDashboard,
+  ListChecks,
   LogOut,
   Upload,
   Users,
@@ -39,6 +40,12 @@ const items: Item[] = [
     label: "Upload Book",
     href: "/upload-book",
     icon: Upload,
+    roles: ["ADMIN"],
+  },
+  {
+    label: "Processamentos",
+    href: "/processamentos",
+    icon: ListChecks,
     roles: ["ADMIN"],
   },
   {

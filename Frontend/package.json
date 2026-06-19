@@ -6,7 +6,7 @@
     "dev": "dotenv -e .env.local -- next dev -p 3001",
     "start": "dotenv -e .env.local -- next start -p 3001",
     "build": "next build",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "overrides": {
     "postcss": "^8.5.10"

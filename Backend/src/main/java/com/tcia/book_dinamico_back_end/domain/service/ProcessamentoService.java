@@ -48,6 +48,69 @@ public class ProcessamentoService {
     }
 
     @Transactional
+    public Processamento registrarFila(
+            Documento documento,
+            Usuario usuario,
+            String nomeArquivoOriginal,
+            String contentType) {
+
+        String nomeArquivo = nomeArquivoOriginal != null && !nomeArquivoOriginal.isBlank()
+                ? nomeArquivoOriginal
+                : documento.getNome();
+
+        Processamento processamento = Processamento.builder()
+                .nomeArquivo(nomeArquivo)
+                .contentType(contentType)
+                .tipoProcessamento(ProcessamentoTipo.DOCUMENTO.getCodigo())
+                .executado(false)
+                .reprocessar(false)
+                .qtdReprocessar(0)
+                .qtdReprocessado(0)
+                .resultado(ProcessamentoResultado.AGENDADO.name())
+                .resultadoAmigavel(ProcessamentoResultado.AGENDADO.getDescricao())
+                .parametro(String.valueOf(documento.getId()))
+                .arquivoAProcessar(documento.getCaminhoArmazenamento())
+                .tamanho(formatarTamanho(documento.getTamanhoBytes()))
+                .usuario(usuario)
+                .documento(documento)
+                .build();
+
+        return processamentoRepository.save(processamento);
+    }
+
+    @Transactional
+    public void verificarProcessamento() {
+        processamentoRepository.findByExecutadoFalseOrReprocessarTrue().forEach(this::processar);
+    }
+
+    private void processar(Processamento p) {
+        try {
+            log.info("Processando item {}: {}", p.getId(), p.getNomeArquivo());
+            p.setDataInicio(LocalDateTime.now());
+            
+            // Simulacao de processamento - aqui entraria a logica real se houvesse.
+            // Por enquanto, apenas move de 'agendado' para 'sucesso'
+            p.setArquivoProcessado(p.getArquivoAProcessar());
+            p.setExecutado(true);
+            p.setReprocessar(false);
+            p.setResultado(ProcessamentoResultado.SUCESSO.name());
+            p.setResultadoAmigavel(ProcessamentoResultado.SUCESSO.getDescricao());
+            p.setDataFim(LocalDateTime.now());
+            
+            processamentoRepository.save(p);
+            log.info("Item {} processado com sucesso.", p.getId());
+        } catch (Exception e) {
+            log.error("Erro ao processar item {}: {}", p.getId(), e.getMessage());
+            p.setExecutado(true);
+            p.setReprocessar(false);
+            p.setResultado(ProcessamentoResultado.ERRO.name());
+            p.setResultadoAmigavel(ProcessamentoResultado.ERRO.getDescricao());
+            p.setDataFim(LocalDateTime.now());
+            processamentoRepository.save(p);
+        }
+    }
+
+    @Transactional
     public Processamento registrarDocumentoProcessado(
             Documento documento,
             Usuario usuario,

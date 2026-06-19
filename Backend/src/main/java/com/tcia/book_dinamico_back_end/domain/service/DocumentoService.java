@@ -86,7 +86,7 @@ public class DocumentoService {
         salvo = documentoRepository.save(salvo);
 
         registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
-        processamentoService.registrarDocumentoProcessado(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
+        processamentoService.registrarFila(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
 
         log.info("Documento criado: id={} nome={} tipo={} ext={} tamanho={}",
                 salvo.getId(), salvo.getNome(), salvo.getTipo(), salvo.getExtensao(), salvo.getTamanhoBytes());
@@ -123,7 +123,7 @@ public class DocumentoService {
         Documento salvo = documentoRepository.save(doc);
         storage.deletarSeExistir(caminhoAntigo);
         registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
-        processamentoService.registrarDocumentoProcessado(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
+        processamentoService.registrarFila(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
 
         log.info("Arquivo substituído em documento id={}: novo={}", salvo.getId(), caminhoNovo);
         return documentoMapper.toResponse(salvo);
@@ -168,3 +168,4 @@ public class DocumentoService {
         return admin;
     }
 }
+

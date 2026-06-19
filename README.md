@@ -1,5 +1,35 @@
 # Book Dinâmico
 
+## Rodar manualmente no Windows
+
+Abra dois terminais PowerShell.
+
+Backend:
+
+```powershell
+cd Backend
+.\mvnw.cmd spring-boot:run
+```
+
+O Spring carrega `Backend\.env` automaticamente quando o comando roda dentro da pasta `Backend`.
+
+Frontend:
+
+```powershell
+cd Frontend
+npm install
+npm run dev
+```
+
+O Next usa `Frontend\.env.local`.
+
+URLs esperadas:
+
+```text
+Backend:  http://localhost:8082/book_dinamico
+Frontend: http://localhost:3001
+```
+
 Este repositório é composto por **Backend (Spring Boot)** e **Frontend (Next.js)**, cada um com suas próprias variáveis de ambiente e formas de configuração.
 
 ---
