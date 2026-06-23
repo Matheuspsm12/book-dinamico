@@ -48,6 +48,14 @@ function statusClass(status?: string) {
   return "border-amber-200 bg-amber-50 text-amber-700";
 }
 
+function isSucesso(status?: string) {
+  return (status?.toLowerCase() ?? "").includes("sucesso");
+}
+
+function processamentoTime(proc: ProcessamentoResponse) {
+  return new Date(proc.dataFim ?? proc.dataInicio ?? proc.dataStart ?? 0).getTime();
+}
+
 export default function ProcessamentosPage() {
   const [page, setPage] = useState<PageResponse<ProcessamentoResponse> | null>(
     null,
@@ -102,6 +110,16 @@ export default function ProcessamentosPage() {
       setErr(e instanceof Error ? e.message : "Erro ao reprocessar.");
     } finally {
       setBusyId(null);
+    }
+  }
+
+  const atualPorDocumento = new Map<number, number>();
+  for (const proc of page?.content ?? []) {
+    if (!proc.documentoId || !isSucesso(proc.resultadoAmigavel)) continue;
+    const atualId = atualPorDocumento.get(proc.documentoId);
+    const atual = page?.content.find((p) => p.id === atualId);
+    if (!atual || processamentoTime(proc) > processamentoTime(atual)) {
+      atualPorDocumento.set(proc.documentoId, proc.id);
     }
   }
 
@@ -196,9 +214,16 @@ export default function ProcessamentosPage() {
                             <p className="truncate font-semibold text-zinc-800">
                               {proc.nomeArquivo}
                             </p>
-                            <p className="text-xs text-zinc-500">
-                              {proc.tamanho ?? "-"}
-                            </p>
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                              <span>{proc.tamanho ?? "-"}</span>
+                              {proc.documentoId &&
+                                atualPorDocumento.get(proc.documentoId) ===
+                                  proc.id && (
+                                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700">
+                                    Publicação atual
+                                  </span>
+                                )}
+                            </div>
                           </div>
                         </div>
                       </td>

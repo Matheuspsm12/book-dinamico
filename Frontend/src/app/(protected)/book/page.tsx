@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Pencil, RefreshCw, Upload, X } from "lucide-react";
+import { CheckCircle2, Download, Pencil, RefreshCw, Upload, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "src/components/ui/button";
@@ -33,6 +33,12 @@ function validarArquivo(f: File | null): string | null {
   }
   if (f.size > MAX_BYTES) return "Arquivo maior que 60 MB.";
   return null;
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
 function BookCard({
@@ -87,6 +93,7 @@ export default function BookDownloadPage() {
   const [substituindo, setSubstituindo] = useState<DocumentoResponse | null>(
     null,
   );
+  const [flash, setFlash] = useState<string | null>(null);
 
   const carregar = useCallback(async () => {
     setLoading(true);
@@ -117,6 +124,11 @@ export default function BookDownloadPage() {
     }
   }
 
+  function showSuccess(msg: string) {
+    setFlash(msg);
+    setTimeout(() => setFlash(null), 5000);
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-white">
       <img
@@ -136,6 +148,13 @@ export default function BookDownloadPage() {
             />
           </div>
           <div className="mx-auto mt-2 h-px w-40 bg-[var(--claro-red)]/40" />
+
+          {flash && (
+            <div className="mx-auto mt-6 flex max-w-xl items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-2 text-emerald-700 text-sm">
+              <CheckCircle2 size={16} />
+              <span>{flash}</span>
+            </div>
+          )}
 
           <div className="flex flex-1 items-center justify-center">
             {loading ? (
@@ -187,6 +206,9 @@ export default function BookDownloadPage() {
               >
                 <p className="text-center font-bold uppercase">{d.nome}</p>
                 <p className="mt-1 text-center opacity-80">{d.descricao}</p>
+                <p className="mt-2 text-center font-semibold text-[10px] uppercase opacity-90">
+                  {d.extensao} · {formatBytes(d.tamanhoBytes)}
+                </p>
                 <p className="mt-1 text-center text-[10px] uppercase opacity-70">
                   {formatDate(d.dataAtualizacao)}
                 </p>
@@ -231,9 +253,10 @@ export default function BookDownloadPage() {
         <QuickReplaceModal
           doc={substituindo}
           onClose={() => setSubstituindo(null)}
-          onSaved={async () => {
+          onSaved={async (nomeArquivo) => {
             setSubstituindo(null);
             await carregar();
+            showSuccess(`Arquivo trocado. Publicado agora: ${nomeArquivo}.`);
           }}
         />
       )}
@@ -335,7 +358,7 @@ function QuickReplaceModal({
 }: {
   doc: DocumentoResponse;
   onClose: () => void;
-  onSaved: () => Promise<void>;
+  onSaved: (nomeArquivo: string) => Promise<void>;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -352,12 +375,13 @@ function QuickReplaceModal({
     try {
       await docsApi.substituirArquivo(doc.id, file);
       const hoje = hojeLocal();
+      const nomeArquivo = inferNomeFromFilename(file.name);
       await docsApi.atualizarMetadados(doc.id, {
-        nome: doc.nome,
+        nome: nomeArquivo,
         descricao: doc.descricao,
         dataAtualizacao: hoje,
       });
-      await onSaved();
+      await onSaved(nomeArquivo);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Erro ao substituir.");
       setSubmitting(false);

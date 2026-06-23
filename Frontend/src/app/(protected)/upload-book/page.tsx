@@ -332,6 +332,7 @@ function NovoModal({
   onError: (msg: string) => void;
 }) {
   const [nome, setNome] = useState("");
+  const [nomeManual, setNomeManual] = useState(false);
   const [descricao, setDescricao] = useState("");
   const [data, setData] = useState(() => hojeLocal());
   const [file, setFile] = useState<File | null>(null);
@@ -340,6 +341,7 @@ function NovoModal({
 
   function reset() {
     setNome("");
+    setNomeManual(false);
     setDescricao("");
     setData(hojeLocal());
     setFile(null);
@@ -399,7 +401,10 @@ function NovoModal({
             id="novo-nome"
             className="mt-1"
             value={nome}
-            onChange={(e) => setNome(e.target.value)}
+            onChange={(e) => {
+              setNome(e.target.value);
+              setNomeManual(e.target.value.trim().length > 0);
+            }}
           />
         </div>
         <div>
@@ -429,7 +434,7 @@ function NovoModal({
               file={file}
               onPick={(f) => {
                 setFile(f);
-                if (f && !nome.trim()) setNome(inferNomeFromFilename(f.name));
+                if (f && !nomeManual) setNome(inferNomeFromFilename(f.name));
               }}
             />
           </div>
@@ -491,8 +496,9 @@ function SubstituirArquivoModal({
     try {
       await docsApi.substituirArquivo(doc.id, file);
       const hoje = hojeLocal();
+      const nomeArquivo = inferNomeFromFilename(file.name);
       const updated = await docsApi.atualizarMetadados(doc.id, {
-        nome: doc.nome,
+        nome: nomeArquivo,
         descricao: doc.descricao,
         dataAtualizacao: hoje,
       });
