@@ -15,6 +15,7 @@ Frontend/.env.*
 Frontend/.vercel
 Frontend/*.tsbuildinfo
 Frontend/next-env.d.ts
+Frontend/*.log
 Frontend/npm-debug.log*
 Frontend/yarn-debug.log*
 Frontend/yarn-error.log*
