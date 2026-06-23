@@ -33,6 +33,7 @@ api.interceptors.request.use((config) => {
 
   if (typeof FormData !== "undefined" && config.data instanceof FormData) {
     config.timeout = MULTIPART_TIMEOUT_MS;
+    delete config.headers["Content-Type"];
   }
 
   return config;
