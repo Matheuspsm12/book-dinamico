@@ -83,6 +83,11 @@ public class ProcessamentoService {
         processamentoRepository.findByExecutadoFalseOrReprocessarTrue().forEach(this::processar);
     }
 
+    @Transactional
+    public void processarImediato(Processamento processamento) {
+        processar(processamento);
+    }
+
     private void processar(Processamento p) {
         try {
             log.info("Processando item {}: {}", p.getId(), p.getNomeArquivo());
@@ -177,6 +182,11 @@ public class ProcessamentoService {
         processamento.setQtdReprocessado(processamento.getQtdReprocessado() + 1);
         processamento.setDataFim(null);
         processamentoRepository.save(processamento);
+    }
+
+    @Transactional
+    public void removerPorDocumento(Long documentoId) {
+        processamentoRepository.deleteByDocumentoId(documentoId);
     }
 
     private String formatarTamanho(Long bytes) {
