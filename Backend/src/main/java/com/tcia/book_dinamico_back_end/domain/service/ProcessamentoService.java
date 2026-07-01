@@ -1,7 +1,10 @@
 package com.tcia.book_dinamico_back_end.domain.service;
 
+import com.tcia.book_dinamico_back_end.core.enums.AuditoriaAcaoEnum;
 import com.tcia.book_dinamico_back_end.core.enums.ProcessamentoResultado;
 import com.tcia.book_dinamico_back_end.core.enums.ProcessamentoTipo;
+import com.tcia.book_dinamico_back_end.core.util.UsuarioLogadoUtil;
+import com.tcia.book_dinamico_back_end.domain.model.Auditoria;
 import com.tcia.book_dinamico_back_end.domain.exception.ArquivoException;
 import com.tcia.book_dinamico_back_end.domain.exception.NegocioException;
 import com.tcia.book_dinamico_back_end.domain.model.Documento;
@@ -28,6 +31,8 @@ public class ProcessamentoService {
 
     private final ProcessamentoRepository processamentoRepository;
     private final ExtracaoConteudoService extracaoConteudoService;
+    private final AuditoriaService auditoriaService;
+    private final UsuarioLogadoUtil usuarioLogadoUtil;
 
     @Transactional(readOnly = true)
     public Processamento buscarPorId(Long id) {
@@ -104,6 +109,7 @@ public class ProcessamentoService {
             p.setDataFim(LocalDateTime.now());
 
             processamentoRepository.save(p);
+            auditar(p, "SUCESSO", p.getNomeArquivo());
             log.info("Item {} processado com sucesso.", p.getId());
         } catch (Exception e) {
             log.error("Erro ao processar item {}: {}", p.getId(), e.getMessage());
@@ -115,7 +121,18 @@ public class ProcessamentoService {
                     : ProcessamentoResultado.ERRO.getDescricao());
             p.setDataFim(LocalDateTime.now());
             processamentoRepository.save(p);
+            auditar(p, "ERRO", e.getMessage());
         }
+    }
+
+    private void auditar(Processamento p, String status, String detalhe) {
+        Auditoria auditoria = new Auditoria();
+        auditoria.setUsuario(usuarioLogadoUtil.getEmailUsuarioLogado());
+        auditoria.setAcao(AuditoriaAcaoEnum.PROCESSAR_DOCUMENTO.getAcao().name());
+        auditoria.setEntidade(AuditoriaAcaoEnum.PROCESSAR_DOCUMENTO.getEntidade().name());
+        auditoria.setEntidadeId(p.getId());
+        auditoria.setDetalhes(status + " - " + detalhe);
+        auditoriaService.salvar(auditoria);
     }
 
     @Transactional

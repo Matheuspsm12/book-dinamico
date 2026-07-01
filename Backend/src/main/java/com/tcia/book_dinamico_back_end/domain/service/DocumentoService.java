@@ -6,6 +6,8 @@ import com.tcia.book_dinamico_back_end.api.response.DocumentoResponse;
 import com.tcia.book_dinamico_back_end.domain.model.Documento;
 import com.tcia.book_dinamico_back_end.domain.model.DocumentoUploadLog;
 import com.tcia.book_dinamico_back_end.domain.model.Usuario;
+import com.tcia.book_dinamico_back_end.core.annotation.Auditar;
+import com.tcia.book_dinamico_back_end.core.enums.AuditoriaAcaoEnum;
 import com.tcia.book_dinamico_back_end.core.enums.ExtensaoDocumento;
 import com.tcia.book_dinamico_back_end.domain.exception.ArquivoException;
 import com.tcia.book_dinamico_back_end.domain.exception.ErroAutenticacaoException;
@@ -64,6 +66,7 @@ public class DocumentoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Documento não encontrado: " + id));
     }
 
+    @Auditar(acao = AuditoriaAcaoEnum.CRIAR_DOCUMENTO, detalhes = false)
     @Transactional
     public DocumentoResponse criar(DocumentoMetadataRequest metadata, MultipartFile arquivo) {
         Usuario admin = adminLogado();
@@ -108,6 +111,7 @@ public class DocumentoService {
         return respostas;
     }
 
+    @Auditar(acao = AuditoriaAcaoEnum.ALTERAR_DOCUMENTO, detalhes = false)
     @Transactional
     public DocumentoResponse substituirArquivo(Long id, MultipartFile arquivo) {
         Usuario admin = adminLogado();
@@ -133,6 +137,7 @@ public class DocumentoService {
         return documentoMapper.toResponse(salvo);
     }
 
+    @Auditar(acao = AuditoriaAcaoEnum.ALTERAR_DOCUMENTO)
     @Transactional
     public DocumentoResponse atualizarMetadados(Long id, DocumentoMetadataRequest request) {
         Documento doc = buscarOuFalhar(id);
@@ -148,6 +153,7 @@ public class DocumentoService {
         return documentoMapper.toResponse(salvo);
     }
 
+    @Auditar(acao = AuditoriaAcaoEnum.EXCLUIR_DOCUMENTO)
     @Transactional
     public void deletar(Long id) {
         Documento doc = buscarOuFalhar(id);
