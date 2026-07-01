@@ -20,13 +20,15 @@ public class ProcessamentoScheduler {
     @Scheduled(cron = "0 */10 * * * *")
     public void executarProcessamento() {
         try {
+            log.info("Verificando Agendamentos");
             var habilitado = dominioService.buscarPorChave("PROCESSAMENTO_HABILITADO");
 
             if (Objects.nonNull(habilitado.getValor()) && Boolean.parseBoolean(habilitado.getValor())) {
-                log.info("Verificando Agendamentos");
                 service.verificarProcessamento();
-                log.info("Processos executados!");
+            } else{
+                log.info("Processamento nao habilitado");
             }
+            log.info("Processos executados!");
         } catch (Exception e) {
             log.error("Erro ao executar agendamentos", e);
         }
