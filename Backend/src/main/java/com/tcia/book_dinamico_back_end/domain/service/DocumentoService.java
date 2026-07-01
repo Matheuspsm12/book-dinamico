@@ -11,6 +11,7 @@ import com.tcia.book_dinamico_back_end.domain.exception.ArquivoException;
 import com.tcia.book_dinamico_back_end.domain.exception.ErroAutenticacaoException;
 import com.tcia.book_dinamico_back_end.domain.exception.NegocioException;
 import com.tcia.book_dinamico_back_end.domain.exception.ResourceNotFoundException;
+import com.tcia.book_dinamico_back_end.domain.repository.DocumentoAbaRepository;
 import com.tcia.book_dinamico_back_end.domain.repository.DocumentoRepository;
 import com.tcia.book_dinamico_back_end.domain.repository.DocumentoUploadLogRepository;
 import com.tcia.book_dinamico_back_end.core.util.AuthUtils;
@@ -32,6 +33,7 @@ import java.util.List;
 public class DocumentoService {
 
     private final DocumentoRepository documentoRepository;
+    private final DocumentoAbaRepository documentoAbaRepository;
     private final DocumentoUploadLogRepository uploadLogRepository;
     private final DocumentoMapper documentoMapper;
     private final ArquivoStorageService storage;
@@ -150,6 +152,7 @@ public class DocumentoService {
     public void deletar(Long id) {
         Documento doc = buscarOuFalhar(id);
         processamentoService.removerPorDocumento(id);
+        documentoAbaRepository.deleteByDocumentoId(id);
         documentoRepository.delete(doc);
         log.info("Documento soft-deletado id={}", id);
     }

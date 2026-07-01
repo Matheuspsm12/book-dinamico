@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 public class ProcessamentoService {
 
     private final ProcessamentoRepository processamentoRepository;
+    private final ExtracaoConteudoService extracaoConteudoService;
 
     @Transactional(readOnly = true)
     public Processamento buscarPorId(Long id) {
@@ -92,16 +93,16 @@ public class ProcessamentoService {
         try {
             log.info("Processando item {}: {}", p.getId(), p.getNomeArquivo());
             p.setDataInicio(LocalDateTime.now());
-            
-            // Simulacao de processamento - aqui entraria a logica real se houvesse.
-            // Por enquanto, apenas move de 'agendado' para 'sucesso'
+
+            extracaoConteudoService.extrair(p);
+
             p.setArquivoProcessado(p.getArquivoAProcessar());
             p.setExecutado(true);
             p.setReprocessar(false);
             p.setResultado(ProcessamentoResultado.SUCESSO.name());
             p.setResultadoAmigavel(ProcessamentoResultado.SUCESSO.getDescricao());
             p.setDataFim(LocalDateTime.now());
-            
+
             processamentoRepository.save(p);
             log.info("Item {} processado com sucesso.", p.getId());
         } catch (Exception e) {
@@ -109,7 +110,9 @@ public class ProcessamentoService {
             p.setExecutado(true);
             p.setReprocessar(false);
             p.setResultado(ProcessamentoResultado.ERRO.name());
-            p.setResultadoAmigavel(ProcessamentoResultado.ERRO.getDescricao());
+            p.setResultadoAmigavel(e instanceof NegocioException
+                    ? e.getMessage()
+                    : ProcessamentoResultado.ERRO.getDescricao());
             p.setDataFim(LocalDateTime.now());
             processamentoRepository.save(p);
         }
