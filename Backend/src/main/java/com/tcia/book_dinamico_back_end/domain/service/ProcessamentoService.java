@@ -185,6 +185,7 @@ public class ProcessamentoService {
         processamento.setQtdReprocessado(processamento.getQtdReprocessado() + 1);
         processamento.setDataFim(null);
         processamentoRepository.save(processamento);
+        processar(processamento);
     }
 
     @Transactional

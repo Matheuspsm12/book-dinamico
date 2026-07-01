@@ -7,6 +7,7 @@ import {
   Pencil,
   Plus,
   RefreshCw,
+  Table2,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -20,7 +21,10 @@ import { Dialog } from "src/components/ui/dialog";
 import { Input } from "src/components/ui/input";
 import { Label } from "src/components/ui/label";
 import { useAuth } from "src/app/contexts/AuthContext";
-import type { DocumentoResponse } from "src/lib/api/types";
+import type {
+  DocumentoAbaResponse,
+  DocumentoResponse,
+} from "src/lib/api/types";
 import {
   cn,
   formatDate,
@@ -37,6 +41,7 @@ type Modal =
   | { kind: "novo" }
   | { kind: "substituir"; doc: DocumentoResponse }
   | { kind: "editar"; doc: DocumentoResponse }
+  | { kind: "conteudo"; doc: DocumentoResponse }
   | { kind: "excluir"; doc: DocumentoResponse };
 
 function extLabel(ext: DocumentoResponse["extensao"]) {
@@ -157,6 +162,7 @@ export default function UploadBookPage() {
               doc={d}
               onSubstituir={() => setModal({ kind: "substituir", doc: d })}
               onEditar={() => setModal({ kind: "editar", doc: d })}
+              onConteudo={() => setModal({ kind: "conteudo", doc: d })}
               onExcluir={() => setModal({ kind: "excluir", doc: d })}
             />
           ))}
@@ -199,6 +205,14 @@ export default function UploadBookPage() {
         />
       )}
 
+      {modal.kind === "conteudo" && (
+        <ConteudoModal
+          doc={modal.doc}
+          open
+          onClose={() => setModal({ kind: "none" })}
+        />
+      )}
+
       {modal.kind === "excluir" && (
         <ExcluirModal
           doc={modal.doc}
@@ -215,15 +229,88 @@ export default function UploadBookPage() {
   );
 }
 
+function ConteudoModal({
+  doc,
+  open,
+  onClose,
+}: {
+  doc: DocumentoResponse;
+  open: boolean;
+  onClose: () => void;
+}) {
+  const [abas, setAbas] = useState<DocumentoAbaResponse[] | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setAbas(null);
+    setErro(null);
+    docsApi
+      .verConteudo(doc.id)
+      .then(setAbas)
+      .catch((e) =>
+        setErro(e instanceof Error ? e.message : "Erro ao carregar conteúdo."),
+      );
+  }, [open, doc.id]);
+
+  const rotulo = doc.extensao === "PPTX" ? "Slides" : "Abas";
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(o) => !o && onClose()}
+      title={`Conteúdo — ${doc.nome}`}
+      description="Extraído no processamento do arquivo."
+      size="lg"
+    >
+      {erro && (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-red-700 text-sm">
+          {erro}
+        </div>
+      )}
+      {!erro && abas === null && (
+        <p className="py-6 text-center text-sm text-zinc-500">Carregando…</p>
+      )}
+      {!erro && abas !== null && abas.length === 0 && (
+        <p className="py-6 text-center text-sm text-zinc-500">
+          Nenhum conteúdo extraído. Reprocesse o documento.
+        </p>
+      )}
+      {!erro && abas !== null && abas.length > 0 && (
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-zinc-200 border-b text-left text-zinc-500">
+              <th className="py-2 font-medium">{rotulo}</th>
+              <th className="py-2 text-right font-medium">Linhas</th>
+              <th className="py-2 text-right font-medium">Colunas</th>
+            </tr>
+          </thead>
+          <tbody>
+            {abas.map((a, i) => (
+              <tr key={i} className="border-zinc-100 border-b">
+                <td className="py-2 text-zinc-800">{a.nomeAba}</td>
+                <td className="py-2 text-right text-zinc-700">{a.qtdLinhas}</td>
+                <td className="py-2 text-right text-zinc-700">{a.qtdColunas}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </Dialog>
+  );
+}
+
 function DocCard({
   doc,
   onSubstituir,
   onEditar,
+  onConteudo,
   onExcluir,
 }: {
   doc: DocumentoResponse;
   onSubstituir: () => void;
   onEditar: () => void;
+  onConteudo: () => void;
   onExcluir: () => void;
 }) {
   const Icon = doc.extensao === "PPTX" ? FileText : FileSpreadsheet;
@@ -269,6 +356,9 @@ function DocCard({
           </Button>
           <Button size="sm" variant="outline" onClick={onEditar}>
             <Pencil size={14} /> Editar
+          </Button>
+          <Button size="sm" variant="outline" onClick={onConteudo}>
+            <Table2 size={14} /> Ver conteúdo
           </Button>
           <Button
             size="sm"

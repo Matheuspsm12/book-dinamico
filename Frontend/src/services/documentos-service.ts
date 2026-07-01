@@ -1,11 +1,19 @@
 import api from "src/services/api";
 import type {
+  DocumentoAbaResponse,
   DocumentoMetadataRequest,
   DocumentoResponse,
 } from "src/lib/api/types";
 
 export async function listar() {
   const { data } = await api.get<DocumentoResponse[]>("/api/documentos");
+  return data;
+}
+
+export async function verConteudo(id: number) {
+  const { data } = await api.get<DocumentoAbaResponse[]>(
+    `/api/documentos/${id}/conteudo`,
+  );
   return data;
 }
 

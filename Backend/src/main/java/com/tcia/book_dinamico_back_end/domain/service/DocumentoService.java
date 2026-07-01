@@ -2,6 +2,7 @@ package com.tcia.book_dinamico_back_end.domain.service;
 
 import com.tcia.book_dinamico_back_end.infrastructure.mapper.DocumentoMapper;
 import com.tcia.book_dinamico_back_end.api.request.DocumentoMetadataRequest;
+import com.tcia.book_dinamico_back_end.api.response.DocumentoAbaResponse;
 import com.tcia.book_dinamico_back_end.api.response.DocumentoResponse;
 import com.tcia.book_dinamico_back_end.domain.model.Documento;
 import com.tcia.book_dinamico_back_end.domain.model.DocumentoUploadLog;
@@ -44,6 +45,17 @@ public class DocumentoService {
     public List<DocumentoResponse> listar() {
         return documentoMapper.toResponseList(
                 documentoRepository.findByAtivoTrueOrderByAtualizadoEmDesc());
+    }
+
+    public List<DocumentoAbaResponse> listarAbas(Long id) {
+        buscarOuFalhar(id);
+        return documentoAbaRepository.findByDocumentoId(id).stream()
+                .map(a -> DocumentoAbaResponse.builder()
+                        .nomeAba(a.getNomeAba())
+                        .qtdLinhas(a.getQtdLinhas())
+                        .qtdColunas(a.getQtdColunas())
+                        .build())
+                .toList();
     }
 
     public DocumentoResponse buscar(Long id) {

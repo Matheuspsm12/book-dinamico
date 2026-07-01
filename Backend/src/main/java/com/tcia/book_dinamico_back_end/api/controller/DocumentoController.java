@@ -2,6 +2,7 @@ package com.tcia.book_dinamico_back_end.api.controller;
 
 import com.tcia.book_dinamico_back_end.core.annotation.DocumentarAPI;
 import com.tcia.book_dinamico_back_end.api.request.DocumentoMetadataRequest;
+import com.tcia.book_dinamico_back_end.api.response.DocumentoAbaResponse;
 import com.tcia.book_dinamico_back_end.api.response.DocumentoResponse;
 import com.tcia.book_dinamico_back_end.domain.model.Documento;
 import com.tcia.book_dinamico_back_end.domain.service.DocumentoService;
@@ -39,6 +40,14 @@ public class DocumentoController {
     @GetMapping("/{id}")
     public ResponseEntity<DocumentoResponse> buscar(@PathVariable Long id) {
         return ResponseEntity.ok(documentoService.buscar(id));
+    }
+
+    @Operation(summary = "Conteúdo extraído do documento",
+            description = "Abas (planilha) ou slides (apresentação) extraídos no processamento.")
+    @DocumentarAPI
+    @GetMapping("/{id}/conteudo")
+    public ResponseEntity<List<DocumentoAbaResponse>> conteudo(@PathVariable Long id) {
+        return ResponseEntity.ok(documentoService.listarAbas(id));
     }
 
     @Operation(summary = "Baixar binário do documento",
