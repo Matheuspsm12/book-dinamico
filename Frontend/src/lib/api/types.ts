@@ -71,12 +71,6 @@ export interface DocumentoMetadataRequest {
   dataAtualizacao: string;
 }
 
-export interface DocumentoAbaResponse {
-  nomeAba: string;
-  qtdLinhas: number;
-  qtdColunas: number;
-}
-
 export type ProcessamentoTipo = "DOCUMENTO";
 
 export interface ProcessamentoResponse {

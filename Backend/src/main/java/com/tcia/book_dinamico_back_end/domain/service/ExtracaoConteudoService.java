@@ -52,12 +52,14 @@ public class ExtracaoConteudoService {
 
     private void extrairPlanilha(Documento documento, InputStream in) throws IOException {
         try (Workbook workbook = WorkbookFactory.create(in)) {
+            log.info("Extraido de '{}': {} aba(s)", documento.getNome(), workbook.getNumberOfSheets());
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
                 int linhas = sheet.getPhysicalNumberOfRows() > 0 ? sheet.getLastRowNum() + 1 : 0;
                 Row cabecalho = sheet.getRow(sheet.getFirstRowNum());
                 int colunas = cabecalho != null ? Math.max(cabecalho.getLastCellNum(), 0) : 0;
 
+                log.info("  {}: {} linhas x {} colunas", sheet.getSheetName(), linhas, colunas);
                 documentoAbaRepository.save(DocumentoAba.builder()
                         .documentoId(documento.getId())
                         .nomeAba(sheet.getSheetName())
@@ -70,10 +72,12 @@ public class ExtracaoConteudoService {
 
     private void extrairApresentacao(Documento documento, InputStream in) throws IOException {
         try (XMLSlideShow ppt = new XMLSlideShow(in)) {
+            int slides = ppt.getSlides().size();
+            log.info("Extraido de '{}': {} slide(s)", documento.getNome(), slides);
             documentoAbaRepository.save(DocumentoAba.builder()
                     .documentoId(documento.getId())
                     .nomeAba("Apresentacao")
-                    .qtdLinhas(ppt.getSlides().size())
+                    .qtdLinhas(slides)
                     .qtdColunas(0)
                     .build());
         }
