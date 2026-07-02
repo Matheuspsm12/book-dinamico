@@ -123,10 +123,12 @@ export default function LoginPage() {
         Crie sua conta
       </Link>
 
-      <div className="mt-6 rounded-md bg-zinc-100 p-3 text-xs text-zinc-500">
-        <p className="font-semibold text-zinc-700">Conta admin (seed):</p>
-        <p>qwerer / qwerer</p>
-      </div>
+      {process.env.NODE_ENV !== "production" && (
+        <div className="mt-6 rounded-md bg-zinc-100 p-3 text-xs text-zinc-500">
+          <p className="font-semibold text-zinc-700">Conta admin (seed):</p>
+          <p>qwerer / qwerer</p>
+        </div>
+      )}
     </>
   );
 }

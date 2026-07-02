@@ -6,11 +6,14 @@ import com.tcia.book_dinamico_back_end.api.response.DocumentoResponse;
 import com.tcia.book_dinamico_back_end.domain.model.Documento;
 import com.tcia.book_dinamico_back_end.domain.model.DocumentoUploadLog;
 import com.tcia.book_dinamico_back_end.domain.model.Usuario;
+import com.tcia.book_dinamico_back_end.core.annotation.Auditar;
+import com.tcia.book_dinamico_back_end.core.enums.AuditoriaAcaoEnum;
 import com.tcia.book_dinamico_back_end.core.enums.ExtensaoDocumento;
 import com.tcia.book_dinamico_back_end.domain.exception.ArquivoException;
 import com.tcia.book_dinamico_back_end.domain.exception.ErroAutenticacaoException;
 import com.tcia.book_dinamico_back_end.domain.exception.NegocioException;
 import com.tcia.book_dinamico_back_end.domain.exception.ResourceNotFoundException;
+import com.tcia.book_dinamico_back_end.domain.repository.DocumentoAbaRepository;
 import com.tcia.book_dinamico_back_end.domain.repository.DocumentoRepository;
 import com.tcia.book_dinamico_back_end.domain.repository.DocumentoUploadLogRepository;
 import com.tcia.book_dinamico_back_end.core.util.AuthUtils;
@@ -32,6 +35,7 @@ import java.util.List;
 public class DocumentoService {
 
     private final DocumentoRepository documentoRepository;
+    private final DocumentoAbaRepository documentoAbaRepository;
     private final DocumentoUploadLogRepository uploadLogRepository;
     private final DocumentoMapper documentoMapper;
     private final ArquivoStorageService storage;
@@ -62,6 +66,7 @@ public class DocumentoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Documento não encontrado: " + id));
     }
 
+    @Auditar(acao = AuditoriaAcaoEnum.CRIAR_DOCUMENTO, detalhes = false)
     @Transactional
     public DocumentoResponse criar(DocumentoMetadataRequest metadata, MultipartFile arquivo) {
         Usuario admin = adminLogado();
@@ -106,6 +111,7 @@ public class DocumentoService {
         return respostas;
     }
 
+    @Auditar(acao = AuditoriaAcaoEnum.ALTERAR_DOCUMENTO, detalhes = false)
     @Transactional
     public DocumentoResponse substituirArquivo(Long id, MultipartFile arquivo) {
         Usuario admin = adminLogado();
@@ -131,6 +137,7 @@ public class DocumentoService {
         return documentoMapper.toResponse(salvo);
     }
 
+    @Auditar(acao = AuditoriaAcaoEnum.ALTERAR_DOCUMENTO)
     @Transactional
     public DocumentoResponse atualizarMetadados(Long id, DocumentoMetadataRequest request) {
         Documento doc = buscarOuFalhar(id);
@@ -146,10 +153,12 @@ public class DocumentoService {
         return documentoMapper.toResponse(salvo);
     }
 
+    @Auditar(acao = AuditoriaAcaoEnum.EXCLUIR_DOCUMENTO)
     @Transactional
     public void deletar(Long id) {
         Documento doc = buscarOuFalhar(id);
         processamentoService.removerPorDocumento(id);
+        documentoAbaRepository.deleteByDocumentoId(id);
         documentoRepository.delete(doc);
         log.info("Documento soft-deletado id={}", id);
     }

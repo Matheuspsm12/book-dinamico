@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface PerfilRepository extends JpaRepository<Perfil, Long> {
 
     Optional<Perfil> findByNomePerfil(String nomePerfil);
+
+    boolean existsByNomePerfilIgnoreCase(String nomePerfil);
 }

@@ -1,7 +1,10 @@
 package com.tcia.book_dinamico_back_end.domain.service;
 
+import com.tcia.book_dinamico_back_end.core.enums.AuditoriaAcaoEnum;
 import com.tcia.book_dinamico_back_end.core.enums.ProcessamentoResultado;
 import com.tcia.book_dinamico_back_end.core.enums.ProcessamentoTipo;
+import com.tcia.book_dinamico_back_end.core.util.UsuarioLogadoUtil;
+import com.tcia.book_dinamico_back_end.domain.model.Auditoria;
 import com.tcia.book_dinamico_back_end.domain.exception.ArquivoException;
 import com.tcia.book_dinamico_back_end.domain.exception.NegocioException;
 import com.tcia.book_dinamico_back_end.domain.model.Documento;
@@ -27,6 +30,9 @@ import java.time.LocalDateTime;
 public class ProcessamentoService {
 
     private final ProcessamentoRepository processamentoRepository;
+    private final ExtracaoConteudoService extracaoConteudoService;
+    private final AuditoriaService auditoriaService;
+    private final UsuarioLogadoUtil usuarioLogadoUtil;
 
     @Transactional(readOnly = true)
     public Processamento buscarPorId(Long id) {
@@ -92,27 +98,41 @@ public class ProcessamentoService {
         try {
             log.info("Processando item {}: {}", p.getId(), p.getNomeArquivo());
             p.setDataInicio(LocalDateTime.now());
-            
-            // Simulacao de processamento - aqui entraria a logica real se houvesse.
-            // Por enquanto, apenas move de 'agendado' para 'sucesso'
+
+            extracaoConteudoService.extrair(p);
+
             p.setArquivoProcessado(p.getArquivoAProcessar());
             p.setExecutado(true);
             p.setReprocessar(false);
             p.setResultado(ProcessamentoResultado.SUCESSO.name());
             p.setResultadoAmigavel(ProcessamentoResultado.SUCESSO.getDescricao());
             p.setDataFim(LocalDateTime.now());
-            
+
             processamentoRepository.save(p);
+            auditar(p, "SUCESSO", p.getNomeArquivo());
             log.info("Item {} processado com sucesso.", p.getId());
         } catch (Exception e) {
             log.error("Erro ao processar item {}: {}", p.getId(), e.getMessage());
             p.setExecutado(true);
             p.setReprocessar(false);
             p.setResultado(ProcessamentoResultado.ERRO.name());
-            p.setResultadoAmigavel(ProcessamentoResultado.ERRO.getDescricao());
+            p.setResultadoAmigavel(e instanceof NegocioException
+                    ? e.getMessage()
+                    : ProcessamentoResultado.ERRO.getDescricao());
             p.setDataFim(LocalDateTime.now());
             processamentoRepository.save(p);
+            auditar(p, "ERRO", e.getMessage());
         }
+    }
+
+    private void auditar(Processamento p, String status, String detalhe) {
+        Auditoria auditoria = new Auditoria();
+        auditoria.setUsuario(usuarioLogadoUtil.getEmailUsuarioLogado());
+        auditoria.setAcao(AuditoriaAcaoEnum.PROCESSAR_DOCUMENTO.getAcao().name());
+        auditoria.setEntidade(AuditoriaAcaoEnum.PROCESSAR_DOCUMENTO.getEntidade().name());
+        auditoria.setEntidadeId(p.getId());
+        auditoria.setDetalhes(status + " - " + detalhe);
+        auditoriaService.salvar(auditoria);
     }
 
     @Transactional
@@ -182,6 +202,7 @@ public class ProcessamentoService {
         processamento.setQtdReprocessado(processamento.getQtdReprocessado() + 1);
         processamento.setDataFim(null);
         processamentoRepository.save(processamento);
+        processar(processamento);
     }
 
     @Transactional

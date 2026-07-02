@@ -1,6 +1,6 @@
 app:
   ambiente: ${BOOK_AMBIENTE}
-  jwt-secret: lQ3V4s9F8d7J3kL2aH6rP1zX0vY8tQ5wN1bR9sU2eM0=
+  jwt-secret: ${BOOK_JWT_SECRET}
   jwt-secure-cookie: true
   empresa: TCIA
   nome-sistema: ${BOOK_NOME_SISTEMA}
