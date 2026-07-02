@@ -107,7 +107,7 @@ export default function UploadBookPage() {
   return (
     <div>
       <PageHeader
-        title="Upload do Book Dinâmico"
+        title="Upload do Book"
         subtitle="Gerencie os documentos publicados no portal."
       />
 
