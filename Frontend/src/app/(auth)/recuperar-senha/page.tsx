@@ -35,14 +35,15 @@ export default function RecuperarSenhaPage() {
           Recuperar senha
         </h1>
         <p className="text-xs text-zinc-500 md:text-sm">
-          Informe seu e-mail e enviaremos uma senha temporária.
+          Informe seu e-mail e enviaremos um link para redefinir sua senha.
         </p>
       </div>
 
       {ok ? (
         <div className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-3 text-emerald-700 text-sm">
-          Se o e-mail informado estiver cadastrado, enviamos uma senha
-          temporária. Verifique sua caixa de entrada e faça login com ela.
+          Se o e-mail informado estiver cadastrado, enviamos um link para
+          redefinir sua senha. Verifique sua caixa de entrada (o link é válido
+          por 1 hora).
         </div>
       ) : (
         <form className="space-y-5" onSubmit={onSubmit}>
@@ -65,7 +66,7 @@ export default function RecuperarSenhaPage() {
             className="h-auto w-full bg-zinc-900 py-3 text-base text-white hover:bg-zinc-800"
             disabled={loading}
           >
-            {loading ? "Enviando..." : "Enviar senha temporária"}
+            {loading ? "Enviando..." : "Enviar link de redefinição"}
           </Button>
 
           {err && (
