@@ -42,6 +42,7 @@ public class DocumentoService {
     private final IntegridadeArquivoValidator integridadeValidator;
     private final AuthUtils authUtils;
     private final ProcessamentoService processamentoService;
+    private final NotificacaoEmailService notificacaoEmailService;
 
     public List<DocumentoResponse> listar() {
         return documentoMapper.toResponseList(
@@ -96,6 +97,8 @@ public class DocumentoService {
 
         log.info("Documento criado: id={} nome={} tipo={} ext={} tamanho={}",
                 salvo.getId(), salvo.getNome(), salvo.getTipo(), salvo.getExtensao(), salvo.getTamanhoBytes());
+
+        notificacaoEmailService.notificarNovaPublicacao();
         return documentoMapper.toResponse(salvo);
     }
 

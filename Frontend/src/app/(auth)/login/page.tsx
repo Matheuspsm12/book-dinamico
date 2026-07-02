@@ -99,6 +99,13 @@ export default function LoginPage() {
           >
             Permanecer logado
           </Label>
+
+          <Link
+            href="/recuperar-senha"
+            className="ml-auto font-medium text-[var(--claro-red)] text-sm hover:underline"
+          >
+            Esqueci minha senha
+          </Link>
         </div>
 
         <Button

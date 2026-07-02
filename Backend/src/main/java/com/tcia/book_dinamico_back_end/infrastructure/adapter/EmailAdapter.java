@@ -60,6 +60,39 @@ public class EmailAdapter {
     }
 
     @Async
+    public void enviarOciosidade(Usuario usuario) {
+        String assunto = "Confirmação de interesse na manutenção do seu acesso";
+        String corpo = """
+                <p>Olá,</p>
+                <p>Identificamos que seu usuário não realiza acesso ao portal há mais de 4 meses.</p>
+                <p>Para mantermos nossa base de usuários atualizada e garantir a segurança das
+                informações disponibilizadas, solicitamos que nos informe, em até 2 dias úteis,
+                o motivo da não utilização da plataforma e seu interesse em manter o acesso ativo.</p>
+                <p>Caso não haja manifestação dentro deste prazo, seu cadastro poderá ser removido
+                automaticamente do sistema, sendo necessário um novo processo de solicitação caso
+                deseje acessar novamente o portal futuramente.</p>
+                <p>Permanecemos à disposição para quaisquer esclarecimentos.</p>
+                <p>Atenciosamente,<br/>Equipe Book Claro</p>
+                """;
+        enviar(usuario.getEmail(), assunto, corpo);
+    }
+
+    @Async
+    public void enviarNovaPublicacao(Usuario usuario) {
+        String assunto = "Novo arquivo disponível para download";
+        String corpo = """
+                <p>Olá,</p>
+                <p>Informamos que um novo arquivo foi disponibilizado em nosso portal de downloads.</p>
+                <p>Para acessar o conteúdo atualizado, basta realizar seu login na plataforma e
+                efetuar o download do material desejado.</p>
+                <p>Recomendamos verificar periodicamente o portal para acompanhar futuras
+                atualizações e publicações.</p>
+                <p>Atenciosamente,<br/>Equipe Book Claro</p>
+                """;
+        enviar(usuario.getEmail(), assunto, corpo);
+    }
+
+    @Async
     public void enviarRejeicao(Usuario usuario) {
         String assunto = "Seu cadastro no Portal Book Dinâmico foi rejeitado";
         String corpo = """

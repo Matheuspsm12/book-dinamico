@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class PermissaoRequest {
 
-    @NotBlank(message = "Nome da permissão não pode estar vazio!")
-    @Size(max = 255, message = "Nome da permissão deve ter no máximo {max} caracteres!")
+    @NotBlank(message = "{permissao.nome.not-blank}")
+    @Size(max = 255, message = "{permissao.nome.size}")
     private String nomePermissao;
 
     private String descricao;

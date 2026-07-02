@@ -31,7 +31,7 @@ const items: Item[] = [
     roles: ["ADMIN"],
   },
   {
-    label: "Book Dinâmico",
+    label: "Book",
     href: "/book",
     icon: Download,
     roles: ["ADMIN", "USUARIO"],
@@ -92,10 +92,8 @@ export function Sidebar() {
           />
           {open && (
             <div className="ml-2 border-zinc-300 border-l pl-3">
-              <p className="font-bold text-[10px] text-zinc-700 uppercase leading-tight">
-                Book Dinâmico
-                <br />
-                Claro / Logística
+              <p className="font-bold text-base text-zinc-800 uppercase leading-tight tracking-wide">
+                Book Claro
               </p>
             </div>
           )}

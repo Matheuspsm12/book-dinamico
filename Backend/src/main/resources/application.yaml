@@ -12,6 +12,19 @@ app:
     remetente: ${BOOK_MAIL_USERNAME}
   scheduling:
     processamento-cron: ${BOOK_SCHEDULING:0 */10 * * * *}
+    ociosidade-cron: ${BOOK_OCIOSIDADE_SCHEDULING:0 0 3 * * *}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+  health:
+    mail:
+      enabled: false
 
 server:
   port: ${BOOK_APP_PORT}
@@ -36,8 +49,6 @@ spring:
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
-  messages:
-    basename: ValidationMessages
   jpa:
     properties:
       hibernate:
