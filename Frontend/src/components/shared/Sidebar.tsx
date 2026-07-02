@@ -92,7 +92,7 @@ export function Sidebar() {
           />
           {open && (
             <div className="ml-2 border-zinc-300 border-l pl-3">
-              <p className="font-bold text-[10px] text-zinc-700 uppercase leading-tight">
+              <p className="font-bold text-base text-zinc-800 uppercase leading-tight tracking-wide">
                 Book Claro
               </p>
             </div>

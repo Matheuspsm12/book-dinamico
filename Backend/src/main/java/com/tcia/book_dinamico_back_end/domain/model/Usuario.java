@@ -93,6 +93,12 @@ public class Usuario implements Serializable {
     @Column(name = "decidido_em")
     private LocalDateTime decididoEm;
 
+    @Column(name = "ultimo_acesso")
+    private LocalDateTime ultimoAcesso;
+
+    @Column(name = "ociosidade_notificado_em")
+    private LocalDateTime ociosidadeNotificadoEm;
+
     @Transient
     public List<GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();

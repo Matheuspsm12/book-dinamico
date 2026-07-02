@@ -12,6 +12,7 @@ app:
     remetente: ${BOOK_MAIL_USERNAME}
   scheduling:
     processamento-cron: ${BOOK_SCHEDULING:0 */10 * * * *}
+    ociosidade-cron: ${BOOK_OCIOSIDADE_SCHEDULING:0 0 3 * * *}
 
 server:
   port: ${BOOK_APP_PORT}

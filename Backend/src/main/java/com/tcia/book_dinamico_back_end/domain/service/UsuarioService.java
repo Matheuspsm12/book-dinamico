@@ -28,7 +28,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Log4j2
 @Service
@@ -48,6 +50,7 @@ public class UsuarioService {
     private final EmailAdapter emailAdapter;
     private final AuthUtils authUtils;
 
+    @Transactional
     public TokenResponse autenticar(LoginRequest request, HttpServletRequest httpRequest) {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ErroAutenticacaoException("erro-credenciais-invalidas"));
@@ -58,6 +61,8 @@ public class UsuarioService {
         }
 
         validarStatusParaLogin(usuario.getStatus());
+
+        usuarioRepository.registrarAcesso(usuario.getId(), LocalDateTime.now());
 
         String token = jwtTokenProvider.gerarToken(usuario, httpRequest);
         log.info("Login bem-sucedido: {}", usuario.getEmail());
@@ -190,6 +195,55 @@ public class UsuarioService {
             emailAdapter.enviarSenhaTemporaria(usuario, senhaTemp);
             log.info("Senha temporária gerada e enviada para usuário id={}", usuario.getId());
         }, () -> log.info("Recuperação de senha solicitada para e-mail inexistente: {}", email));
+    }
+
+    private static final int OCIOSIDADE_MESES = 4;
+    private static final int OCIOSIDADE_PRAZO_DIAS_UTEIS = 2;
+
+    @Transactional
+    public void processarOciosidade() {
+        if (!emailAdapter.isHabilitado()) {
+            log.info("[ociosidade] e-mail desabilitado; verificação ignorada");
+            return;
+        }
+        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime limiteOciosidade = agora.minusMonths(OCIOSIDADE_MESES);
+        List<Usuario> aprovados = usuarioRepository.findByStatus(UsuarioStatus.APROVADO);
+
+        for (Usuario usuario : aprovados) {
+            LocalDateTime acesso = usuario.getUltimoAcesso() != null
+                    ? usuario.getUltimoAcesso()
+                    : usuario.getCriadoEm();
+
+            boolean ocioso = acesso != null && acesso.isBefore(limiteOciosidade);
+            if (!ocioso) {
+                continue;
+            }
+
+            if (usuario.getOciosidadeNotificadoEm() == null) {
+                usuario.setOciosidadeNotificadoEm(agora);
+                usuarioRepository.save(usuario);
+                emailAdapter.enviarOciosidade(usuario);
+                log.info("Ociosidade notificada: id={} email={}", usuario.getId(), usuario.getEmail());
+            } else if (agora.isAfter(adicionarDiasUteis(usuario.getOciosidadeNotificadoEm(), OCIOSIDADE_PRAZO_DIAS_UTEIS))) {
+                usuario.setStatus(UsuarioStatus.DESATIVADO);
+                usuarioRepository.save(usuario);
+                log.info("Usuário desativado por ociosidade: id={} email={}", usuario.getId(), usuario.getEmail());
+            }
+        }
+    }
+
+    private static LocalDateTime adicionarDiasUteis(LocalDateTime inicio, int diasUteis) {
+        LocalDateTime data = inicio;
+        int adicionados = 0;
+        while (adicionados < diasUteis) {
+            data = data.plusDays(1);
+            DayOfWeek dia = data.getDayOfWeek();
+            if (dia != DayOfWeek.SATURDAY && dia != DayOfWeek.SUNDAY) {
+                adicionados++;
+            }
+        }
+        return data;
     }
 
     private static String gerarSenhaTemporaria() {
