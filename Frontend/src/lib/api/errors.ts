@@ -9,6 +9,9 @@ const FRIENDLY: Record<string, string> = {
 
   "erro-email-duplicado": "Já existe um usuário cadastrado com este e-mail.",
 
+  "token-invalido":
+    "Link de redefinição inválido ou expirado. Solicite um novo e-mail de recuperação.",
+
   "erro-decisao-invalida-status-nao-pendente":
     "Esta ação só é permitida em usuários com status PENDENTE.",
   "erro-usuario-ja-desativado": "Usuário já está desativado.",

@@ -9,7 +9,9 @@ import com.tcia.book_dinamico_back_end.api.response.TokenResponse;
 import com.tcia.book_dinamico_back_end.api.response.UsuarioResponse;
 import com.tcia.book_dinamico_back_end.infrastructure.adapter.EmailAdapter;
 import com.tcia.book_dinamico_back_end.domain.model.Usuario;
+import com.tcia.book_dinamico_back_end.domain.model.ResetSenhaToken;
 import com.tcia.book_dinamico_back_end.domain.repository.PerfilRepository;
+import com.tcia.book_dinamico_back_end.domain.repository.ResetSenhaTokenRepository;
 import com.tcia.book_dinamico_back_end.core.enums.UsuarioStatus;
 import com.tcia.book_dinamico_back_end.domain.exception.ErroAutenticacaoException;
 import com.tcia.book_dinamico_back_end.domain.exception.NegocioException;
@@ -28,9 +30,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Log4j2
 @Service
@@ -49,6 +54,10 @@ public class UsuarioService {
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailAdapter emailAdapter;
     private final AuthUtils authUtils;
+    private final ResetSenhaTokenRepository resetSenhaTokenRepository;
+
+    @Value("${app.url-front-end}")
+    private String urlFrontEnd;
 
     @Transactional
     public TokenResponse autenticar(LoginRequest request, HttpServletRequest httpRequest) {
@@ -183,18 +192,45 @@ public class UsuarioService {
         log.info("Senha temporária gerada e enviada para usuário id={}", usuario.getId());
     }
 
+    private static final int RESET_TOKEN_VALIDADE_HORAS = 1;
+
     @Transactional
     public void recuperarSenhaPorEmail(String email) {
         if (!emailAdapter.isHabilitado()) {
             throw new NegocioException("email-desabilitado");
         }
         usuarioRepository.findByEmail(email).ifPresentOrElse(usuario -> {
-            String senhaTemp = gerarSenhaTemporaria();
-            usuario.setSenhaHash(passwordEncoder.encode(senhaTemp));
-            usuarioRepository.save(usuario);
-            emailAdapter.enviarSenhaTemporaria(usuario, senhaTemp);
-            log.info("Senha temporária gerada e enviada para usuário id={}", usuario.getId());
+            String token = UUID.randomUUID().toString();
+            ResetSenhaToken resetToken = ResetSenhaToken.builder()
+                    .token(token)
+                    .usuario(usuario)
+                    .expiraEm(LocalDateTime.now().plusHours(RESET_TOKEN_VALIDADE_HORAS))
+                    .usado(false)
+                    .build();
+            resetSenhaTokenRepository.save(resetToken);
+
+            String link = urlFrontEnd.split(",")[0].trim() + "/redefinir-senha?token=" + token;
+            emailAdapter.enviarLinkRecuperacao(usuario, link);
+            log.info("Link de redefinição de senha enviado para usuário id={}", usuario.getId());
         }, () -> log.info("Recuperação de senha solicitada para e-mail inexistente: {}", email));
+    }
+
+    @Transactional
+    public void redefinirSenha(String token, String novaSenha) {
+        ResetSenhaToken resetToken = resetSenhaTokenRepository.findByToken(token)
+                .orElseThrow(() -> new NegocioException("token-invalido"));
+
+        if (!resetToken.isValido()) {
+            throw new NegocioException("token-invalido");
+        }
+
+        Usuario usuario = resetToken.getUsuario();
+        usuario.setSenhaHash(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+
+        resetToken.setUsado(true);
+        resetSenhaTokenRepository.save(resetToken);
+        log.info("Senha redefinida via token para usuário id={}", usuario.getId());
     }
 
     private static final int OCIOSIDADE_MESES = 4;

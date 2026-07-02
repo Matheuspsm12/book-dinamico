@@ -59,6 +59,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/actuator/health", "/actuator/info").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/autenticacao/recuperar-senha").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/autenticacao/redefinir-senha").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/usuarios/cadastro").permitAll();
                     auth.anyRequest().authenticated();
                 })

@@ -93,6 +93,22 @@ public class EmailAdapter {
     }
 
     @Async
+    public void enviarLinkRecuperacao(Usuario usuario, String urlRedefinicao) {
+        String assunto = "Redefinição de senha — Portal Book Claro";
+        String corpo = """
+                <p>Olá %s,</p>
+                <p>Recebemos uma solicitação para redefinir a senha de acesso ao
+                <strong>Portal Book Claro</strong>.</p>
+                <p>Para criar uma nova senha, clique no link abaixo:</p>
+                <p><a href="%s" style="font-weight:bold;">Redefinir minha senha</a></p>
+                <p>Este link é válido por 1 hora. Se você não solicitou a redefinição,
+                ignore este e-mail — sua senha permanecerá a mesma.</p>
+                <p>Atenciosamente,<br/>Equipe Book Claro</p>
+                """.formatted(escape(usuario.getNome()), urlRedefinicao);
+        enviar(usuario.getEmail(), assunto, corpo);
+    }
+
+    @Async
     public void enviarRejeicao(Usuario usuario) {
         String assunto = "Seu cadastro no Portal Book Dinâmico foi rejeitado";
         String corpo = """

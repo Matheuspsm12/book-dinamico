@@ -16,3 +16,7 @@ export async function logout() {
 export async function recuperarSenha(email: string) {
   await api.post("/autenticacao/recuperar-senha", { email });
 }
+
+export async function redefinirSenha(token: string, novaSenha: string) {
+  await api.post("/autenticacao/redefinir-senha", { token, novaSenha });
+}
