@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 public class UsuarioEdicaoRequest {
 
-    @Size(max = 200, message = "Nome deve ter no máximo {max} caracteres!")
+    @Size(max = 200, message = "{usuario.nome.size}")
     private String nome;
 
-    @Size(max = 200, message = "Empresa deve ter no máximo {max} caracteres!")
+    @Size(max = 200, message = "{usuario.empresa.size}")
     private String empresa;
 
-    @Email(message = "E-mail inválido!")
-    @Size(max = 200, message = "E-mail deve ter no máximo {max} caracteres!")
+    @Email(message = "{usuario.email.invalido}")
+    @Size(max = 200, message = "{usuario.email.size}")
     private String email;
 }

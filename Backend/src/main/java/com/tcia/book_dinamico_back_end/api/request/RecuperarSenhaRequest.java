@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class RecuperarSenhaRequest {
 
-    @NotBlank(message = "E-mail nao pode estar vazio!")
-    @Email(message = "E-mail invalido!")
+    @NotBlank(message = "{email.not-blank}")
+    @Email(message = "{email.invalido}")
     private String email;
 }

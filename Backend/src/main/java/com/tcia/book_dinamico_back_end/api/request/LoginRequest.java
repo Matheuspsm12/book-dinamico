@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class LoginRequest {
 
-    @NotBlank(message = "Usuario nao pode estar vazio!")
+    @NotBlank(message = "{login.usuario.not-blank}")
     private String email;
 
-    @NotBlank(message = "Senha nao pode estar vazia!")
+    @NotBlank(message = "{login.senha.not-blank}")
     private String senha;
 }

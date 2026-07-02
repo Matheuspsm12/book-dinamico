@@ -10,8 +10,8 @@ import java.util.List;
 @Data
 public class PerfilRequest {
 
-    @NotBlank(message = "Nome do perfil não pode estar vazio!")
-    @Size(max = 255, message = "Nome do perfil deve ter no máximo {max} caracteres!")
+    @NotBlank(message = "{perfil.nome.not-blank}")
+    @Size(max = 255, message = "{perfil.nome.size}")
     private String nomePerfil;
 
     private String descricao;

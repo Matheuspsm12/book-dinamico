@@ -56,6 +56,7 @@ public class SecurityConfig {
                     auth.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll();
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     auth.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    auth.requestMatchers("/actuator/health", "/actuator/info").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/autenticacao/recuperar-senha").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/usuarios/cadastro").permitAll();
