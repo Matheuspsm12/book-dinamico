@@ -28,6 +28,7 @@ API Spring Boot para distribuição controlada de books dinâmicos da Claro/Log�
 - `BOOK_DIRETORIO`: diretório de armazenamento dos uploads — deve ficar **fora** do projeto (volume/disco externo).
 - `BOOK_MAIL_HOST`, `BOOK_MAIL_PORT`, `BOOK_MAIL_USERNAME`, `BOOK_MAIL_PASSWORD`.
 - `BOOK_JWT_SECRET`: chave usada para assinar tokens (substitua o valor default em produção).
+- `BOOK_SCHEDULING`: expressão cron do agendamento de processamento (default `0 */10 * * * *` — a cada 10 min).
 
 ## Como Rodar Localmente
 1. Configure as variáveis de ambiente acima e crie o banco `book_dinamico`.
