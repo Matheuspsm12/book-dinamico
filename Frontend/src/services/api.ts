@@ -3,8 +3,7 @@ import { clearSession, getToken } from "src/lib/auth-storage";
 import { friendlyMessage } from "src/lib/api/errors";
 import type { ApiErrorBody } from "src/lib/api/types";
 
-export const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8082/book_dinamico";
+export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MULTIPART_TIMEOUT_MS = 120_000;
