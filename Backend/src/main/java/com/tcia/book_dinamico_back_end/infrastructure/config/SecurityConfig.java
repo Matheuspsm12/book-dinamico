@@ -57,6 +57,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     auth.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/autenticacao/recuperar-senha").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/usuarios/cadastro").permitAll();
                     auth.anyRequest().authenticated();
                 })

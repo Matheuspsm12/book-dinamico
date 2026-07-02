@@ -178,6 +178,20 @@ public class UsuarioService {
         log.info("Senha temporária gerada e enviada para usuário id={}", usuario.getId());
     }
 
+    @Transactional
+    public void recuperarSenhaPorEmail(String email) {
+        if (!emailAdapter.isHabilitado()) {
+            throw new NegocioException("email-desabilitado");
+        }
+        usuarioRepository.findByEmail(email).ifPresentOrElse(usuario -> {
+            String senhaTemp = gerarSenhaTemporaria();
+            usuario.setSenhaHash(passwordEncoder.encode(senhaTemp));
+            usuarioRepository.save(usuario);
+            emailAdapter.enviarSenhaTemporaria(usuario, senhaTemp);
+            log.info("Senha temporária gerada e enviada para usuário id={}", usuario.getId());
+        }, () -> log.info("Recuperação de senha solicitada para e-mail inexistente: {}", email));
+    }
+
     private static String gerarSenhaTemporaria() {
         final String alfabeto = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
         java.security.SecureRandom rnd = new java.security.SecureRandom();

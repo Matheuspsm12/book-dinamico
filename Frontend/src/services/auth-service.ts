@@ -12,3 +12,7 @@ export async function login(email: string, senha: string) {
 export async function logout() {
   await api.post("/autenticacao/logout");
 }
+
+export async function recuperarSenha(email: string) {
+  await api.post("/autenticacao/recuperar-senha", { email });
+}

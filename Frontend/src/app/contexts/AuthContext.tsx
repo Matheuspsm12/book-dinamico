@@ -41,7 +41,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (loading) return;
-    const isAuthRoute = pathname === "/login" || pathname === "/cadastro";
+    const isAuthRoute =
+      pathname === "/login" ||
+      pathname === "/cadastro" ||
+      pathname === "/recuperar-senha";
     if (!user && !isAuthRoute) {
       router.replace("/login");
     } else if (user && isAuthRoute) {

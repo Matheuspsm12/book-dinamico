@@ -2,6 +2,7 @@ package com.tcia.book_dinamico_back_end.api.controller;
 
 import com.tcia.book_dinamico_back_end.core.annotation.DocumentarAPI;
 import com.tcia.book_dinamico_back_end.api.request.LoginRequest;
+import com.tcia.book_dinamico_back_end.api.request.RecuperarSenhaRequest;
 import com.tcia.book_dinamico_back_end.api.response.TokenResponse;
 import com.tcia.book_dinamico_back_end.domain.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,5 +32,14 @@ public class AuthController {
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         TokenResponse token = usuarioService.autenticar(request, httpRequest);
         return ResponseEntity.ok(token);
+    }
+
+    @Operation(summary = "Recuperar senha por e-mail",
+            description = "Gera uma senha temporária e envia para o e-mail informado, caso exista.")
+    @DocumentarAPI
+    @PostMapping("/recuperar-senha")
+    public ResponseEntity<Void> recuperarSenha(@Valid @RequestBody RecuperarSenhaRequest request) {
+        usuarioService.recuperarSenhaPorEmail(request.getEmail());
+        return ResponseEntity.noContent().build();
     }
 }
