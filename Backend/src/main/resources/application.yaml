@@ -10,6 +10,8 @@ app:
   email:
     habilitado: ${BOOK_EMAIL_HABILITADO}
     remetente: ${BOOK_MAIL_USERNAME}
+  scheduling:
+    processamento-cron: ${BOOK_SCHEDULING:0 */10 * * * *}
 
 server:
   port: ${BOOK_APP_PORT}

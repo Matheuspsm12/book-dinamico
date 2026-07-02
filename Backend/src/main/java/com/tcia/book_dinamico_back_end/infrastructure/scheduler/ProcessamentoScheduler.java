@@ -17,7 +17,7 @@ public class ProcessamentoScheduler {
     private final ProcessamentoService service;
     private final DominioService dominioService;
 
-    @Scheduled(cron = "0 */10 * * * *")
+    @Scheduled(cron = "${app.scheduling.processamento-cron}")
     public void executarProcessamento() {
         try {
             log.info("Verificando Agendamentos");
