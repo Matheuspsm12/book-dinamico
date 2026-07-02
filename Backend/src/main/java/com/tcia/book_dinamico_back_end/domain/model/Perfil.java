@@ -42,7 +42,7 @@ public class Perfil implements Serializable {
     private Boolean ativado;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "perfil", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "perfil", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<PerfilPermissao> perfilPermissao;

@@ -8,7 +8,13 @@ public enum AuditoriaAcaoEnum {
     CRIAR_DOCUMENTO(EntidadeAuditoriaEnum.DOCUMENTO, AcaoBaseAuditoriaEnum.CRIAR),
     ALTERAR_DOCUMENTO(EntidadeAuditoriaEnum.DOCUMENTO, AcaoBaseAuditoriaEnum.ALTERAR),
     EXCLUIR_DOCUMENTO(EntidadeAuditoriaEnum.DOCUMENTO, AcaoBaseAuditoriaEnum.EXCLUIR),
-    PROCESSAR_DOCUMENTO(EntidadeAuditoriaEnum.PROCESSAMENTO, AcaoBaseAuditoriaEnum.PROCESSAR);
+    PROCESSAR_DOCUMENTO(EntidadeAuditoriaEnum.PROCESSAMENTO, AcaoBaseAuditoriaEnum.PROCESSAR),
+    CRIAR_PERFIL(EntidadeAuditoriaEnum.PERFIL, AcaoBaseAuditoriaEnum.CRIAR),
+    ALTERAR_PERFIL(EntidadeAuditoriaEnum.PERFIL, AcaoBaseAuditoriaEnum.ALTERAR),
+    EXCLUIR_PERFIL(EntidadeAuditoriaEnum.PERFIL, AcaoBaseAuditoriaEnum.EXCLUIR),
+    CRIAR_PERMISSAO(EntidadeAuditoriaEnum.PERMISSAO, AcaoBaseAuditoriaEnum.CRIAR),
+    ALTERAR_PERMISSAO(EntidadeAuditoriaEnum.PERMISSAO, AcaoBaseAuditoriaEnum.ALTERAR),
+    EXCLUIR_PERMISSAO(EntidadeAuditoriaEnum.PERMISSAO, AcaoBaseAuditoriaEnum.EXCLUIR);
 
     private final EntidadeAuditoriaEnum entidade;
     private final AcaoBaseAuditoriaEnum acao;
