@@ -25,13 +25,13 @@
     <!-- Perfil hom -->
     <springProfile name="hom">
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>@PATH_LOG_PRODUCAO@/development.log</file>
+            <file>@PATH_LOG_PRODUCAO@/book_dinamico.log</file>
             <encoder>
                 <pattern>${LOG_PATTERN}</pattern>
                 <charset>UTF-8</charset>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>@PATH_LOG_PRODUCAO@/dep-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>@PATH_LOG_PRODUCAO@/book_dinamico-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <maxHistory>30</maxHistory>
                 <maxFileSize>50MB</maxFileSize>
                 <totalSizeCap>50MB</totalSizeCap>
@@ -48,13 +48,13 @@
     -->
     <springProfile name="prod">
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>@PATH_LOG_PRODUCAO@/dep.log</file>
+            <file>@PATH_LOG_PRODUCAO@/book_dinamico.log</file>
             <encoder>
                 <pattern>${LOG_PATTERN}</pattern>
                 <charset>UTF-8</charset>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <fileNamePattern>@PATH_LOG_PRODUCAO@/dep-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <fileNamePattern>@PATH_LOG_PRODUCAO@/book_dinamico-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <maxHistory>30</maxHistory>
                 <maxFileSize>50MB</maxFileSize>
             </rollingPolicy>
