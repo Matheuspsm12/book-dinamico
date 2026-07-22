@@ -9,8 +9,7 @@
     "lint": "eslint ."
   },
   "overrides": {
-    "postcss": "^8.5.10",
-    "sharp": "^0.35.3"
+    "postcss": "^8.5.10"
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.6.2",
