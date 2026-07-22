@@ -13,7 +13,7 @@ public class OciosidadeScheduler {
 
     private final UsuarioService usuarioService;
 
-    @Scheduled(cron = "${app.scheduling.ociosidade-cron}")
+    @Scheduled(cron = "${scheduling.ociosidade.cron}")
     public void verificarOciosidade() {
         try {
             log.info("Verificando ociosidade de usuários");

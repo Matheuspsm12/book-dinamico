@@ -11,9 +11,12 @@ app:
   email:
     habilitado: ${BOOK_EMAIL_HABILITADO}
     remetente: ${BOOK_MAIL_USERNAME}
-  scheduling:
-    processamento-cron: ${BOOK_SCHEDULING:0 */10 * * * *}
-    ociosidade-cron: ${BOOK_OCIOSIDADE_SCHEDULING:0 0 3 * * *}
+
+scheduling:
+  processamento:
+    cron: ${BOOK_SCHEDULING:0 */1 * * * *} # A cada 1 minuto default
+  ociosidade:
+    cron: ${BOOK_OCIOSIDADE_SCHEDULING:0 0 3 * * *}
 
 management:
   endpoints:
