@@ -30,14 +30,8 @@ const nextConfig: NextConfig = {
             key: "Cross-Origin-Opener-Policy",
             value: "same-origin",
           },
-          {
-            key: "Cross-Origin-Resource-Policy",
-            value: "same-origin",
-          },
-          {
-            key: "Cross-Origin-Embedder-Policy",
-            value: "require-corp",
-          },
+          // Sem COEP require-corp: o app consome uma API de outra origem
+          // (front :443 -> back :8443). require-corp bloquearia esses recursos.
         ],
       },
     ];
