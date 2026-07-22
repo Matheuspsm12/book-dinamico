@@ -2,7 +2,7 @@ UPDATE usuario
 SET nome = 'Qwerer',
     empresa = 'TCIA',
     email = 'qwerer',
-    senha_hash = crypt('qwerer', gen_salt('bf')),
+    senha_hash = '$2b$10$Uv.h5l1q3sHdi6nM8SsK8O/BVC7rhOT2E.VEgBLlO0sj596ObAcoe',
     justificativa = 'Usuario base do sistema.',
     status = 'APROVADO',
     id_perfil = (SELECT id FROM perfil WHERE nome_perfil = 'ADMIN'),
@@ -12,7 +12,7 @@ WHERE email = 'admin@claro.com.br';
 INSERT INTO usuario (
     id, nome, empresa, email, senha_hash, justificativa, status, id_perfil, criado_em, atualizado_em
 )
-SELECT nextval('usuario_seq'), 'Qwerer', 'TCIA', 'qwerer', crypt('qwerer', gen_salt('bf')),
+SELECT nextval('usuario_seq'), 'Qwerer', 'TCIA', 'qwerer', '$2b$10$Uv.h5l1q3sHdi6nM8SsK8O/BVC7rhOT2E.VEgBLlO0sj596ObAcoe',
        'Usuario base do sistema.', 'APROVADO', p.id, NOW(), NOW()
 FROM perfil p
 WHERE p.nome_perfil = 'ADMIN'
