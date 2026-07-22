@@ -13,7 +13,7 @@ API Spring Boot para distribuição controlada de books dinâmicos da Claro/Log�
 - `src/main/java/com/tcia/book_dinamico_back_end/domain`: models, services, repositories, specifications e exceptions.
 - `src/main/java/com/tcia/book_dinamico_back_end/infrastructure`: segurança (JWT), configurações, mappers MapStruct e adapters.
 - `src/main/java/com/tcia/book_dinamico_back_end/core`: enums, utilitários e anotações.
-- `src/main/resources`: `application.yaml` e migrações Flyway em `db/migration`.
+- `src/main/resources`: `application.yml` e migrações Flyway em `db/migration`.
 - `src/test/java`: testes JUnit 5 espelhando os pacotes principais.
 
 ## Pré-requisitos
@@ -27,7 +27,8 @@ API Spring Boot para distribuição controlada de books dinâmicos da Claro/Log�
 - `BOOK_AMBIENTE`, `BOOK_APP_NAME`, `BOOK_NOME_SISTEMA`, `BOOK_URL_SITE`, `BOOK_URL_FRONT_END`.
 - `BOOK_DIRETORIO`: diretório de armazenamento dos uploads — deve ficar **fora** do projeto (volume/disco externo).
 - `BOOK_MAIL_HOST`, `BOOK_MAIL_PORT`, `BOOK_MAIL_USERNAME`, `BOOK_MAIL_PASSWORD`.
-- `BOOK_JWT_SECRET`: chave usada para assinar tokens (substitua o valor default em produção).
+- `BOOK_CHAVE_JWT_SECRET`: chave usada para assinar tokens (substitua o valor default em produção).
+- `BOOK_PERMITIR_LOGIN_LOCAL`: habilita/desabilita o login local (`true`/`false`).
 - `BOOK_SCHEDULING`: expressão cron do agendamento de processamento (default `0 */10 * * * *` — a cada 10 min).
 - `BOOK_OCIOSIDADE_SCHEDULING`: expressão cron da verificação de ociosidade de usuários (default `0 0 3 * * *` — diariamente às 3h).
 

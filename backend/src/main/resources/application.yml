@@ -1,7 +1,8 @@
 app:
   ambiente: ${BOOK_AMBIENTE}
-  jwt-secret: ${BOOK_JWT_SECRET}
+  jwt-secret: ${BOOK_CHAVE_JWT_SECRET}
   jwt-secure-cookie: true
+  permitir-login-local: ${BOOK_PERMITIR_LOGIN_LOCAL}
   empresa: TCIA
   nome-sistema: ${BOOK_NOME_SISTEMA}
   url-site: ${BOOK_URL_SITE}
