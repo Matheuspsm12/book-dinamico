@@ -25,21 +25,21 @@
     <!-- Perfil hom -->
     <springProfile name="hom">
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>@PATH_LOG_PRODUCAO@/book_dinamico.log</file>
+            <file>@PATH_LOG_PRODUCAO@/book.log</file>
             <encoder>
-                <pattern>${LOG_PATTERN}</pattern>
-                <charset>UTF-8</charset>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-                <fileNamePattern>@PATH_LOG_PRODUCAO@/book_dinamico-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <!-- Nome dos arquivos de log rotacionados -->
+                <fileNamePattern>@PATH_LOG_PRODUCAO@/book-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <!-- Tempo de retenção dos logs (opcional) -->
                 <maxHistory>30</maxHistory>
-                <maxFileSize>50MB</maxFileSize>
+                <!-- Tamanho máximo permitido para o arquivo de log (opcional) -->
                 <totalSizeCap>50MB</totalSizeCap>
             </rollingPolicy>
         </appender>
-
         <root level="INFO">
-            <appender-ref ref="FILE"/>
+            <appender-ref ref="FILE" />
         </root>
     </springProfile>
 
@@ -48,20 +48,21 @@
     -->
     <springProfile name="prod">
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>@PATH_LOG_PRODUCAO@/book_dinamico.log</file>
+            <file>@PATH_LOG_PRODUCAO@/book.log</file>
             <encoder>
-                <pattern>${LOG_PATTERN}</pattern>
-                <charset>UTF-8</charset>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
             </encoder>
-            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <fileNamePattern>@PATH_LOG_PRODUCAO@/book_dinamico-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- Nome dos arquivos de log rotacionados -->
+                <fileNamePattern>@PATH_LOG_PRODUCAO@/book-%d{yyyy-MM-dd}.log</fileNamePattern>
+                <!-- Tempo de retenção dos logs (opcional) -->
                 <maxHistory>30</maxHistory>
-                <maxFileSize>50MB</maxFileSize>
+                <!-- Tamanho máximo permitido para o arquivo de log (opcional) -->
+                <totalSizeCap>50MB</totalSizeCap>
             </rollingPolicy>
         </appender>
-
         <root level="INFO">
-            <appender-ref ref="FILE"/>
+            <appender-ref ref="FILE" />
         </root>
     </springProfile>
 

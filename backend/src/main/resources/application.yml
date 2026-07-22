@@ -1,7 +1,8 @@
 app:
   ambiente: ${BOOK_AMBIENTE}
-  jwt-secret: ${BOOK_JWT_SECRET}
+  jwt-secret: ${BOOK_CHAVE_JWT_SECRET}
   jwt-secure-cookie: true
+  permitir-login-local: ${BOOK_PERMITIR_LOGIN_LOCAL}
   empresa: TCIA
   nome-sistema: ${BOOK_NOME_SISTEMA}
   url-site: ${BOOK_URL_SITE}
@@ -10,9 +11,12 @@ app:
   email:
     habilitado: ${BOOK_EMAIL_HABILITADO}
     remetente: ${BOOK_MAIL_USERNAME}
-  scheduling:
-    processamento-cron: ${BOOK_SCHEDULING:0 */10 * * * *}
-    ociosidade-cron: ${BOOK_OCIOSIDADE_SCHEDULING:0 0 3 * * *}
+
+scheduling:
+  processamento:
+    cron: ${BOOK_SCHEDULING:0 */1 * * * *} # A cada 1 minuto default
+  ociosidade:
+    cron: ${BOOK_OCIOSIDADE_SCHEDULING:0 0 3 * * *}
 
 management:
   endpoints:

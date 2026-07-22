@@ -7,21 +7,21 @@ Abra dois terminais PowerShell.
 Backend:
 
 ```powershell
-cd Backend
+cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
-O Spring carrega `Backend\.env` automaticamente quando o comando roda dentro da pasta `Backend`.
+O Spring carrega `backend\.env` automaticamente quando o comando roda dentro da pasta `backend`.
 
 Frontend:
 
 ```powershell
-cd Frontend
+cd frontend
 npm install
 npm run dev
 ```
 
-O Next usa `Frontend\.env.local`.
+O Next usa `frontend\.env.local`.
 
 URLs esperadas:
 
@@ -63,7 +63,7 @@ Este projeto utiliza **variáveis de ambiente** para configuração da aplicaç�
 > Definido via variável de ambiente (string longa e aleatória):
 >
 > ```
-> BOOK_JWT_SECRET=substitua-por-string-longa-aleatoria
+> BOOK_CHAVE_JWT_SECRET=substitua-por-string-longa-aleatoria
 > ```
 
 ---
@@ -116,17 +116,17 @@ O frontend utiliza apenas um arquivo `.env.local` com as variáveis abaixo:
 
 ```env
 PORT=3001
-NEXT_PUBLIC_API_BASE_URL=http://localhost:8082/book_dinamico
+NEXT_PUBLIC_API_URL=http://localhost:8082/book_dinamico
 ```
 
 - `PORT`: Porta em que o frontend será executado
-- `NEXT_PUBLIC_API_BASE_URL`: URL base da API do backend
+- `NEXT_PUBLIC_API_URL`: URL base da API do backend
 
 > Variáveis iniciadas com `NEXT_PUBLIC_` ficam expostas no browser.
 
 ---
 
-## Exemplo de Configuração (application.yaml – DEV)
+## Exemplo de Configuração (application.yml – DEV)
 
 ```env
 BOOK_AMBIENTE=DEV
@@ -148,7 +148,7 @@ BOOK_NOME_SISTEMA=Book Dinâmico
 BOOK_URL_FRONT_END=http://localhost:3001
 BOOK_URL_SITE=http://localhost:8082/book_dinamico
 BOOK_DIRETORIO=/var/dados/book-dinamico-arquivos
-BOOK_JWT_SECRET=substitua-por-string-longa-aleatoria
+BOOK_CHAVE_JWT_SECRET=substitua-por-string-longa-aleatoria
 ```
 
 ---
