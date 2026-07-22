@@ -1,7 +1,6 @@
--- Cria pgcrypto para uso em V5 (seed admin com BCrypt nativo do Postgres).
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
 -- Sequências per-tabela. Padrão TCIA: allocationSize=1 no @SequenceGenerator.
+-- (Sem CREATE EXTENSION: o usuário do banco em homolog/prod não é superuser.
+--  Seeds usam hash BCrypt pré-computado; busca acento-insensível usa translate().)
 
 CREATE SEQUENCE IF NOT EXISTS usuario_seq
     START WITH 1

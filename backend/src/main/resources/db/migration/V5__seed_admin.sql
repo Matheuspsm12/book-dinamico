@@ -21,7 +21,7 @@ INSERT INTO usuario (
     'Administrador',
     'Claro',
     'admin@claro.com.br',
-    crypt('admin', gen_salt('bf')),
+    '$2b$10$nDcGsDG/XmHVNY9VespL/uiKUgIPjSQ3BMdTPjxTiqGQn2H.ZG6YK',
     'Usuário administrador padrão (seed inicial).',
     'APROVADO',
     'ADMIN',

@@ -14,7 +14,10 @@ import java.util.List;
 @Component
 public class UsuarioSpecifications {
 
-    private static final String UNACCENT_FUNCTION = "unaccent";
+    // Busca acento-insensível sem a extensão unaccent (que exige superuser):
+    // translate() troca cada caractere acentuado pelo equivalente sem acento.
+    private static final String ACENTOS = "áàâãäéèêëíìîïóòôõöúùûüçñ";
+    private static final String SEM_ACENTOS = "aaaaaeeeeiiiiooooouuuucn";
 
     public Specification<Usuario> comFiltros(UsuarioFiltroRequest filtro) {
         return (root, query, cb) -> {
@@ -30,14 +33,16 @@ public class UsuarioSpecifications {
             if (filtro.getEmpresa() != null && !filtro.getEmpresa().isBlank()) {
                 String empresa = normalizar(filtro.getEmpresa());
                 Expression<String> empresaUnaccent = cb.function(
-                        UNACCENT_FUNCTION, String.class, cb.lower(root.get("empresa")));
+                        "translate", String.class, cb.lower(root.get("empresa")),
+                        cb.literal(ACENTOS), cb.literal(SEM_ACENTOS));
                 predicates.add(cb.like(empresaUnaccent, "%" + empresa + "%"));
             }
 
             if (filtro.getNome() != null && !filtro.getNome().isBlank()) {
                 String nome = normalizar(filtro.getNome());
                 Expression<String> nomeUnaccent = cb.function(
-                        UNACCENT_FUNCTION, String.class, cb.lower(root.get("nome")));
+                        "translate", String.class, cb.lower(root.get("nome")),
+                        cb.literal(ACENTOS), cb.literal(SEM_ACENTOS));
                 predicates.add(cb.like(nomeUnaccent, "%" + nome + "%"));
             }
 
