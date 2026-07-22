@@ -23,8 +23,9 @@ public class SecurityHeadersFilter implements Filter {
         httpResponse.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
         httpResponse.setHeader("X-Permitted-Cross-Domain-Policies", "none");
         httpResponse.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-        httpResponse.setHeader("Cross-Origin-Resource-Policy", "same-origin");
-        httpResponse.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+        // API consumida por outra origem (front :443 -> back :8443): precisa ser cross-origin,
+        // senao o browser bloqueia a leitura da resposta mesmo com CORS liberado.
+        httpResponse.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
         chain.doFilter(request, response);
     }
 }
