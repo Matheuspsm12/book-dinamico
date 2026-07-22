@@ -263,6 +263,7 @@ public class UsuarioService {
                 log.info("Ociosidade notificada: id={} email={}", usuario.getId(), usuario.getEmail());
             } else if (agora.isAfter(adicionarDiasUteis(usuario.getOciosidadeNotificadoEm(), OCIOSIDADE_PRAZO_DIAS_UTEIS))) {
                 usuario.setStatus(UsuarioStatus.DESATIVADO);
+                usuario.setAtivo(false);
                 usuarioRepository.save(usuario);
                 log.info("Usuário desativado por ociosidade: id={} email={}", usuario.getId(), usuario.getEmail());
             }
@@ -317,6 +318,7 @@ public class UsuarioService {
             throw new NegocioException("erro-usuario-ja-desativado");
         }
         usuario.setStatus(UsuarioStatus.DESATIVADO);
+        usuario.setAtivo(false);
         Usuario salvo = usuarioRepository.save(usuario);
         log.info("Usuário desativado: id={} email={}", salvo.getId(), salvo.getEmail());
         return usuarioMapper.toResponse(salvo);
@@ -330,6 +332,7 @@ public class UsuarioService {
         }
         validarCapAprovados();
         usuario.setStatus(UsuarioStatus.APROVADO);
+        usuario.setAtivo(true);
         Usuario salvo = usuarioRepository.save(usuario);
         log.info("Usuário reativado: id={} email={}", salvo.getId(), salvo.getEmail());
         return usuarioMapper.toResponse(salvo);

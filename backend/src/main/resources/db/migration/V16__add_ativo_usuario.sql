@@ -1,0 +1,6 @@
+ALTER TABLE usuario
+    ADD COLUMN ativo BOOLEAN NOT NULL DEFAULT TRUE;
+
+UPDATE usuario
+SET ativo = FALSE
+WHERE status = 'DESATIVADO';

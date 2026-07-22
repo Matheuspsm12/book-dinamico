@@ -58,7 +58,7 @@ public class Usuario implements Serializable {
 
     @Column(name = "senha_hash", nullable = false, length = 255)
     @NotBlank(message = "Senha não pode estar vazia!")
-    private String senhaHash;
+    private String senha;
 
     @Column(name = "justificativa", nullable = false, columnDefinition = "TEXT")
     @NotBlank(message = "Justificativa não pode estar vazia!")
@@ -68,6 +68,10 @@ public class Usuario implements Serializable {
     @Column(name = "status", nullable = false, length = 20)
     @NotNull(message = "Status não pode ser nulo!")
     private UsuarioStatus status;
+
+    @Column(name = "ativo", nullable = false)
+    @Builder.Default
+    private Boolean ativo = true;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_perfil", nullable = false)
@@ -98,6 +102,14 @@ public class Usuario implements Serializable {
 
     @Column(name = "ociosidade_notificado_em")
     private LocalDateTime ociosidadeNotificadoEm;
+
+    public String getSenhaHash() {
+        return senha;
+    }
+
+    public void setSenhaHash(String senhaHash) {
+        this.senha = senhaHash;
+    }
 
     @Transient
     public List<GrantedAuthority> getAuthorities() {

@@ -16,8 +16,9 @@ import java.util.List;
 public interface UsuarioMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "senhaHash", ignore = true)
+    @Mapping(target = "senha", ignore = true)
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "ativo", ignore = true)
     @Mapping(target = "perfil", ignore = true)
     @Mapping(target = "criadoEm", ignore = true)
     @Mapping(target = "atualizadoEm", ignore = true)
@@ -33,8 +34,9 @@ public interface UsuarioMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "senhaHash", ignore = true)
+    @Mapping(target = "senha", ignore = true)
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "ativo", ignore = true)
     @Mapping(target = "perfil", ignore = true)
     @Mapping(target = "criadoEm", ignore = true)
     @Mapping(target = "atualizadoEm", ignore = true)
