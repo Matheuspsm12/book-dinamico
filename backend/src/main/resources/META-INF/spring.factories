@@ -1,0 +1,2 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.tcia.book_dinamico_back_end.infrastructure.config.ContextPathEnvironmentPostProcessor
