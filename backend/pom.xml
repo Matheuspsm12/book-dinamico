@@ -4,15 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.0</version>
-        <relativePath/>
+        <groupId>com.tcia</groupId>
+        <artifactId>book-dinamico-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.tcia</groupId>
     <artifactId>book_dinamico_backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <name>book_dinamico_backend</name>
     <description>Backend do Portal Book Dinâmico</description>
 
