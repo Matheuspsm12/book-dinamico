@@ -56,8 +56,8 @@ public class UsuarioService {
     private final AuthUtils authUtils;
     private final ResetSenhaTokenRepository resetSenhaTokenRepository;
 
-    @Value("${app.url-front-end}")
-    private String urlFrontEnd;
+    @Value("${app.url-site}")
+    private String urlSite;
 
     @Transactional
     public TokenResponse autenticar(LoginRequest request, HttpServletRequest httpRequest) {
@@ -209,7 +209,7 @@ public class UsuarioService {
                     .build();
             resetSenhaTokenRepository.save(resetToken);
 
-            String link = urlFrontEnd.split(",")[0].trim() + "/redefinir-senha?token=" + token;
+            String link = urlSite.split(",")[0].trim() + "/redefinir-senha?token=" + token;
             emailAdapter.enviarLinkRecuperacao(usuario, link);
             log.info("Link de redefinição de senha enviado para usuário id={}", usuario.getId());
         }, () -> log.info("Recuperação de senha solicitada para e-mail inexistente: {}", email));
