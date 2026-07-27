@@ -8,7 +8,7 @@ app:
   url-site: ${BOOK_URL_SITE:https://book.tcia.com.br/login}
   diretorio: ${BOOK_DIRETORIO}
   email:
-    habilitado: ${BOOK_EMAIL_HABILITADO}
+    habilitado: ${BOOK_EMAIL_HABILITADO:true}
     remetente: ${BOOK_MAIL_USERNAME}
 
 scheduling:
