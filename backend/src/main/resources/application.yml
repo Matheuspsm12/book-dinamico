@@ -34,10 +34,9 @@ server:
   port: ${BOOK_APP_PORT}
   max-http-request-header-size: 512000
   servlet:
-    # O context-path NÃO é definido aqui de propósito. Ele é normalizado em
-    # código por ContextPathNormalizer (WebServerFactoryCustomizer), que tolera
-    # BOOK_CONTEXT_PATH vindo como 'book_dinamico', '/book_dinamico/', '' etc.
-    # sem quebrar o boot do Tomcat.
+    # O valor é normalizado antes do binding por ContextPathEnvironmentPostProcessor,
+    # que tolera BOOK_CONTEXT_PATH vindo como 'book_dinamico', '/book_dinamico/', '' etc.
+    context-path: ${BOOK_CONTEXT_PATH:/book_dinamico}
     encoding:
       charset: UTF-8
       enabled: true
