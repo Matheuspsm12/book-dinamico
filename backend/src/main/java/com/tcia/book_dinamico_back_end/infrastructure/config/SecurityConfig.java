@@ -32,8 +32,8 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${app.url-front-end}")
-    private String urlFrontEnd;
+    @Value("${app.url-site}")
+    private String urlSite;
 
     @Bean
     JwtFilter jwtFilter(JwtTokenProvider jwtTokenProvider, UsuarioRepository usuarioRepository) {
@@ -84,7 +84,7 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        List<String> allowedOrigins = Arrays.stream(urlFrontEnd.split(","))
+        List<String> allowedOrigins = Arrays.stream(urlSite.split(","))
                 .map(String::trim)
                 .filter(origem -> !origem.isEmpty())
                 .map(origem -> origem.endsWith("/") ? origem.substring(0, origem.length() - 1) : origem)
