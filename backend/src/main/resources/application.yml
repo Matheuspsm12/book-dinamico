@@ -5,7 +5,7 @@ app:
   permitir-login-local: ${BOOK_PERMITIR_LOGIN_LOCAL}
   empresa: TCIA
   nome-sistema: ${BOOK_NOME_SISTEMA:Book Dinâmico}
-  url-site: ${BOOK_URL_SITE:https://homol.book.tcia.com.br}
+  url-site: ${BOOK_URL_SITE:https://book.tcia.com.br/login}
   diretorio: ${BOOK_DIRETORIO}
   email:
     habilitado: ${BOOK_EMAIL_HABILITADO}
