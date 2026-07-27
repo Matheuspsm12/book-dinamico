@@ -34,7 +34,10 @@ server:
   port: ${BOOK_APP_PORT}
   max-http-request-header-size: 512000
   servlet:
-    context-path: ${BOOK_CONTEXT_PATH:/book_dinamico}
+    # Normaliza o context-path: garante barra inicial, remove barra(s) final(is)
+    # e cai no default quando a env vier vazia. Assim aceita 'book_dinamico',
+    # '/book_dinamico/', '' etc. sem quebrar o boot do Tomcat.
+    context-path: "#{('${BOOK_CONTEXT_PATH:/book_dinamico}'.trim().isEmpty() ? '/book_dinamico' : ('${BOOK_CONTEXT_PATH:/book_dinamico}'.trim().startsWith('/') ? '${BOOK_CONTEXT_PATH:/book_dinamico}'.trim() : '/'.concat('${BOOK_CONTEXT_PATH:/book_dinamico}'.trim()))).replaceAll('/+$', '')}"
     encoding:
       charset: UTF-8
       enabled: true
