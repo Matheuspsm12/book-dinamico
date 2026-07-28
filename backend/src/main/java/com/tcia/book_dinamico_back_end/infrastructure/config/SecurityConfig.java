@@ -8,7 +8,6 @@ import com.tcia.book_dinamico_back_end.infrastructure.security.CustomAuthenticat
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,7 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Log4j2
@@ -31,9 +29,6 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
-    @Value("${app.url-site}")
-    private String urlSite;
 
     @Bean
     JwtFilter jwtFilter(JwtTokenProvider jwtTokenProvider, UsuarioRepository usuarioRepository) {
@@ -82,21 +77,26 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Allowlist explícita das origens do frontend (prod e homol). Origens são
+     * {@code scheme://host} puros — sem path/barra — porque é assim que o navegador
+     * envia o header {@code Origin}; qualquer path aqui faria o match falhar.
+     */
+    private static final List<String> ORIGENS_PERMITIDAS = List.of(
+            "https://book.tcia.com.br",
+            "https://homol.book.tcia.com.br"
+    );
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        List<String> allowedOrigins = Arrays.stream(urlSite.split(","))
-                .map(String::trim)
-                .filter(origem -> !origem.isEmpty())
-                .map(origem -> origem.endsWith("/") ? origem.substring(0, origem.length() - 1) : origem)
-                .toList();
-        log.info("Origens permitidas (CORS): {}", allowedOrigins);
-
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(allowedOrigins);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Client-Type", "X-Device-Id"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowedOrigins(ORIGENS_PERMITIDAS);
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Client-Type", "X-Device-Id", "X-Correlation-Id"));
+        configuration.setExposedHeaders(List.of("Authorization", "X-Correlation-Id"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        log.info("Origens permitidas (CORS): {}", ORIGENS_PERMITIDAS);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
