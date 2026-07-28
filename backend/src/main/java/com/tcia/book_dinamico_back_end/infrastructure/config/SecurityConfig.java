@@ -23,6 +23,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -87,19 +88,43 @@ public class SecurityConfig {
         List<String> allowedOrigins = Arrays.stream(urlSite.split(","))
                 .map(String::trim)
                 .filter(origem -> !origem.isEmpty())
-                .map(origem -> origem.endsWith("/") ? origem.substring(0, origem.length() - 1) : origem)
+                .map(SecurityConfig::normalizarOrigem)
+                .distinct()
                 .toList();
         log.info("Origens permitidas (CORS): {}", allowedOrigins);
 
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(allowedOrigins);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Client-Type", "X-Device-Id"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Client-Type", "X-Device-Id", "X-Correlation-Id"));
+        configuration.setExposedHeaders(List.of("Authorization", "X-Correlation-Id"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    /**
+     * Normaliza a origem para o formato aceito pelo CORS: {@code scheme://host[:porta]},
+     * removendo qualquer path, query ou barra final. Blinda o CORS contra valores como
+     * {@code https://homol.book.tcia.com.br/book_dinamico/} — que como estão quebrariam
+     * o match da origem enviada pelo navegador.
+     */
+    private static String normalizarOrigem(String valor) {
+        try {
+            URI uri = URI.create(valor);
+            if (uri.getScheme() != null && uri.getHost() != null) {
+                String origem = uri.getScheme() + "://" + uri.getHost();
+                if (uri.getPort() != -1) {
+                    origem += ":" + uri.getPort();
+                }
+                return origem;
+            }
+        } catch (IllegalArgumentException ignorado) {
+            // valor não é URI válida; cai no fallback abaixo
+        }
+        return valor.endsWith("/") ? valor.substring(0, valor.length() - 1) : valor;
     }
 }
