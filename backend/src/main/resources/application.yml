@@ -8,7 +8,7 @@ app:
   url-site: ${BOOK_URL_SITE:https://homol.book.tcia.com.br}
   diretorio: ${BOOK_DIRETORIO}
   email:
-    habilitado: ${BOOK_EMAIL_HABILITADO}
+    habilitado: ${BOOK_EMAIL_HABILITADO:true}
     remetente: ${BOOK_MAIL_USERNAME}
 
 scheduling:
