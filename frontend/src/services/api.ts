@@ -5,12 +5,15 @@ import type { ApiErrorBody } from "src/lib/api/types";
 
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export const SITE_URL = (BASE_URL ?? "").replace(/\/api\/?$/, "");
+
+
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MULTIPART_TIMEOUT_MS = 120_000;
 
 const api = axios.create({
-  baseURL: BASE_URL,
-  timeout: DEFAULT_TIMEOUT_MS,
+  baseURL: SITE_URL,
+
   headers: {
     "Content-Type": "application/json",
     "X-Client-type": "web",
