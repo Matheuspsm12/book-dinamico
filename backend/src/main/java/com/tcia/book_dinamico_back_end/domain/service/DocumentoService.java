@@ -44,6 +44,9 @@ public class DocumentoService {
     private final ProcessamentoService processamentoService;
     private final NotificacaoEmailService notificacaoEmailService;
 
+    /** Teto total de armazenamento agregado dos documentos ativos (2 GB). */
+    private static final long MAX_TOTAL_BYTES = 2L * 1024 * 1024 * 1024;
+
     public List<DocumentoResponse> listar() {
         return documentoMapper.toResponseList(
                 documentoRepository.findByAtivoTrueOrderByAtualizadoEmDesc());
@@ -72,6 +75,7 @@ public class DocumentoService {
     public DocumentoResponse criar(DocumentoMetadataRequest metadata, MultipartFile arquivo) {
         Usuario admin = adminLogado();
         ExtensaoDocumento ext = integridadeValidator.validar(arquivo);
+        validarLimiteArmazenamento(arquivo.getSize(), 0L);
 
         Documento doc = Documento.builder()
                 .nome(metadata.getNome())
@@ -120,6 +124,8 @@ public class DocumentoService {
         Usuario admin = adminLogado();
         Documento doc = buscarOuFalhar(id);
         ExtensaoDocumento novaExt = integridadeValidator.validar(arquivo);
+        // Ao substituir, o tamanho atual do próprio documento é liberado.
+        validarLimiteArmazenamento(arquivo.getSize(), doc.getTamanhoBytes());
 
         String caminhoAntigo = doc.getCaminhoArmazenamento();
         String caminhoNovo = storage.gravar(doc.getId(), novaExt.name(), arquivo);
@@ -160,10 +166,29 @@ public class DocumentoService {
     @Transactional
     public void deletar(Long id) {
         Documento doc = buscarOuFalhar(id);
+        String caminho = doc.getCaminhoArmazenamento();
         processamentoService.removerPorDocumento(id);
         documentoAbaRepository.deleteByDocumentoId(id);
         documentoRepository.delete(doc);
-        log.info("Documento soft-deletado id={}", id);
+        // Libera o espaço em disco: o binário não é mais necessário após a exclusão.
+        storage.deletarSeExistir(caminho);
+        log.info("Documento excluído id={} e arquivo removido do disco: {}", id, caminho);
+    }
+
+    /**
+     * Garante que o total armazenado não ultrapasse {@link #MAX_TOTAL_BYTES}.
+     *
+     * @param novoTamanho    tamanho do arquivo que será adicionado
+     * @param tamanhoLiberado tamanho que será removido na mesma operação (ex.: substituição)
+     */
+    private void validarLimiteArmazenamento(long novoTamanho, long tamanhoLiberado) {
+        long atual = documentoRepository.somarTamanhoBytesAtivos();
+        long projetado = atual - tamanhoLiberado + novoTamanho;
+        if (projetado > MAX_TOTAL_BYTES) {
+            log.warn("Limite de armazenamento excedido: atual={} novo={} liberado={} projetado={} max={}",
+                    atual, novoTamanho, tamanhoLiberado, projetado, MAX_TOTAL_BYTES);
+            throw new NegocioException("erro-limite-armazenamento");
+        }
     }
 
     private void registrarUploadLog(Documento doc, Usuario admin, String nomeArquivoOriginal) {
