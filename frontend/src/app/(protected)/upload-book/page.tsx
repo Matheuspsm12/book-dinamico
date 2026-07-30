@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  AlertTriangle,
   CheckCircle2,
   FileSpreadsheet,
   FileText,
+  HardDrive,
   Pencil,
   Plus,
   RefreshCw,
@@ -31,6 +33,10 @@ import * as docsApi from "src/services/documentos-service";
 
 const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
 const MAX_BYTES = 60 * 1024 * 1024;
+/** Teto total de armazenamento agregado de todos os documentos. */
+const MAX_TOTAL_BYTES = 2 * 1024 * 1024 * 1024; // 2 GB
+/** A partir deste percentual exibimos alerta antecipado. */
+const AVISO_PERCENTUAL = 0.9;
 
 type Modal =
   | { kind: "none" }
@@ -46,7 +52,9 @@ function extLabel(ext: DocumentoResponse["extensao"]) {
 function formatBytes(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
 function validarArquivo(f: File | null): string | null {
@@ -104,6 +112,10 @@ export default function UploadBookPage() {
 
   if (loading || !user) return null;
 
+  const totalBytes = docs.reduce((acc, d) => acc + d.tamanhoBytes, 0);
+  const disponivel = Math.max(0, MAX_TOTAL_BYTES - totalBytes);
+  const cheio = totalBytes >= MAX_TOTAL_BYTES;
+
   return (
     <div>
       <PageHeader
@@ -111,13 +123,25 @@ export default function UploadBookPage() {
         subtitle="Gerencie os documentos publicados no portal."
       />
 
+      {!carregando && (
+        <StorageMeter totalBytes={totalBytes} docs={docs} />
+      )}
+
       <div className="mb-5 flex items-center justify-between">
         <p className="text-sm text-zinc-500">
           {carregando
             ? "Carregando…"
             : `${docs.length} documento(s) publicado(s)`}
         </p>
-        <Button onClick={() => setModal({ kind: "novo" })}>
+        <Button
+          onClick={() => setModal({ kind: "novo" })}
+          disabled={carregando || cheio}
+          title={
+            cheio
+              ? "Limite de 2 GB atingido — exclua documentos para liberar espaço."
+              : undefined
+          }
+        >
           <Plus size={16} /> Novo documento
         </Button>
       </div>
@@ -165,6 +189,7 @@ export default function UploadBookPage() {
 
       <NovoModal
         open={modal.kind === "novo"}
+        disponivel={disponivel}
         onClose={() => setModal({ kind: "none" })}
         onSuccess={async (d) => {
           showOk(`Documento "${d.nome}" criado.`);
@@ -212,6 +237,106 @@ export default function UploadBookPage() {
         />
       )}
     </div>
+  );
+}
+
+function StorageMeter({
+  totalBytes,
+  docs,
+}: {
+  totalBytes: number;
+  docs: DocumentoResponse[];
+}) {
+  const pct = Math.min(100, (totalBytes / MAX_TOTAL_BYTES) * 100);
+  const cheio = totalBytes >= MAX_TOTAL_BYTES;
+  const emAlerta = totalBytes >= MAX_TOTAL_BYTES * AVISO_PERCENTUAL;
+
+  const barColor = cheio
+    ? "bg-red-500"
+    : emAlerta
+      ? "bg-amber-500"
+      : "bg-emerald-500";
+
+  // Maiores arquivos primeiro — ajuda a decidir o que excluir.
+  const maiores = [...docs]
+    .sort((a, b) => b.tamanhoBytes - a.tamanhoBytes)
+    .slice(0, 3);
+
+  return (
+    <Card className="mb-5">
+      <CardContent className="pt-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <div className="grid h-9 w-9 place-items-center rounded-md bg-zinc-100 text-zinc-600">
+              <HardDrive size={18} />
+            </div>
+            <div>
+              <p className="font-semibold text-zinc-800 text-sm">
+                Armazenamento total
+              </p>
+              <p className="text-xs text-zinc-500">
+                {formatBytes(totalBytes)} de {formatBytes(MAX_TOTAL_BYTES)}{" "}
+                utilizados
+              </p>
+            </div>
+          </div>
+          <span
+            className={cn(
+              "rounded-full px-2.5 py-1 font-semibold text-xs",
+              cheio
+                ? "bg-red-50 text-red-700"
+                : emAlerta
+                  ? "bg-amber-50 text-amber-700"
+                  : "bg-emerald-50 text-emerald-700",
+            )}
+          >
+            {pct.toFixed(pct >= 10 ? 0 : 1)}%
+          </span>
+        </div>
+
+        <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-zinc-100">
+          <div
+            className={cn("h-full rounded-full transition-all", barColor)}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+
+        {(cheio || emAlerta) && (
+          <div
+            className={cn(
+              "mt-4 flex items-start gap-2 rounded-md border px-3 py-2 text-sm",
+              cheio
+                ? "border-red-200 bg-red-50 text-red-700"
+                : "border-amber-200 bg-amber-50 text-amber-700",
+            )}
+          >
+            <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+            <div>
+              <p className="font-semibold">
+                {cheio
+                  ? "Limite de 2 GB atingido."
+                  : "Você está perto do limite de 2 GB."}
+              </p>
+              <p>
+                {cheio
+                  ? "Não é possível enviar novos arquivos. Exclua alguns documentos para liberar espaço."
+                  : `Restam ${formatBytes(Math.max(0, MAX_TOTAL_BYTES - totalBytes))} livres. Considere excluir documentos antigos.`}
+                {maiores.length > 0 && (
+                  <>
+                    {" "}
+                    Maiores arquivos:{" "}
+                    {maiores
+                      .map((d) => `${d.nome} (${formatBytes(d.tamanhoBytes)})`)
+                      .join(", ")}
+                    .
+                  </>
+                )}
+              </p>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -322,11 +447,13 @@ function FilePicker({
 
 function NovoModal({
   open,
+  disponivel,
   onClose,
   onSuccess,
   onError,
 }: {
   open: boolean;
+  disponivel: number;
   onClose: () => void;
   onSuccess: (d: DocumentoResponse) => void | Promise<void>;
   onError: (msg: string) => void;
@@ -363,6 +490,11 @@ function NovoModal({
     const arquivoErr = validarArquivo(file);
     if (arquivoErr) return setErroLocal(arquivoErr);
     if (!file) return;
+    if (file.size > disponivel) {
+      return setErroLocal(
+        `Sem espaço: este arquivo (${formatBytes(file.size)}) excede o espaço livre (${formatBytes(disponivel)}). Exclua documentos para liberar o limite de 2 GB.`,
+      );
+    }
 
     setSubmitting(true);
     try {

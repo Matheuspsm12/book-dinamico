@@ -30,6 +30,8 @@ const FRIENDLY: Record<string, string> = {
     "O conteúdo do arquivo não corresponde à extensão informada.",
   "erro-lote-quantidades-divergentes":
     "Quantidade de metadados precisa bater com a quantidade de arquivos.",
+  "erro-limite-armazenamento":
+    "Limite de 2 GB de armazenamento atingido. Exclua documentos para liberar espaço antes de enviar novos arquivos.",
 
   "erro-inesperado":
     "Ocorreu um erro inesperado. Tente novamente em instantes.",
