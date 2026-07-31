@@ -6,7 +6,6 @@ import {
   FileSpreadsheet,
   FileText,
   HardDrive,
-  History,
   Pencil,
   Plus,
   RefreshCw,
@@ -23,15 +22,8 @@ import { Dialog } from "src/components/ui/dialog";
 import { Input } from "src/components/ui/input";
 import { Label } from "src/components/ui/label";
 import { useAuth } from "src/app/contexts/AuthContext";
-import type { AuditoriaResponse, DocumentoResponse } from "src/lib/api/types";
-import {
-  cn,
-  formatDate,
-  formatDateTime,
-  hojeLocal,
-  inferNomeFromFilename,
-} from "src/lib/utils";
-import * as auditoriaApi from "src/services/auditoria-service";
+import type { DocumentoResponse } from "src/lib/api/types";
+import { cn, formatDate, hojeLocal, inferNomeFromFilename } from "src/lib/utils";
 import * as docsApi from "src/services/documentos-service";
 
 const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
@@ -75,28 +67,16 @@ export default function UploadBookPage() {
   const { user, loading } = useAuth();
   const [docs, setDocs] = useState<DocumentoResponse[]>([]);
   const [carregando, setCarregando] = useState(true);
-  const [historico, setHistorico] = useState<AuditoriaResponse[]>([]);
   const [modal, setModal] = useState<Modal>({ kind: "none" });
   const [flash, setFlash] = useState<{
     tipo: "ok" | "err";
     msg: string;
   } | null>(null);
 
-  const carregarHistorico = useCallback(async () => {
-    try {
-      const page = await auditoriaApi.listarHistoricoDocumentos(0, 50);
-      setHistorico(page.content);
-    } catch {
-      // histórico é complementar; não bloqueia a tela se falhar
-      setHistorico([]);
-    }
-  }, []);
-
   const carregar = useCallback(async () => {
     setCarregando(true);
     try {
       setDocs(await docsApi.listar());
-      await carregarHistorico();
     } catch (e) {
       setFlash({
         tipo: "err",
@@ -105,7 +85,7 @@ export default function UploadBookPage() {
     } finally {
       setCarregando(false);
     }
-  }, [carregarHistorico]);
+  }, []);
 
   useEffect(() => {
     if (!loading && user && user.role !== "ADMIN") router.replace("/book");
@@ -202,8 +182,6 @@ export default function UploadBookPage() {
         </div>
       )}
 
-      {!carregando && <HistoricoSection itens={historico} />}
-
       <NovoModal
         open={modal.kind === "novo"}
         disponivel={disponivel}
@@ -254,90 +232,6 @@ export default function UploadBookPage() {
         />
       )}
     </div>
-  );
-}
-
-const ACAO_LABEL: Record<string, string> = {
-  CRIAR: "Criação",
-  ALTERAR: "Edição",
-  SUBSTITUIR: "Substituição",
-  EXCLUIR: "Exclusão",
-  PROCESSAR: "Processamento",
-};
-
-const ACAO_BADGE: Record<string, string> = {
-  CRIAR: "bg-emerald-100 text-emerald-700",
-  ALTERAR: "bg-blue-100 text-blue-700",
-  SUBSTITUIR: "bg-amber-100 text-amber-700",
-  EXCLUIR: "bg-red-100 text-red-700",
-  PROCESSAR: "bg-zinc-100 text-zinc-600",
-};
-
-function HistoricoSection({ itens }: { itens: AuditoriaResponse[] }) {
-  return (
-    <Card className="mt-8">
-      <CardContent className="pt-6">
-        <div className="mb-4 flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-md bg-zinc-100 text-zinc-600">
-            <History size={18} />
-          </div>
-          <div>
-            <p className="font-semibold text-zinc-800">Histórico de alterações</p>
-            <p className="text-xs text-zinc-500">
-              Quem fez o quê e quando — substituições, edições e exclusões dos
-              arquivos.
-            </p>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-zinc-200 border-b text-left text-xs text-zinc-500 uppercase">
-                <th className="py-3 font-semibold">Documento</th>
-                <th className="py-3 font-semibold">Ação</th>
-                <th className="py-3 font-semibold">Usuário</th>
-                <th className="py-3 font-semibold">Data / Hora</th>
-              </tr>
-            </thead>
-            <tbody>
-              {itens.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-8 text-center text-zinc-400">
-                    Nenhuma alteração registrada ainda.
-                  </td>
-                </tr>
-              ) : (
-                itens.map((h) => (
-                  <tr
-                    key={h.id}
-                    className="border-zinc-100 border-b hover:bg-zinc-50"
-                  >
-                    <td className="py-3 font-medium text-zinc-800">
-                      {h.detalhes || "—"}
-                    </td>
-                    <td className="py-3">
-                      <span
-                        className={cn(
-                          "rounded-full px-2 py-0.5 font-semibold text-xs",
-                          ACAO_BADGE[h.acao] ?? "bg-zinc-100 text-zinc-600",
-                        )}
-                      >
-                        {ACAO_LABEL[h.acao] ?? h.acao}
-                      </span>
-                    </td>
-                    <td className="py-3 text-zinc-700">{h.usuario}</td>
-                    <td className="py-3 text-zinc-500">
-                      {formatDateTime(h.dataHora)}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 

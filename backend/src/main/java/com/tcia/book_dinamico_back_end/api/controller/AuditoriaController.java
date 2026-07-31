@@ -30,4 +30,13 @@ public class AuditoriaController {
     public ResponseEntity<Page<AuditoriaResponse>> historicoDocumentos(Pageable pageable) {
         return ResponseEntity.ok(auditoriaService.listarHistoricoDocumentos(pageable));
     }
+
+    @Operation(summary = "Histórico de usuários",
+            description = "Lista paginada das ações sobre usuários (criação, alterações e inatividade), mais recentes primeiro.")
+    @DocumentarAPI
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/usuarios")
+    public ResponseEntity<Page<AuditoriaResponse>> historicoUsuarios(Pageable pageable) {
+        return ResponseEntity.ok(auditoriaService.listarHistoricoUsuarios(pageable));
+    }
 }

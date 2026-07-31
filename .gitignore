@@ -75,3 +75,8 @@ Backend/.sts4-cache
 Thumbs.db
 *.pem
 HELP.md
+
+# artefatos de execução local
+backend/*.log
+backend/logs/
+backend/@PATH_LOG_PRODUCAO@/

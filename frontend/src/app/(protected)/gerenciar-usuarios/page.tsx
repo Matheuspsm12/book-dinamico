@@ -28,6 +28,12 @@ import { cn, formatDate } from "src/lib/utils";
 import * as perfisApi from "src/services/perfis-service";
 import * as usuariosApi from "src/services/usuarios-service";
 
+// Usuários base do sistema não podem ser gerenciados.
+const EMAILS_USUARIO_BASE = ["qwerer", "admin@claro.com.br"];
+function ehUsuarioBase(email: string) {
+  return EMAILS_USUARIO_BASE.includes(email.toLowerCase());
+}
+
 const statusBadge: Record<UsuarioStatus, string> = {
   PENDENTE: "bg-amber-100 text-amber-700",
   APROVADO: "bg-emerald-100 text-emerald-700",
@@ -316,7 +322,7 @@ export default function GerenciarUsuariosPage() {
                       <td className="py-3 text-zinc-700">{u.empresa}</td>
                       <td className="py-3 text-zinc-700">{u.email}</td>
                       <td className="py-3 text-zinc-700">
-                        {u.role && u.role !== "USUARIO" ? (
+                        {u.role ? (
                           u.role
                         ) : (
                           <span className="text-zinc-400">—</span>
@@ -337,13 +343,19 @@ export default function GerenciarUsuariosPage() {
                       </td>
                       <td className="py-3">
                         <div className="flex justify-end">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => abrirModal(u)}
-                          >
-                            <Settings2 size={14} /> Gerenciar
-                          </Button>
+                          {ehUsuarioBase(u.email) ? (
+                            <span className="text-xs text-zinc-400 italic">
+                              Usuário base
+                            </span>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => abrirModal(u)}
+                            >
+                              <Settings2 size={14} /> Gerenciar
+                            </Button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -471,29 +483,34 @@ export default function GerenciarUsuariosPage() {
                     }
                   />
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => void simular(undefined)}
-                    disabled={salvando}
-                  >
-                    <Play size={13} /> Simular inatividade (&gt;4 meses)
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => void simular(5)}
-                    disabled={salvando}
-                  >
-                    <Play size={13} /> Simular prazo vencido
-                  </Button>
-                </div>
-                <p className="mt-2 text-xs text-zinc-400">
-                  Depois de simular, use “Rodar verificação de ociosidade” para
-                  disparar o e-mail (inatividade) ou a desativação (prazo
-                  vencido).
-                </p>
+                {user.producao === false && (
+                  <>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void simular(undefined)}
+                        disabled={salvando}
+                      >
+                        <Play size={13} /> Simular inatividade (&gt;4 meses)
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void simular(5)}
+                        disabled={salvando}
+                      >
+                        <Play size={13} /> Simular prazo vencido
+                      </Button>
+                    </div>
+                    <p className="mt-2 text-xs text-zinc-400">
+                      Ferramenta de teste (indisponível em produção). Depois de
+                      simular, use “Rodar verificação de ociosidade” para
+                      disparar o e-mail (inatividade) ou a desativação (prazo
+                      vencido).
+                    </p>
+                  </>
+                )}
               </div>
             )}
 

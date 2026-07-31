@@ -18,6 +18,10 @@ const FRIENDLY: Record<string, string> = {
   "erro-usuario-nao-desativado": "Usuário não está desativado.",
   "erro-ociosidade-usuario-nao-aprovado":
     "Só é possível simular ociosidade em usuários aprovados.",
+  "erro-simulacao-indisponivel-em-producao":
+    "A simulação de ociosidade não está disponível em produção.",
+  "erro-usuario-base-protegido":
+    "Este é um usuário base do sistema e não pode ser gerenciado.",
   "cap-usuarios-excedido":
     "Limite de 40 usuários aprovados atingido. Desative alguém antes de aprovar outro.",
   "email-desabilitado":

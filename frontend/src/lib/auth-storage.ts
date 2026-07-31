@@ -9,6 +9,7 @@ export interface AuthSession {
   nome: string;
   email: string;
   role: UsuarioRole;
+  producao: boolean;
 }
 
 function pickStorage(): Storage | null {

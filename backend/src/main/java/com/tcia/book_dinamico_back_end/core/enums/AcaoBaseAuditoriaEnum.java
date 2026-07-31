@@ -5,5 +5,6 @@ public enum AcaoBaseAuditoriaEnum {
     ALTERAR,
     SUBSTITUIR,
     EXCLUIR,
+    INATIVIDADE,
     PROCESSAR
 }

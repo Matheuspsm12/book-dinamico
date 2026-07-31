@@ -8,7 +8,9 @@ import com.tcia.book_dinamico_back_end.api.request.UsuarioFiltroRequest;
 import com.tcia.book_dinamico_back_end.api.response.OciosidadeResultadoResponse;
 import com.tcia.book_dinamico_back_end.api.response.TokenResponse;
 import com.tcia.book_dinamico_back_end.api.response.UsuarioResponse;
+import com.tcia.book_dinamico_back_end.core.enums.AuditoriaAcaoEnum;
 import com.tcia.book_dinamico_back_end.infrastructure.adapter.EmailAdapter;
+import com.tcia.book_dinamico_back_end.domain.model.Auditoria;
 import com.tcia.book_dinamico_back_end.domain.model.Usuario;
 import com.tcia.book_dinamico_back_end.domain.model.ResetSenhaToken;
 import com.tcia.book_dinamico_back_end.domain.repository.PerfilRepository;
@@ -45,7 +47,7 @@ public class UsuarioService {
 
     public static final long CAP_USUARIOS_APROVADOS = 40L;
 
-    private static final String PERFIL_USUARIO = "USUARIO";
+    private static final String PERFIL_USUARIO = "OPERADOR";
 
     private final UsuarioRepository usuarioRepository;
     private final PerfilRepository perfilRepository;
@@ -56,9 +58,15 @@ public class UsuarioService {
     private final EmailAdapter emailAdapter;
     private final AuthUtils authUtils;
     private final ResetSenhaTokenRepository resetSenhaTokenRepository;
+    private final AuditoriaService auditoriaService;
+    private final AmbienteService ambienteService;
 
     @Value("${app.url-site}")
     private String urlSite;
+
+    /** Usuários base do sistema — não podem ser gerenciados/alterados. */
+    private static final java.util.Set<String> EMAILS_USUARIO_BASE =
+            java.util.Set.of("qwerer", "admin@claro.com.br");
 
     @Transactional
     public TokenResponse autenticar(LoginRequest request, HttpServletRequest httpRequest) {
@@ -83,6 +91,7 @@ public class UsuarioService {
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
                 .role(usuario.getPerfil() != null ? usuario.getPerfil().getNomePerfil() : null)
+                .producao(ambienteService.isProducao())
                 .build();
     }
 
@@ -108,6 +117,7 @@ public class UsuarioService {
         Usuario salvo = usuarioRepository.save(usuario);
         log.info("Novo cadastro PENDENTE: id={} email={}", salvo.getId(), salvo.getEmail());
 
+        auditar(AuditoriaAcaoEnum.CRIAR_USUARIO, salvo, salvo.getEmail(), "Autocadastro (aguardando aprovação)");
         return usuarioMapper.toResponse(salvo);
     }
 
@@ -137,6 +147,8 @@ public class UsuarioService {
                 salvo.getAprovadoPor() != null ? salvo.getAprovadoPor().getId() : null);
 
         emailAdapter.enviarAprovacao(salvo);
+        auditar(AuditoriaAcaoEnum.ALTERAR_USUARIO, salvo, actorEmail(),
+                "Aprovado" + (salvo.getPerfil() != null ? " · perfil: " + salvo.getPerfil().getNomePerfil() : ""));
         return usuarioMapper.toResponse(salvo);
     }
 
@@ -153,6 +165,7 @@ public class UsuarioService {
         log.info("Usuário rejeitado: id={} email={}", salvo.getId(), salvo.getEmail());
 
         emailAdapter.enviarRejeicao(salvo);
+        auditar(AuditoriaAcaoEnum.ALTERAR_USUARIO, salvo, actorEmail(), "Rejeitado");
         return usuarioMapper.toResponse(salvo);
     }
 
@@ -273,12 +286,16 @@ public class UsuarioService {
                 usuarioRepository.save(usuario);
                 emailAdapter.enviarOciosidade(usuario);
                 notificados.add(usuario.getEmail());
+                auditar(AuditoriaAcaoEnum.OCIOSIDADE_USUARIO, usuario, "sistema",
+                        "Notificado por ociosidade (mais de 4 meses sem acesso)");
                 log.info("Ociosidade notificada: id={} email={}", usuario.getId(), usuario.getEmail());
             } else if (agora.isAfter(adicionarDiasUteis(usuario.getOciosidadeNotificadoEm(), OCIOSIDADE_PRAZO_DIAS_UTEIS))) {
                 usuario.setStatus(UsuarioStatus.DESATIVADO);
                 usuario.setAtivo(false);
                 usuarioRepository.save(usuario);
                 desativados.add(usuario.getEmail());
+                auditar(AuditoriaAcaoEnum.OCIOSIDADE_USUARIO, usuario, "sistema",
+                        "Desativado por ociosidade (sem manifestação no prazo)");
                 log.info("Usuário desativado por ociosidade: id={} email={}", usuario.getId(), usuario.getEmail());
             }
         }
@@ -301,6 +318,9 @@ public class UsuarioService {
      */
     @Transactional
     public UsuarioResponse simularOciosidade(Long usuarioId, Integer mesesInativos, Integer notificadoHaDias) {
+        if (ambienteService.isProducao()) {
+            throw new NegocioException("erro-simulacao-indisponivel-em-producao");
+        }
         Usuario usuario = buscarPorIdOuFalhar(usuarioId);
         if (usuario.getStatus() != UsuarioStatus.APROVADO) {
             throw new NegocioException("erro-ociosidade-usuario-nao-aprovado");
@@ -350,11 +370,15 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponse atualizar(Long usuarioId, UsuarioEdicaoRequest request) {
         Usuario usuario = buscarPorIdOuFalhar(usuarioId);
+        validarNaoEhUsuarioBase(usuario);
 
         if (request.getEmail() != null && !request.getEmail().equalsIgnoreCase(usuario.getEmail())
                 && usuarioRepository.existsByEmail(request.getEmail())) {
             throw new NegocioException("erro-email-duplicado");
         }
+
+        boolean trocouPerfil = request.getIdPerfil() != null
+                && (usuario.getPerfil() == null || !request.getIdPerfil().equals(usuario.getPerfil().getId()));
 
         usuarioMapper.atualizar(usuario, request);
 
@@ -366,6 +390,10 @@ public class UsuarioService {
         log.info("Usuário atualizado: id={} email={} perfil={}",
                 salvo.getId(), salvo.getEmail(),
                 salvo.getPerfil() != null ? salvo.getPerfil().getNomePerfil() : null);
+        String detalhe = trocouPerfil && salvo.getPerfil() != null
+                ? "Perfil alterado para " + salvo.getPerfil().getNomePerfil()
+                : "Dados atualizados";
+        auditar(AuditoriaAcaoEnum.ALTERAR_USUARIO, salvo, actorEmail(), detalhe);
         return usuarioMapper.toResponse(salvo);
     }
 
@@ -374,9 +402,33 @@ public class UsuarioService {
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado: " + idPerfil));
     }
 
+    private void validarNaoEhUsuarioBase(Usuario usuario) {
+        if (usuario.getEmail() != null
+                && EMAILS_USUARIO_BASE.contains(usuario.getEmail().toLowerCase())) {
+            throw new NegocioException("erro-usuario-base-protegido");
+        }
+    }
+
+    private String actorEmail() {
+        Usuario logado = authUtils.getUsuarioLogado();
+        return logado != null ? logado.getEmail() : "sistema";
+    }
+
+    private void auditar(AuditoriaAcaoEnum acao, Usuario alvo, String actorEmail, String detalhe) {
+        Auditoria registro = new Auditoria();
+        registro.setUsuario(actorEmail != null ? actorEmail : "sistema");
+        registro.setAcao(acao.getAcao().name());
+        registro.setEntidade(acao.getEntidade().name());
+        registro.setEntidadeId(alvo.getId());
+        // Guarda quem foi afetado + o que aconteceu, para o histórico de usuários.
+        registro.setDetalhes(alvo.getNome() + " (" + alvo.getEmail() + ") — " + detalhe);
+        auditoriaService.salvar(registro);
+    }
+
     @Transactional
     public UsuarioResponse desativar(Long usuarioId) {
         Usuario usuario = buscarPorIdOuFalhar(usuarioId);
+        validarNaoEhUsuarioBase(usuario);
         if (usuario.getStatus() == UsuarioStatus.DESATIVADO) {
             throw new NegocioException("erro-usuario-ja-desativado");
         }
@@ -384,12 +436,14 @@ public class UsuarioService {
         usuario.setAtivo(false);
         Usuario salvo = usuarioRepository.save(usuario);
         log.info("Usuário desativado: id={} email={}", salvo.getId(), salvo.getEmail());
+        auditar(AuditoriaAcaoEnum.ALTERAR_USUARIO, salvo, actorEmail(), "Desativado");
         return usuarioMapper.toResponse(salvo);
     }
 
     @Transactional
     public UsuarioResponse ativar(Long usuarioId) {
         Usuario usuario = buscarPorIdOuFalhar(usuarioId);
+        validarNaoEhUsuarioBase(usuario);
         if (usuario.getStatus() != UsuarioStatus.DESATIVADO) {
             throw new NegocioException("erro-usuario-nao-desativado");
         }
@@ -398,6 +452,7 @@ public class UsuarioService {
         usuario.setAtivo(true);
         Usuario salvo = usuarioRepository.save(usuario);
         log.info("Usuário reativado: id={} email={}", salvo.getId(), salvo.getEmail());
+        auditar(AuditoriaAcaoEnum.ALTERAR_USUARIO, salvo, actorEmail(), "Reativado");
         return usuarioMapper.toResponse(salvo);
     }
 }

@@ -3,9 +3,9 @@ export type UsuarioStatus =
   | "APROVADO"
   | "REJEITADO"
   | "DESATIVADO";
-// "ADMIN" e "USUARIO" são fixos (segurança/guards); os demais são perfis de
-// negócio cadastráveis (Vendedor, Gerente de Loja, etc.), por isso string.
-export type UsuarioRole = "ADMIN" | "USUARIO" | (string & {});
+// Perfis do sistema: ADMIN (gate de segurança/guards), OPERADOR (default do
+// autocadastro) e LOGISTICA. (string & {}) mantém tolerância a valores futuros.
+export type UsuarioRole = "ADMIN" | "OPERADOR" | "LOGISTICA" | (string & {});
 
 export interface PerfilResponse {
   id: number;
@@ -23,6 +23,7 @@ export interface TokenResponse {
   nome: string;
   email: string;
   role: UsuarioRole;
+  producao: boolean;
 }
 
 export interface UsuarioResponse {
