@@ -25,9 +25,16 @@ export async function criar(metadata: DocumentoMetadataRequest, arquivo: File) {
   return data;
 }
 
-export async function substituirArquivo(id: number, arquivo: File) {
+export async function substituirArquivo(
+  id: number,
+  arquivo: File,
+  opts?: { nome?: string; dataAtualizacao?: string },
+) {
   const form = new FormData();
   form.append("arquivo", arquivo);
+  if (opts?.nome) form.append("nome", opts.nome);
+  if (opts?.dataAtualizacao)
+    form.append("dataAtualizacao", opts.dataAtualizacao);
   const { data } = await api.put<DocumentoResponse>(
     `/api/documentos/${id}/arquivo`,
     form,

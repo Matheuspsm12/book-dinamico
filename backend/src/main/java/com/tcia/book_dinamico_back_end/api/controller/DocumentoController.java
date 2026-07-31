@@ -87,8 +87,10 @@ public class DocumentoController {
     @PutMapping(value = "/{id}/arquivo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentoResponse> substituirArquivo(
             @PathVariable Long id,
-            @RequestPart("arquivo") MultipartFile arquivo) {
-        return ResponseEntity.ok(documentoService.substituirArquivo(id, arquivo));
+            @RequestPart("arquivo") MultipartFile arquivo,
+            @RequestParam(value = "nome", required = false) String nome,
+            @RequestParam(value = "dataAtualizacao", required = false) String dataAtualizacao) {
+        return ResponseEntity.ok(documentoService.substituirArquivo(id, arquivo, nome, dataAtualizacao));
     }
 
     @Operation(summary = "Editar metadata", description = "Atualiza nome/descricao/dataAtualizacao. Não toca no binário.")

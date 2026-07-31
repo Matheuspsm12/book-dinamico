@@ -16,4 +16,6 @@ public class UsuarioEdicaoRequest {
     @Email(message = "{usuario.email.invalido}")
     @Size(max = 200, message = "{usuario.email.size}")
     private String email;
+
+    private Long idPerfil;
 }

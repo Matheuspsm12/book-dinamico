@@ -18,6 +18,20 @@ export function formatDate(d: string | Date) {
   return new Date(d).toLocaleDateString("pt-BR");
 }
 
+export function formatDateTime(d: string | Date) {
+  const date = d instanceof Date ? d : new Date(d);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
+
 export function inferNomeFromFilename(filename: string): string {
   let name = filename.replace(/\.(xlsm|xlsx|pptx)$/i, "");
   name = name.replace(/^\d{4}[\s_]+\p{L}+_/iu, "");

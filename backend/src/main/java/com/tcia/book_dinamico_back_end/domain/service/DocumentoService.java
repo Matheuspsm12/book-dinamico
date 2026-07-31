@@ -5,8 +5,8 @@ import com.tcia.book_dinamico_back_end.api.request.DocumentoMetadataRequest;
 import com.tcia.book_dinamico_back_end.api.response.DocumentoResponse;
 import com.tcia.book_dinamico_back_end.domain.model.Documento;
 import com.tcia.book_dinamico_back_end.domain.model.DocumentoUploadLog;
+import com.tcia.book_dinamico_back_end.domain.model.Auditoria;
 import com.tcia.book_dinamico_back_end.domain.model.Usuario;
-import com.tcia.book_dinamico_back_end.core.annotation.Auditar;
 import com.tcia.book_dinamico_back_end.core.enums.AuditoriaAcaoEnum;
 import com.tcia.book_dinamico_back_end.core.enums.ExtensaoDocumento;
 import com.tcia.book_dinamico_back_end.domain.exception.ArquivoException;
@@ -43,6 +43,7 @@ public class DocumentoService {
     private final AuthUtils authUtils;
     private final ProcessamentoService processamentoService;
     private final NotificacaoEmailService notificacaoEmailService;
+    private final AuditoriaService auditoriaService;
 
     /** Teto total de armazenamento agregado dos documentos ativos (2 GB). */
     private static final long MAX_TOTAL_BYTES = 2L * 1024 * 1024 * 1024;
@@ -70,7 +71,6 @@ public class DocumentoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Documento não encontrado: " + id));
     }
 
-    @Auditar(acao = AuditoriaAcaoEnum.CRIAR_DOCUMENTO, detalhes = false)
     @Transactional
     public DocumentoResponse criar(DocumentoMetadataRequest metadata, MultipartFile arquivo) {
         Usuario admin = adminLogado();
@@ -102,6 +102,7 @@ public class DocumentoService {
         log.info("Documento criado: id={} nome={} tipo={} ext={} tamanho={}",
                 salvo.getId(), salvo.getNome(), salvo.getTipo(), salvo.getExtensao(), salvo.getTamanhoBytes());
 
+        auditar(AuditoriaAcaoEnum.CRIAR_DOCUMENTO, salvo, admin);
         notificacaoEmailService.notificarNovaPublicacao();
         return documentoMapper.toResponse(salvo);
     }
@@ -118,9 +119,8 @@ public class DocumentoService {
         return respostas;
     }
 
-    @Auditar(acao = AuditoriaAcaoEnum.ALTERAR_DOCUMENTO, detalhes = false)
     @Transactional
-    public DocumentoResponse substituirArquivo(Long id, MultipartFile arquivo) {
+    public DocumentoResponse substituirArquivo(Long id, MultipartFile arquivo, String nome, String dataAtualizacao) {
         Usuario admin = adminLogado();
         Documento doc = buscarOuFalhar(id);
         ExtensaoDocumento novaExt = integridadeValidator.validar(arquivo);
@@ -135,6 +135,14 @@ public class DocumentoService {
         doc.setExtensao(novaExt);
         doc.setTipo(novaExt.getTipo());
         doc.setAtualizadoPor(admin);
+        // A substituição também sincroniza nome/data quando informados, numa única
+        // operação (evita um segundo registro de "edição" no histórico).
+        if (nome != null && !nome.isBlank()) {
+            doc.setNome(nome);
+        }
+        if (dataAtualizacao != null && !dataAtualizacao.isBlank()) {
+            doc.setDataAtualizacao(java.time.LocalDate.parse(dataAtualizacao));
+        }
 
         Documento salvo = documentoRepository.save(doc);
         storage.deletarSeExistir(caminhoAntigo);
@@ -143,10 +151,10 @@ public class DocumentoService {
         processamentoService.processarImediato(processamento);
 
         log.info("Arquivo substituído em documento id={}: novo={}", salvo.getId(), caminhoNovo);
+        auditar(AuditoriaAcaoEnum.SUBSTITUIR_DOCUMENTO, salvo, admin);
         return documentoMapper.toResponse(salvo);
     }
 
-    @Auditar(acao = AuditoriaAcaoEnum.ALTERAR_DOCUMENTO)
     @Transactional
     public DocumentoResponse atualizarMetadados(Long id, DocumentoMetadataRequest request) {
         Documento doc = buscarOuFalhar(id);
@@ -159,20 +167,33 @@ public class DocumentoService {
 
         Documento salvo = documentoRepository.save(doc);
         log.info("Metadata atualizada em documento id={}", salvo.getId());
+        auditar(AuditoriaAcaoEnum.ALTERAR_DOCUMENTO, salvo, admin);
         return documentoMapper.toResponse(salvo);
     }
 
-    @Auditar(acao = AuditoriaAcaoEnum.EXCLUIR_DOCUMENTO)
     @Transactional
     public void deletar(Long id) {
         Documento doc = buscarOuFalhar(id);
+        Usuario admin = adminLogado();
         String caminho = doc.getCaminhoArmazenamento();
+        // Captura o nome antes de excluir — o registro de auditoria precisa sobreviver ao delete.
+        auditar(AuditoriaAcaoEnum.EXCLUIR_DOCUMENTO, doc, admin);
         processamentoService.removerPorDocumento(id);
         documentoAbaRepository.deleteByDocumentoId(id);
         documentoRepository.delete(doc);
         // Libera o espaço em disco: o binário não é mais necessário após a exclusão.
         storage.deletarSeExistir(caminho);
         log.info("Documento excluído id={} e arquivo removido do disco: {}", id, caminho);
+    }
+
+    private void auditar(AuditoriaAcaoEnum acao, Documento doc, Usuario admin) {
+        Auditoria registro = new Auditoria();
+        registro.setUsuario(admin != null ? admin.getEmail() : "sistema");
+        registro.setAcao(acao.getAcao().name());
+        registro.setEntidade(acao.getEntidade().name());
+        registro.setEntidadeId(doc.getId());
+        registro.setDetalhes(doc.getNome());
+        auditoriaService.salvar(registro);
     }
 
     /**

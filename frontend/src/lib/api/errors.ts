@@ -16,6 +16,8 @@ const FRIENDLY: Record<string, string> = {
     "Esta ação só é permitida em usuários com status PENDENTE.",
   "erro-usuario-ja-desativado": "Usuário já está desativado.",
   "erro-usuario-nao-desativado": "Usuário não está desativado.",
+  "erro-ociosidade-usuario-nao-aprovado":
+    "Só é possível simular ociosidade em usuários aprovados.",
   "cap-usuarios-excedido":
     "Limite de 40 usuários aprovados atingido. Desative alguém antes de aprovar outro.",
   "email-desabilitado":

@@ -5,6 +5,7 @@ import com.tcia.book_dinamico_back_end.api.request.LoginRequest;
 import com.tcia.book_dinamico_back_end.api.request.UsuarioCadastroRequest;
 import com.tcia.book_dinamico_back_end.api.request.UsuarioEdicaoRequest;
 import com.tcia.book_dinamico_back_end.api.request.UsuarioFiltroRequest;
+import com.tcia.book_dinamico_back_end.api.response.OciosidadeResultadoResponse;
 import com.tcia.book_dinamico_back_end.api.response.TokenResponse;
 import com.tcia.book_dinamico_back_end.api.response.UsuarioResponse;
 import com.tcia.book_dinamico_back_end.infrastructure.adapter.EmailAdapter;
@@ -117,10 +118,14 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioResponse aprovar(Long usuarioId) {
+    public UsuarioResponse aprovar(Long usuarioId, Long idPerfil) {
         Usuario usuario = buscarPorIdOuFalhar(usuarioId);
         validarStatusPendente(usuario);
         validarCapAprovados();
+
+        if (idPerfil != null) {
+            usuario.setPerfil(buscarPerfilOuFalhar(idPerfil));
+        }
 
         usuario.setStatus(UsuarioStatus.APROVADO);
         usuario.setAprovadoPor(adminLogado());
@@ -237,14 +242,21 @@ public class UsuarioService {
     private static final int OCIOSIDADE_PRAZO_DIAS_UTEIS = 2;
 
     @Transactional
-    public void processarOciosidade() {
+    public OciosidadeResultadoResponse processarOciosidade() {
         if (!emailAdapter.isHabilitado()) {
             log.info("[ociosidade] e-mail desabilitado; verificação ignorada");
-            return;
+            return OciosidadeResultadoResponse.builder()
+                    .emailDesabilitado(true)
+                    .notificados(List.of())
+                    .desativados(List.of())
+                    .build();
         }
         LocalDateTime agora = LocalDateTime.now();
         LocalDateTime limiteOciosidade = agora.minusMonths(OCIOSIDADE_MESES);
         List<Usuario> aprovados = usuarioRepository.findByStatus(UsuarioStatus.APROVADO);
+
+        List<String> notificados = new java.util.ArrayList<>();
+        List<String> desativados = new java.util.ArrayList<>();
 
         for (Usuario usuario : aprovados) {
             LocalDateTime acesso = usuario.getUltimoAcesso() != null
@@ -260,14 +272,53 @@ public class UsuarioService {
                 usuario.setOciosidadeNotificadoEm(agora);
                 usuarioRepository.save(usuario);
                 emailAdapter.enviarOciosidade(usuario);
+                notificados.add(usuario.getEmail());
                 log.info("Ociosidade notificada: id={} email={}", usuario.getId(), usuario.getEmail());
             } else if (agora.isAfter(adicionarDiasUteis(usuario.getOciosidadeNotificadoEm(), OCIOSIDADE_PRAZO_DIAS_UTEIS))) {
                 usuario.setStatus(UsuarioStatus.DESATIVADO);
                 usuario.setAtivo(false);
                 usuarioRepository.save(usuario);
+                desativados.add(usuario.getEmail());
                 log.info("Usuário desativado por ociosidade: id={} email={}", usuario.getId(), usuario.getEmail());
             }
         }
+
+        return OciosidadeResultadoResponse.builder()
+                .emailDesabilitado(false)
+                .notificados(notificados)
+                .desativados(desativados)
+                .build();
+    }
+
+    /**
+     * Encena a ociosidade de um usuário APROVADO para permitir demonstrar o fluxo sem
+     * esperar os 4 meses reais: retrocede o último acesso e, opcionalmente, a data de
+     * notificação (para que a próxima verificação já desative).
+     *
+     * @param mesesInativos          há quantos meses o usuário "não acessa" (default 5)
+     * @param notificadoHaDias       se informado (>0), marca como já notificado há N dias
+     *                               corridos, encenando a etapa de desativação
+     */
+    @Transactional
+    public UsuarioResponse simularOciosidade(Long usuarioId, Integer mesesInativos, Integer notificadoHaDias) {
+        Usuario usuario = buscarPorIdOuFalhar(usuarioId);
+        if (usuario.getStatus() != UsuarioStatus.APROVADO) {
+            throw new NegocioException("erro-ociosidade-usuario-nao-aprovado");
+        }
+        int meses = (mesesInativos != null && mesesInativos > 0) ? mesesInativos : OCIOSIDADE_MESES + 1;
+        LocalDateTime agora = LocalDateTime.now();
+
+        usuario.setUltimoAcesso(agora.minusMonths(meses));
+        if (notificadoHaDias != null && notificadoHaDias > 0) {
+            usuario.setOciosidadeNotificadoEm(agora.minusDays(notificadoHaDias));
+        } else {
+            usuario.setOciosidadeNotificadoEm(null);
+        }
+
+        Usuario salvo = usuarioRepository.save(usuario);
+        log.info("Ociosidade simulada: id={} email={} mesesInativos={} notificadoHaDias={}",
+                salvo.getId(), salvo.getEmail(), meses, notificadoHaDias);
+        return usuarioMapper.toResponse(salvo);
     }
 
     private static LocalDateTime adicionarDiasUteis(LocalDateTime inicio, int diasUteis) {
@@ -306,9 +357,21 @@ public class UsuarioService {
         }
 
         usuarioMapper.atualizar(usuario, request);
+
+        if (request.getIdPerfil() != null) {
+            usuario.setPerfil(buscarPerfilOuFalhar(request.getIdPerfil()));
+        }
+
         Usuario salvo = usuarioRepository.save(usuario);
-        log.info("Usuário atualizado: id={} email={}", salvo.getId(), salvo.getEmail());
+        log.info("Usuário atualizado: id={} email={} perfil={}",
+                salvo.getId(), salvo.getEmail(),
+                salvo.getPerfil() != null ? salvo.getPerfil().getNomePerfil() : null);
         return usuarioMapper.toResponse(salvo);
+    }
+
+    private com.tcia.book_dinamico_back_end.domain.model.Perfil buscarPerfilOuFalhar(Long idPerfil) {
+        return perfilRepository.findById(idPerfil)
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado: " + idPerfil));
     }
 
     @Transactional

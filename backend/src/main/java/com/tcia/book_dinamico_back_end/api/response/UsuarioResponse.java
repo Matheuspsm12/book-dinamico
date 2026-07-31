@@ -22,8 +22,11 @@ public class UsuarioResponse {
     private String justificativa;
     private UsuarioStatus status;
     private String role;
+    private Long idPerfil;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
     private LocalDateTime decididoEm;
     private Long aprovadoPorId;
+    private LocalDateTime ultimoAcesso;
+    private LocalDateTime ociosidadeNotificadoEm;
 }

@@ -1,6 +1,8 @@
 import api from "src/services/api";
 import type {
+  OciosidadeResultado,
   PageResponse,
+  SimularOciosidadeRequest,
   UsuarioCadastroRequest,
   UsuarioEdicaoRequest,
   UsuarioFiltroRequest,
@@ -33,9 +35,10 @@ export async function paginar(
   return data;
 }
 
-export async function aprovar(id: number) {
+export async function aprovar(id: number, idPerfil?: number) {
   const { data } = await api.post<UsuarioResponse>(
     `/api/usuarios/${id}/aprovar`,
+    idPerfil != null ? { idPerfil } : undefined,
   );
   return data;
 }
@@ -68,4 +71,22 @@ export async function desativar(id: number) {
 
 export async function resetarMinhaSenhaPorEmail() {
   await api.post("/api/usuarios/me/resetar-senha");
+}
+
+export async function processarOciosidade() {
+  const { data } = await api.post<OciosidadeResultado>(
+    "/api/usuarios/ociosidade/processar",
+  );
+  return data;
+}
+
+export async function simularOciosidade(
+  id: number,
+  input: SimularOciosidadeRequest,
+) {
+  const { data } = await api.post<UsuarioResponse>(
+    `/api/usuarios/${id}/simular-ociosidade`,
+    input,
+  );
+  return data;
 }
