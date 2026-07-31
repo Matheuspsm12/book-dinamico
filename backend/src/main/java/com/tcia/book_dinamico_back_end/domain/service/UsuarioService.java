@@ -47,7 +47,7 @@ public class UsuarioService {
 
     public static final long CAP_USUARIOS_APROVADOS = 40L;
 
-    private static final String PERFIL_USUARIO = "USUARIO";
+    private static final String PERFIL_USUARIO = "OPERADOR";
 
     private final UsuarioRepository usuarioRepository;
     private final PerfilRepository perfilRepository;

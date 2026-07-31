@@ -322,7 +322,7 @@ export default function GerenciarUsuariosPage() {
                       <td className="py-3 text-zinc-700">{u.empresa}</td>
                       <td className="py-3 text-zinc-700">{u.email}</td>
                       <td className="py-3 text-zinc-700">
-                        {u.role && u.role !== "USUARIO" ? (
+                        {u.role ? (
                           u.role
                         ) : (
                           <span className="text-zinc-400">—</span>
