@@ -7,6 +7,7 @@ public enum AuditoriaAcaoEnum {
 
     CRIAR_DOCUMENTO(EntidadeAuditoriaEnum.DOCUMENTO, AcaoBaseAuditoriaEnum.CRIAR),
     ALTERAR_DOCUMENTO(EntidadeAuditoriaEnum.DOCUMENTO, AcaoBaseAuditoriaEnum.ALTERAR),
+    SUBSTITUIR_DOCUMENTO(EntidadeAuditoriaEnum.DOCUMENTO, AcaoBaseAuditoriaEnum.SUBSTITUIR),
     EXCLUIR_DOCUMENTO(EntidadeAuditoriaEnum.DOCUMENTO, AcaoBaseAuditoriaEnum.EXCLUIR),
     PROCESSAR_DOCUMENTO(EntidadeAuditoriaEnum.PROCESSAMENTO, AcaoBaseAuditoriaEnum.PROCESSAR),
     CRIAR_PERFIL(EntidadeAuditoriaEnum.PERFIL, AcaoBaseAuditoriaEnum.CRIAR),

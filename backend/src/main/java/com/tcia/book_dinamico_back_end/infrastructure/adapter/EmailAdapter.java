@@ -27,34 +27,42 @@ public class EmailAdapter {
     @Value("${app.email.remetente}")
     private String remetente;
 
+    @Value("${app.url-site}")
+    private String urlSite;
+
     public boolean isHabilitado() {
         return habilitado;
     }
 
+    private String baseUrl() {
+        return urlSite.split(",")[0].trim();
+    }
+
     @Async
     public void enviarAprovacao(Usuario usuario) {
-        String assunto = "Seu cadastro no Portal Book Dinâmico foi aprovado";
+        String assunto = "Seu cadastro no Portal Book Claro foi aprovado";
         String corpo = """
                 <p>Olá %s,</p>
-                <p>Boa notícia! Seu cadastro no <strong>Portal Book Dinâmico</strong> foi
+                <p>Boa notícia! Seu cadastro no <strong>Portal Book Claro</strong> foi
                 <strong>aprovado</strong> pelo administrador.</p>
                 <p>Você já pode entrar com o e-mail e a senha que cadastrou.</p>
-                <p>Atenciosamente,<br/>Equipe Book Dinâmico</p>
-                """.formatted(escape(usuario.getNome()));
+                <p>Acesse o link a seguir:<br/><a href="%s/login">%s/login</a></p>
+                <p>Atenciosamente,<br/>Equipe Logística</p>
+                """.formatted(escape(usuario.getNome()), baseUrl(), baseUrl());
         enviar(usuario.getEmail(), assunto, corpo);
     }
 
     @Async
     public void enviarSenhaTemporaria(Usuario usuario, String senhaTemporaria) {
-        String assunto = "Sua nova senha de acesso — Portal Book Dinâmico";
+        String assunto = "Sua nova senha de acesso — Portal Book Claro";
         String corpo = """
                 <p>Olá %s,</p>
-                <p>Você solicitou a alteração de senha no <strong>Portal Book Dinâmico</strong>.</p>
+                <p>Você solicitou a alteração de senha no <strong>Portal Book Claro</strong>.</p>
                 <p>Sua nova senha temporária é:</p>
                 <p style="font-size:18px;font-weight:bold;letter-spacing:1px;background:#f3f3f3;padding:8px 14px;display:inline-block;border-radius:4px;">%s</p>
                 <p>Recomendamos que, após o login, você acesse o portal e troque por uma senha de sua preferência.</p>
                 <p>Se você não solicitou esta alteração, entre em contato imediatamente com o administrador.</p>
-                <p>Atenciosamente,<br/>Equipe Book Dinâmico</p>
+                <p>Atenciosamente,<br/>Equipe Logística</p>
                 """.formatted(escape(usuario.getNome()), escape(senhaTemporaria));
         enviar(usuario.getEmail(), assunto, corpo);
     }
@@ -72,7 +80,7 @@ public class EmailAdapter {
                 automaticamente do sistema, sendo necessário um novo processo de solicitação caso
                 deseje acessar novamente o portal futuramente.</p>
                 <p>Permanecemos à disposição para quaisquer esclarecimentos.</p>
-                <p>Atenciosamente,<br/>Equipe Book Claro</p>
+                <p>Atenciosamente,<br/>Equipe Logística</p>
                 """;
         enviar(usuario.getEmail(), assunto, corpo);
     }
@@ -87,8 +95,9 @@ public class EmailAdapter {
                 efetuar o download do material desejado.</p>
                 <p>Recomendamos verificar periodicamente o portal para acompanhar futuras
                 atualizações e publicações.</p>
-                <p>Atenciosamente,<br/>Equipe Book Claro</p>
-                """;
+                <p>Acesse o link a seguir:<br/><a href="%s/book">%s/book</a></p>
+                <p>Atenciosamente,<br/>Equipe Logística</p>
+                """.formatted(baseUrl(), baseUrl());
         enviar(usuario.getEmail(), assunto, corpo);
     }
 
@@ -103,20 +112,20 @@ public class EmailAdapter {
                 <p><a href="%s" style="font-weight:bold;">Redefinir minha senha</a></p>
                 <p>Este link é válido por 1 hora. Se você não solicitou a redefinição,
                 ignore este e-mail — sua senha permanecerá a mesma.</p>
-                <p>Atenciosamente,<br/>Equipe Book Claro</p>
+                <p>Atenciosamente,<br/>Equipe Logística</p>
                 """.formatted(escape(usuario.getNome()), urlRedefinicao);
         enviar(usuario.getEmail(), assunto, corpo);
     }
 
     @Async
     public void enviarRejeicao(Usuario usuario) {
-        String assunto = "Seu cadastro no Portal Book Dinâmico foi rejeitado";
+        String assunto = "Seu cadastro no Portal Book Claro foi rejeitado";
         String corpo = """
                 <p>Olá %s,</p>
-                <p>Infelizmente seu cadastro no <strong>Portal Book Dinâmico</strong> foi
+                <p>Infelizmente seu cadastro no <strong>Portal Book Claro</strong> foi
                 <strong>rejeitado</strong>. Se acredita que isto é um engano, entre em contato
                 com o administrador.</p>
-                <p>Atenciosamente,<br/>Equipe Book Dinâmico</p>
+                <p>Atenciosamente,<br/>Equipe Logística</p>
                 """.formatted(escape(usuario.getNome()));
         enviar(usuario.getEmail(), assunto, corpo);
     }

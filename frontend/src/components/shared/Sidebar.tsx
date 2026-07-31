@@ -20,7 +20,8 @@ type Item = {
   label: string;
   href: string;
   icon: React.ComponentType<{ size?: number }>;
-  roles: ("ADMIN" | "USUARIO")[];
+  // true = só ADMIN; ausente/false = visível a qualquer perfil logado.
+  adminOnly?: boolean;
 };
 
 const items: Item[] = [
@@ -28,31 +29,30 @@ const items: Item[] = [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["ADMIN"],
+    adminOnly: true,
   },
   {
     label: "Book",
     href: "/book",
     icon: Download,
-    roles: ["ADMIN", "USUARIO"],
   },
   {
     label: "Upload Book",
     href: "/upload-book",
     icon: Upload,
-    roles: ["ADMIN"],
+    adminOnly: true,
   },
   {
     label: "Processamentos",
     href: "/processamentos",
     icon: ListChecks,
-    roles: ["ADMIN"],
+    adminOnly: true,
   },
   {
     label: "Gerenciar Usuários",
     href: "/gerenciar-usuarios",
     icon: Users,
-    roles: ["ADMIN"],
+    adminOnly: true,
   },
 ];
 
@@ -62,7 +62,8 @@ export function Sidebar() {
   const { user, signOut } = useAuth();
 
   if (!user) return null;
-  const visible = items.filter((i) => i.roles.includes(user.role));
+  const isAdmin = user.role === "ADMIN";
+  const visible = items.filter((i) => !i.adminOnly || isAdmin);
 
   return (
     <aside
@@ -93,7 +94,7 @@ export function Sidebar() {
           {open && (
             <div className="ml-2 border-zinc-300 border-l pl-3">
               <p className="font-bold text-base text-zinc-800 uppercase leading-tight tracking-wide">
-                Book Claro
+                Books Claro
               </p>
             </div>
           )}

@@ -28,6 +28,7 @@ public interface UsuarioMapper {
 
     @Mapping(target = "aprovadoPorId", source = "aprovadoPor.id")
     @Mapping(target = "role", source = "perfil.nomePerfil")
+    @Mapping(target = "idPerfil", source = "perfil.id")
     UsuarioResponse toResponse(Usuario usuario);
 
     List<UsuarioResponse> toResponseList(List<Usuario> usuarios);

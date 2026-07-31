@@ -1,9 +1,12 @@
 package com.tcia.book_dinamico_back_end.api.controller;
 
 import com.tcia.book_dinamico_back_end.core.annotation.DocumentarAPI;
+import com.tcia.book_dinamico_back_end.api.request.AprovarUsuarioRequest;
+import com.tcia.book_dinamico_back_end.api.request.SimularOciosidadeRequest;
 import com.tcia.book_dinamico_back_end.api.request.UsuarioCadastroRequest;
 import com.tcia.book_dinamico_back_end.api.request.UsuarioEdicaoRequest;
 import com.tcia.book_dinamico_back_end.api.request.UsuarioFiltroRequest;
+import com.tcia.book_dinamico_back_end.api.response.OciosidadeResultadoResponse;
 import com.tcia.book_dinamico_back_end.api.response.UsuarioResponse;
 import com.tcia.book_dinamico_back_end.domain.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,12 +49,15 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Aprovar usuário pendente",
-            description = "Transição PENDENTE→APROVADO. Aplica cap de 40 (RN15/A10/N2). Dispara e-mail.")
+            description = "Transição PENDENTE→APROVADO. Opcionalmente define o perfil. Aplica cap de 40 (RN15/A10/N2). Dispara e-mail.")
     @DocumentarAPI
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/aprovar")
-    public ResponseEntity<UsuarioResponse> aprovar(@PathVariable Long id) {
-        return ResponseEntity.ok(usuarioService.aprovar(id));
+    public ResponseEntity<UsuarioResponse> aprovar(
+            @PathVariable Long id,
+            @RequestBody(required = false) AprovarUsuarioRequest request) {
+        Long idPerfil = request != null ? request.getIdPerfil() : null;
+        return ResponseEntity.ok(usuarioService.aprovar(id, idPerfil));
     }
 
     @Operation(summary = "Rejeitar usuário pendente",
@@ -100,5 +106,27 @@ public class UsuarioController {
     @PostMapping("/{id}/ativar")
     public ResponseEntity<UsuarioResponse> ativar(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.ativar(id));
+    }
+
+    @Operation(summary = "Rodar verificação de ociosidade agora",
+            description = "Executa manualmente a rotina de ociosidade (mesma do cron) e retorna o resumo.")
+    @DocumentarAPI
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/ociosidade/processar")
+    public ResponseEntity<OciosidadeResultadoResponse> processarOciosidade() {
+        return ResponseEntity.ok(usuarioService.processarOciosidade());
+    }
+
+    @Operation(summary = "Simular ociosidade de um usuário",
+            description = "Retrocede o último acesso (e opcionalmente a notificação) para demonstrar o fluxo sem esperar 4 meses.")
+    @DocumentarAPI
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/simular-ociosidade")
+    public ResponseEntity<UsuarioResponse> simularOciosidade(
+            @PathVariable Long id,
+            @RequestBody(required = false) SimularOciosidadeRequest request) {
+        Integer meses = request != null ? request.getMesesInativos() : null;
+        Integer notificadoHaDias = request != null ? request.getNotificadoHaDias() : null;
+        return ResponseEntity.ok(usuarioService.simularOciosidade(id, meses, notificadoHaDias));
     }
 }

@@ -3,7 +3,16 @@ export type UsuarioStatus =
   | "APROVADO"
   | "REJEITADO"
   | "DESATIVADO";
-export type UsuarioRole = "ADMIN" | "USUARIO";
+// "ADMIN" e "USUARIO" são fixos (segurança/guards); os demais são perfis de
+// negócio cadastráveis (Vendedor, Gerente de Loja, etc.), por isso string.
+export type UsuarioRole = "ADMIN" | "USUARIO" | (string & {});
+
+export interface PerfilResponse {
+  id: number;
+  nomePerfil: string;
+  descricao?: string;
+  ativado?: boolean;
+}
 
 export type TipoDocumento = "POWERPOINT" | "EXCEL";
 export type ExtensaoDocumento = "XLSM" | "XLSX" | "PPTX";
@@ -24,10 +33,24 @@ export interface UsuarioResponse {
   justificativa?: string;
   status: UsuarioStatus;
   role: UsuarioRole;
+  idPerfil?: number;
   criadoEm?: string;
   atualizadoEm?: string;
   decididoEm?: string;
   aprovadoPorId?: number;
+  ultimoAcesso?: string;
+  ociosidadeNotificadoEm?: string;
+}
+
+export interface OciosidadeResultado {
+  emailDesabilitado: boolean;
+  notificados: string[];
+  desativados: string[];
+}
+
+export interface SimularOciosidadeRequest {
+  mesesInativos?: number;
+  notificadoHaDias?: number;
 }
 
 export interface UsuarioCadastroRequest {
@@ -42,6 +65,7 @@ export interface UsuarioEdicaoRequest {
   nome?: string;
   empresa?: string;
   email?: string;
+  idPerfil?: number;
 }
 
 export interface UsuarioFiltroRequest {
@@ -69,6 +93,23 @@ export interface DocumentoMetadataRequest {
   nome: string;
   descricao: string;
   dataAtualizacao: string;
+}
+
+export type AuditoriaAcao =
+  | "CRIAR"
+  | "ALTERAR"
+  | "SUBSTITUIR"
+  | "EXCLUIR"
+  | "PROCESSAR";
+
+export interface AuditoriaResponse {
+  id: number;
+  usuario: string;
+  acao: AuditoriaAcao | string;
+  entidade: string;
+  entidadeId?: number;
+  detalhes?: string;
+  dataHora: string;
 }
 
 export type ProcessamentoTipo = "DOCUMENTO";
