@@ -3,6 +3,7 @@
 import {
   ChevronRight,
   Download,
+  History,
   LayoutDashboard,
   ListChecks,
   LogOut,
@@ -52,6 +53,12 @@ const items: Item[] = [
     label: "Gerenciar Usuários",
     href: "/gerenciar-usuarios",
     icon: Users,
+    adminOnly: true,
+  },
+  {
+    label: "Histórico",
+    href: "/historico",
+    icon: History,
     adminOnly: true,
   },
 ];

@@ -23,6 +23,7 @@ export interface TokenResponse {
   nome: string;
   email: string;
   role: UsuarioRole;
+  producao: boolean;
 }
 
 export interface UsuarioResponse {

@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       nome: token.nome,
       email: token.email,
       role: token.role,
+      producao: token.producao,
     };
     saveSession(session, persistente);
     setUser(session);

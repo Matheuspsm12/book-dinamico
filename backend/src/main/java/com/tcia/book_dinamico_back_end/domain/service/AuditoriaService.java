@@ -27,6 +27,12 @@ public class AuditoriaService {
                 .map(this::toResponse);
     }
 
+    public Page<AuditoriaResponse> listarHistoricoUsuarios(Pageable pageable) {
+        return repository
+                .findByEntidadeOrderByDataHoraDesc(EntidadeAuditoriaEnum.USUARIO.name(), pageable)
+                .map(this::toResponse);
+    }
+
     private AuditoriaResponse toResponse(Auditoria a) {
         return AuditoriaResponse.builder()
                 .id(a.getId())
