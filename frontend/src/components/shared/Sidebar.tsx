@@ -44,6 +44,12 @@ const items: Item[] = [
     adminOnly: true,
   },
   {
+    label: "Histórico",
+    href: "/historico",
+    icon: History,
+    adminOnly: true,
+  },
+  {
     label: "Processamentos",
     href: "/processamentos",
     icon: ListChecks,
@@ -53,12 +59,6 @@ const items: Item[] = [
     label: "Gerenciar Usuários",
     href: "/gerenciar-usuarios",
     icon: Users,
-    adminOnly: true,
-  },
-  {
-    label: "Histórico",
-    href: "/historico",
-    icon: History,
     adminOnly: true,
   },
 ];
