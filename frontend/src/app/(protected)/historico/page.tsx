@@ -37,6 +37,18 @@ const ACAO_BADGE: Record<string, string> = {
 
 type Aba = "book" | "usuario";
 
+// Rede de segurança para registros antigos do book, quando "detalhes" trazia
+// args serializados (ex.: [7,{"nome":"X",...}] ou [6]) em vez do nome do doc.
+function nomeDocumento(detalhes?: string): string {
+  const t = (detalhes ?? "").trim();
+  if (!t) return "documento removido";
+  if (t.startsWith("[")) {
+    const m = t.match(/"nome"\s*:\s*"([^"]*)"/);
+    return m ? m[1] : "documento removido";
+  }
+  return t;
+}
+
 export default function HistoricoPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -136,7 +148,7 @@ export default function HistoricoPage() {
                       className="border-zinc-100 border-b hover:bg-zinc-50"
                     >
                       <td className="py-3 font-medium text-zinc-800">
-                        {h.detalhes || "—"}
+                        {isBook ? nomeDocumento(h.detalhes) : h.detalhes || "—"}
                       </td>
                       <td className="py-3">
                         <span
