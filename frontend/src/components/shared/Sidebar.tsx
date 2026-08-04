@@ -33,7 +33,7 @@ const items: Item[] = [
     adminOnly: true,
   },
   {
-    label: "Book",
+    label: "Books",
     href: "/book",
     icon: Download,
   },

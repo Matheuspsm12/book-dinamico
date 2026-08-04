@@ -3,9 +3,9 @@ export type UsuarioStatus =
   | "APROVADO"
   | "REJEITADO"
   | "DESATIVADO";
-// Perfis do sistema: ADMIN (gate de segurança/guards), OPERADOR (default do
-// autocadastro) e LOGISTICA. (string & {}) mantém tolerância a valores futuros.
-export type UsuarioRole = "ADMIN" | "OPERADOR" | "LOGISTICA" | (string & {});
+// Perfis do sistema: ADMIN (gate de segurança/guards) e OPERADOR (default do
+// autocadastro; só baixa os arquivos). (string & {}) tolera valores futuros.
+export type UsuarioRole = "ADMIN" | "OPERADOR" | (string & {});
 
 export interface PerfilResponse {
   id: number;
