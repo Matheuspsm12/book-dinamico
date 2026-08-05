@@ -3,8 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "src/app/contexts/AuthContext";
 
 export const metadata: Metadata = {
-  title: "Book Dinâmico Claro",
-  description: "Portal de Book Dinâmico — Claro / Logística",
+  title: "Books Claro",
+  description: "Portal Books Claro — Claro / Logística",
 };
 
 export default function RootLayout({
