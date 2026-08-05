@@ -70,7 +70,7 @@ export default function DashboardPage() {
     <div>
       <PageHeader
         title="Dashboard"
-        subtitle="Visão geral do portal Book Dinâmico."
+        subtitle="Visão geral do portal Books Claro."
       />
 
       {err && (
