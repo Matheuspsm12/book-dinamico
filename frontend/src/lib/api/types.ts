@@ -15,7 +15,13 @@ export interface PerfilResponse {
 }
 
 export type TipoDocumento = "POWERPOINT" | "EXCEL";
-export type ExtensaoDocumento = "XLSM" | "XLSX" | "PPTX";
+export type ExtensaoDocumento =
+  | "XLSM"
+  | "XLSX"
+  | "XLSB"
+  | "XLTX"
+  | "XLTM"
+  | "PPTX";
 
 export interface TokenResponse {
   token: string;

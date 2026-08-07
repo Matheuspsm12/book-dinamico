@@ -6,6 +6,9 @@ import java.util.Optional;
 public enum ExtensaoDocumento {
     XLSM(TipoDocumento.EXCEL),
     XLSX(TipoDocumento.EXCEL),
+    XLSB(TipoDocumento.EXCEL),
+    XLTX(TipoDocumento.EXCEL),
+    XLTM(TipoDocumento.EXCEL),
     PPTX(TipoDocumento.POWERPOINT);
 
     private final TipoDocumento tipo;
