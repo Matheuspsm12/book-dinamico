@@ -26,7 +26,14 @@ import type { DocumentoResponse } from "src/lib/api/types";
 import { cn, formatDate, hojeLocal, inferNomeFromFilename } from "src/lib/utils";
 import * as docsApi from "src/services/documentos-service";
 
-const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
+const ALLOWED = [
+  ".xlsm",
+  ".xlsx",
+  ".xlsb",
+  ".xltx",
+  ".xltm",
+  ".pptx",
+] as const;
 const MAX_BYTES = 60 * 1024 * 1024;
 /** Teto total de armazenamento agregado de todos os documentos. */
 const MAX_TOTAL_BYTES = 2 * 1024 * 1024 * 1024; // 2 GB
