@@ -20,9 +20,8 @@ import * as docsApi from "src/services/documentos-service";
 const ALLOWED = [".xlsm", ".xlsx", ".pptx"] as const;
 const MAX_BYTES = 60 * 1024 * 1024;
 
-function formatoLabel(ext: DocumentoResponse["extensao"]) {
-  if (ext === "XLSM" || ext === "XLSX") return "EXCEL";
-  return "POWER POINT";
+function formatoLabel(tipo: DocumentoResponse["tipo"]) {
+  return tipo === "EXCEL" ? "EXCEL" : "POWER POINT";
 }
 
 function validarArquivo(f: File | null): string | null {
@@ -58,7 +57,7 @@ function BookCard({
             {doc.nome}
           </p>
           <p className="mt-3 font-semibold text-sm uppercase opacity-90">
-            {formatoLabel(doc.extensao)}
+            {formatoLabel(doc.tipo)}
           </p>
         </div>
         <button
