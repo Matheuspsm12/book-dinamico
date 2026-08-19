@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Book Dinâmico",
+    "slug": "claro-book-dinamico-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "clarobook",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "edgeToEdgeEnabled": true
+    }
+  }
+}

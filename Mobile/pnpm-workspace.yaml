@@ -1,0 +1,7 @@
+packages:
+  - "."
+
+# Reduz a exposição a versões recém-publicadas e falha se uma dependência
+# tentar executar um script de build que não tenha sido explicitamente aceita.
+minimumReleaseAge: 1440
+strictDepBuilds: true
