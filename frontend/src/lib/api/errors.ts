@@ -30,7 +30,7 @@ const FRIENDLY: Record<string, string> = {
   "arquivo-invalido":
     "Arquivo inválido. Verifique extensão, tamanho e conteúdo.",
   "arquivo-extensao-nao-permitida":
-    "Extensão de arquivo não permitida. Aceitos: .xlsm, .xlsx, .pptx.",
+    "Extensão de arquivo não permitida. Aceitos: .xlsx, .xlsm, .xlsb, .xltx, .xltm, .pptx.",
   "arquivo-tamanho-excedido": "O arquivo excede o limite de 60 MB.",
   "arquivo-conteudo-incompativel":
     "O conteúdo do arquivo não corresponde à extensão informada.",
