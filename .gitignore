@@ -80,3 +80,12 @@ HELP.md
 backend/*.log
 backend/logs/
 backend/@PATH_LOG_PRODUCAO@/
+
+# Contexto e pontes locais de agentes de IA
+.ai/
+.codex/
+.claude/
+AGENTS.md
+CLAUDE.md
+.env
+.env.local
