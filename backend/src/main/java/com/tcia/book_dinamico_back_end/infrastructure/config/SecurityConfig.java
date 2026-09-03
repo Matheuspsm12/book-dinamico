@@ -8,6 +8,7 @@ import com.tcia.book_dinamico_back_end.infrastructure.security.CustomAuthenticat
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -82,21 +83,32 @@ public class SecurityConfig {
      * {@code scheme://host} puros — sem path/barra — porque é assim que o navegador
      * envia o header {@code Origin}; qualquer path aqui faria o match falhar.
      */
-    private static final List<String> ORIGENS_PERMITIDAS = List.of(
+    private static final List<String> ORIGENS_PERMITIDAS_PRODUCAO = List.of(
             "https://book.tcia.com.br",
             "https://homol.book.tcia.com.br"
     );
 
+    private static final List<String> ORIGENS_PERMITIDAS_DEV = List.of(
+            "https://book.tcia.com.br",
+            "https://homol.book.tcia.com.br",
+            "exp://192.168.0.9:8081",
+            "http://192.168.0.9:8081"
+    );
+
+    @Value("${app.ambiente}")
+    private String ambiente;
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(ORIGENS_PERMITIDAS);
+        configuration.setAllowedOrigins(
+                "DEV".equalsIgnoreCase(ambiente) ? ORIGENS_PERMITIDAS_DEV : ORIGENS_PERMITIDAS_PRODUCAO);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Client-Type", "X-Device-Id", "X-Correlation-Id"));
         configuration.setExposedHeaders(List.of("Authorization", "X-Correlation-Id"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
-        log.info("Origens permitidas (CORS): {}", ORIGENS_PERMITIDAS);
+        log.info("Origens permitidas (CORS): {}", configuration.getAllowedOrigins());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
