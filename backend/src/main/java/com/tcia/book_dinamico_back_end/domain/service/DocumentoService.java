@@ -152,6 +152,7 @@ public class DocumentoService {
 
         log.info("Arquivo substituído em documento id={}: novo={}", salvo.getId(), caminhoNovo);
         auditar(AuditoriaAcaoEnum.SUBSTITUIR_DOCUMENTO, salvo, admin);
+        notificacaoEmailService.notificarNovaPublicacao();
         return documentoMapper.toResponse(salvo);
     }
 
