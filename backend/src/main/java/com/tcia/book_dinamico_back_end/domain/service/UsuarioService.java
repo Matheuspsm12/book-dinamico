@@ -45,7 +45,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UsuarioService {
 
-    public static final long CAP_USUARIOS_APROVADOS = 40L;
+    public static final long CAP_USUARIOS_APROVADOS = 10_000L;
 
     private static final String PERFIL_USUARIO = "OPERADOR";
 
