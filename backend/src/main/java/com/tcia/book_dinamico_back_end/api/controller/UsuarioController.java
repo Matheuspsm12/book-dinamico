@@ -49,7 +49,7 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Aprovar usuário pendente",
-            description = "Transição PENDENTE→APROVADO. Opcionalmente define o perfil. Aplica cap de 40 (RN15/A10/N2). Dispara e-mail.")
+            description = "Transição PENDENTE→APROVADO. Opcionalmente define o perfil. Aplica cap de 10.000 (RN15/A10/N2). Dispara e-mail.")
     @DocumentarAPI
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/aprovar")
@@ -100,7 +100,7 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Reativar usuário desativado",
-            description = "Transição DESATIVADO → APROVADO. Reentra no cap de 40 (RN15).")
+            description = "Transição DESATIVADO → APROVADO. Reentra no cap de 10.000 (RN15).")
     @DocumentarAPI
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/ativar")
