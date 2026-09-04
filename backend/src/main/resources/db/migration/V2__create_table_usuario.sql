@@ -1,7 +1,7 @@
 -- Tabela usuario.
 -- Sem coluna ativo / sem @SQLDelete: status=DESATIVADO já cobre soft-delete (decisão de schema).
 -- aprovado_por: self-FK para o admin que decidiu (RN09).
--- Cap de usuarios APROVADO e enforced pelo servico, nao por constraint (N2 + A10).
+-- Cap de 40 APROVADO é enforced pelo serviço, não por constraint (N2 + A10).
 
 CREATE TABLE usuario (
     id              BIGINT       NOT NULL DEFAULT nextval('usuario_seq'),
