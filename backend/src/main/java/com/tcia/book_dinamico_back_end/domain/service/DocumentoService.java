@@ -3,6 +3,7 @@ package com.tcia.book_dinamico_back_end.domain.service;
 import com.tcia.book_dinamico_back_end.infrastructure.mapper.DocumentoMapper;
 import com.tcia.book_dinamico_back_end.api.request.DocumentoMetadataRequest;
 import com.tcia.book_dinamico_back_end.api.response.DocumentoResponse;
+import com.tcia.book_dinamico_back_end.domain.event.ProcessamentoAgendadoEvent;
 import com.tcia.book_dinamico_back_end.domain.model.Documento;
 import com.tcia.book_dinamico_back_end.domain.model.DocumentoUploadLog;
 import com.tcia.book_dinamico_back_end.domain.model.Auditoria;
@@ -18,9 +19,12 @@ import com.tcia.book_dinamico_back_end.domain.repository.DocumentoRepository;
 import com.tcia.book_dinamico_back_end.domain.repository.DocumentoUploadLogRepository;
 import com.tcia.book_dinamico_back_end.core.util.AuthUtils;
 import com.tcia.book_dinamico_back_end.core.util.IntegridadeArquivoValidator;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Log4j2
 @Service
@@ -44,6 +49,8 @@ public class DocumentoService {
     private final ProcessamentoService processamentoService;
     private final NotificacaoEmailService notificacaoEmailService;
     private final AuditoriaService auditoriaService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final MeterRegistry meterRegistry;
 
     /** Teto total de armazenamento agregado dos documentos ativos (2 GB). */
     private static final long MAX_TOTAL_BYTES = 2L * 1024 * 1024 * 1024;
@@ -73,38 +80,58 @@ public class DocumentoService {
 
     @Transactional
     public DocumentoResponse criar(DocumentoMetadataRequest metadata, MultipartFile arquivo) {
-        Usuario admin = adminLogado();
-        ExtensaoDocumento ext = integridadeValidator.validar(arquivo);
-        validarLimiteArmazenamento(arquivo.getSize(), 0L);
+        long inicioMs = System.currentTimeMillis();
+        String nomeArquivo = arquivo.getOriginalFilename();
+        Long documentoId = null;
+        ExtensaoDocumento ext = null;
+        log.info("Upload iniciado operacao=CRIAR arquivo={} tamanhoBytes={}", nomeArquivo, arquivo.getSize());
 
-        Documento doc = Documento.builder()
-                .nome(metadata.getNome())
-                .descricao(metadata.getDescricao())
-                .dataAtualizacao(metadata.getDataAtualizacao())
-                .tipo(ext.getTipo())
-                .extensao(ext)
-                .tamanhoBytes(arquivo.getSize())
-                .caminhoArmazenamento("__placeholder__")
-                .criadoPor(admin)
-                .atualizadoPor(admin)
-                .ativo(true)
-                .build();
+        try {
+            Usuario admin = adminLogado();
+            ext = integridadeValidator.validar(arquivo);
+            validarLimiteArmazenamento(arquivo.getSize(), 0L);
 
-        Documento salvo = documentoRepository.save(doc);
-        String caminho = storage.gravar(salvo.getId(), ext.name(), arquivo);
-        salvo.setCaminhoArmazenamento(caminho);
-        salvo = documentoRepository.save(salvo);
+            Documento doc = Documento.builder()
+                    .nome(metadata.getNome())
+                    .descricao(metadata.getDescricao())
+                    .dataAtualizacao(metadata.getDataAtualizacao())
+                    .tipo(ext.getTipo())
+                    .extensao(ext)
+                    .tamanhoBytes(arquivo.getSize())
+                    .caminhoArmazenamento("__placeholder__")
+                    .criadoPor(admin)
+                    .atualizadoPor(admin)
+                    .ativo(true)
+                    .build();
 
-        registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
-        var processamento = processamentoService.registrarFila(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
-        processamentoService.processarImediato(processamento);
+            Documento salvo = documentoRepository.save(doc);
+            documentoId = salvo.getId();
+            String caminho = storage.gravar(salvo.getId(), ext.name(), arquivo);
+            salvo.setCaminhoArmazenamento(caminho);
+            salvo = documentoRepository.save(salvo);
 
-        log.info("Documento criado: id={} nome={} tipo={} ext={} tamanho={}",
-                salvo.getId(), salvo.getNome(), salvo.getTipo(), salvo.getExtensao(), salvo.getTamanhoBytes());
+            registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
+            var processamento = processamentoService.registrarFila(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
+            eventPublisher.publishEvent(new ProcessamentoAgendadoEvent(processamento.getId()));
 
-        auditar(AuditoriaAcaoEnum.CRIAR_DOCUMENTO, salvo, admin);
-        notificacaoEmailService.notificarNovaPublicacao();
-        return documentoMapper.toResponse(salvo);
+            log.info("Documento criado: id={} nome={} tipo={} ext={} tamanho={}",
+                    salvo.getId(), salvo.getNome(), salvo.getTipo(), salvo.getExtensao(), salvo.getTamanhoBytes());
+
+            auditar(AuditoriaAcaoEnum.CRIAR_DOCUMENTO, salvo, admin);
+            notificacaoEmailService.notificarNovaPublicacao();
+
+            long duracaoMs = duracaoMs(inicioMs);
+            registrarMetricasUpload("CRIAR", "SUCESSO", duracaoMs);
+            log.info("Upload concluido operacao=CRIAR documentoId={} arquivo={} extensao={} tamanhoBytes={} duracaoMs={}",
+                    documentoId, nomeArquivo, ext, arquivo.getSize(), duracaoMs);
+            return documentoMapper.toResponse(salvo);
+        } catch (RuntimeException e) {
+            long duracaoMs = duracaoMs(inicioMs);
+            registrarMetricasUpload("CRIAR", "ERRO", duracaoMs);
+            log.error("Upload falhou operacao=CRIAR documentoId={} arquivo={} extensao={} tamanhoBytes={} duracaoMs={}",
+                    documentoId, nomeArquivo, ext, arquivo.getSize(), duracaoMs, e);
+            throw e;
+        }
     }
 
     @Transactional
@@ -121,39 +148,56 @@ public class DocumentoService {
 
     @Transactional
     public DocumentoResponse substituirArquivo(Long id, MultipartFile arquivo, String nome, String dataAtualizacao) {
-        Usuario admin = adminLogado();
-        Documento doc = buscarOuFalhar(id);
-        ExtensaoDocumento novaExt = integridadeValidator.validar(arquivo);
-        // Ao substituir, o tamanho atual do próprio documento é liberado.
-        validarLimiteArmazenamento(arquivo.getSize(), doc.getTamanhoBytes());
+        long inicioMs = System.currentTimeMillis();
+        String nomeArquivo = arquivo.getOriginalFilename();
+        log.info("Upload iniciado operacao=SUBSTITUIR documentoId={} arquivo={} tamanhoBytes={}",
+                id, nomeArquivo, arquivo.getSize());
 
-        String caminhoAntigo = doc.getCaminhoArmazenamento();
-        String caminhoNovo = storage.gravar(doc.getId(), novaExt.name(), arquivo);
+        try {
+            Usuario admin = adminLogado();
+            Documento doc = buscarOuFalhar(id);
+            ExtensaoDocumento novaExt = integridadeValidator.validar(arquivo);
+            // Ao substituir, o tamanho atual do próprio documento é liberado.
+            validarLimiteArmazenamento(arquivo.getSize(), doc.getTamanhoBytes());
 
-        doc.setCaminhoArmazenamento(caminhoNovo);
-        doc.setTamanhoBytes(arquivo.getSize());
-        doc.setExtensao(novaExt);
-        doc.setTipo(novaExt.getTipo());
-        doc.setAtualizadoPor(admin);
-        // A substituição também sincroniza nome/data quando informados, numa única
-        // operação (evita um segundo registro de "edição" no histórico).
-        if (nome != null && !nome.isBlank()) {
-            doc.setNome(nome);
+            String caminhoAntigo = doc.getCaminhoArmazenamento();
+            String caminhoNovo = storage.gravar(doc.getId(), novaExt.name(), arquivo);
+
+            doc.setCaminhoArmazenamento(caminhoNovo);
+            doc.setTamanhoBytes(arquivo.getSize());
+            doc.setExtensao(novaExt);
+            doc.setTipo(novaExt.getTipo());
+            doc.setAtualizadoPor(admin);
+            // A substituição também sincroniza nome/data quando informados, numa única
+            // operação (evita um segundo registro de "edição" no histórico).
+            if (nome != null && !nome.isBlank()) {
+                doc.setNome(nome);
+            }
+            if (dataAtualizacao != null && !dataAtualizacao.isBlank()) {
+                doc.setDataAtualizacao(java.time.LocalDate.parse(dataAtualizacao));
+            }
+
+            Documento salvo = documentoRepository.save(doc);
+            storage.deletarSeExistir(caminhoAntigo);
+            registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
+            var processamento = processamentoService.registrarFila(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
+            eventPublisher.publishEvent(new ProcessamentoAgendadoEvent(processamento.getId()));
+
+            log.info("Arquivo substituído em documento id={}: novo={}", salvo.getId(), caminhoNovo);
+            auditar(AuditoriaAcaoEnum.SUBSTITUIR_DOCUMENTO, salvo, admin);
+            notificacaoEmailService.notificarNovaPublicacao();
+            long duracaoMs = duracaoMs(inicioMs);
+            registrarMetricasUpload("SUBSTITUIR", "SUCESSO", duracaoMs);
+            log.info("Upload concluido operacao=SUBSTITUIR documentoId={} arquivo={} extensao={} tamanhoBytes={} duracaoMs={}",
+                    id, nomeArquivo, novaExt, arquivo.getSize(), duracaoMs);
+            return documentoMapper.toResponse(salvo);
+        } catch (RuntimeException e) {
+            long duracaoMs = duracaoMs(inicioMs);
+            registrarMetricasUpload("SUBSTITUIR", "ERRO", duracaoMs);
+            log.error("Upload falhou operacao=SUBSTITUIR documentoId={} arquivo={} tamanhoBytes={} duracaoMs={}",
+                    id, nomeArquivo, arquivo.getSize(), duracaoMs, e);
+            throw e;
         }
-        if (dataAtualizacao != null && !dataAtualizacao.isBlank()) {
-            doc.setDataAtualizacao(java.time.LocalDate.parse(dataAtualizacao));
-        }
-
-        Documento salvo = documentoRepository.save(doc);
-        storage.deletarSeExistir(caminhoAntigo);
-        registrarUploadLog(salvo, admin, arquivo.getOriginalFilename());
-        var processamento = processamentoService.registrarFila(salvo, admin, arquivo.getOriginalFilename(), arquivo.getContentType());
-        processamentoService.processarImediato(processamento);
-
-        log.info("Arquivo substituído em documento id={}: novo={}", salvo.getId(), caminhoNovo);
-        auditar(AuditoriaAcaoEnum.SUBSTITUIR_DOCUMENTO, salvo, admin);
-        notificacaoEmailService.notificarNovaPublicacao();
-        return documentoMapper.toResponse(salvo);
     }
 
     @Transactional
@@ -220,6 +264,19 @@ public class DocumentoService {
                 .nomeArquivo(nomeArquivoOriginal != null ? nomeArquivoOriginal : "(sem nome)")
                 .datetime(LocalDateTime.now())
                 .build());
+    }
+
+    private long duracaoMs(long inicioMs) {
+        return System.currentTimeMillis() - inicioMs;
+    }
+
+    private void registrarMetricasUpload(String operacao, String resultado, long duracaoMs) {
+        meterRegistry.counter("book.documento.upload.total", "operacao", operacao, "resultado", resultado).increment();
+        Timer.builder("book.documento.upload.duracao")
+                .tag("operacao", operacao)
+                .tag("resultado", resultado)
+                .register(meterRegistry)
+                .record(duracaoMs, TimeUnit.MILLISECONDS);
     }
 
     private Usuario adminLogado() {
