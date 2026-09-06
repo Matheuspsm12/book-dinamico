@@ -11,6 +11,8 @@ import com.tcia.book_dinamico_back_end.domain.model.Documento;
 import com.tcia.book_dinamico_back_end.domain.model.Processamento;
 import com.tcia.book_dinamico_back_end.domain.model.Usuario;
 import com.tcia.book_dinamico_back_end.domain.repository.ProcessamentoRepository;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 
 @Log4j2
 @Service
@@ -33,10 +36,17 @@ public class ProcessamentoService {
     private final ExtracaoConteudoService extracaoConteudoService;
     private final AuditoriaService auditoriaService;
     private final UsuarioLogadoUtil usuarioLogadoUtil;
+    private final MeterRegistry meterRegistry;
 
     @Transactional(readOnly = true)
     public Processamento buscarPorId(Long id) {
         return processamentoRepository.findById(id)
+                .orElseThrow(() -> new NegocioException("processamento-nao-encontrado"));
+    }
+
+    @Transactional(readOnly = true)
+    public Processamento buscarUltimoPorDocumento(Long documentoId) {
+        return processamentoRepository.findFirstByDocumentoIdOrderByDataStartDescIdDesc(documentoId)
                 .orElseThrow(() -> new NegocioException("processamento-nao-encontrado"));
     }
 
@@ -94,9 +104,17 @@ public class ProcessamentoService {
         processar(processamento);
     }
 
+    @Transactional
+    public void processarPorId(Long id) {
+        processar(buscarPorId(id));
+    }
+
     private void processar(Processamento p) {
+        long inicioMs = System.currentTimeMillis();
+        Long documentoId = p.getDocumento() != null ? p.getDocumento().getId() : null;
         try {
-            log.info("Processando item {}: {}", p.getId(), p.getNomeArquivo());
+            log.info("Processamento iniciado id={} documentoId={} arquivo={}",
+                    p.getId(), documentoId, p.getNomeArquivo());
             p.setDataInicio(LocalDateTime.now());
 
             extracaoConteudoService.extrair(p);
@@ -110,9 +128,15 @@ public class ProcessamentoService {
 
             processamentoRepository.save(p);
             auditar(p, "SUCESSO", p.getNomeArquivo());
-            log.info("Item {} processado com sucesso.", p.getId());
+            long duracaoMs = duracaoMs(inicioMs);
+            registrarMetricas("SUCESSO", duracaoMs);
+            log.info("Processamento concluido id={} documentoId={} arquivo={} resultado={} duracaoMs={}",
+                    p.getId(), documentoId, p.getNomeArquivo(), p.getResultado(), duracaoMs);
         } catch (Exception e) {
-            log.error("Erro ao processar item {}: {}", p.getId(), e.getMessage());
+            long duracaoMs = duracaoMs(inicioMs);
+            registrarMetricas("ERRO", duracaoMs);
+            log.error("Processamento falhou id={} documentoId={} arquivo={} duracaoMs={}",
+                    p.getId(), documentoId, p.getNomeArquivo(), duracaoMs, e);
             p.setExecutado(true);
             p.setReprocessar(false);
             p.setResultado(ProcessamentoResultado.ERRO.name());
@@ -123,6 +147,18 @@ public class ProcessamentoService {
             processamentoRepository.save(p);
             auditar(p, "ERRO", e.getMessage());
         }
+    }
+
+    private long duracaoMs(long inicioMs) {
+        return System.currentTimeMillis() - inicioMs;
+    }
+
+    private void registrarMetricas(String resultado, long duracaoMs) {
+        meterRegistry.counter("book.processamento.total", "resultado", resultado).increment();
+        Timer.builder("book.processamento.duracao")
+                .tag("resultado", resultado)
+                .register(meterRegistry)
+                .record(duracaoMs, TimeUnit.MILLISECONDS);
     }
 
     private void auditar(Processamento p, String status, String detalhe) {

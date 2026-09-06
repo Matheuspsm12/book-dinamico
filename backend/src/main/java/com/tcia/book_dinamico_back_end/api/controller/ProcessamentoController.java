@@ -48,6 +48,15 @@ public class ProcessamentoController {
         return assembler.toModel(processamento);
     }
 
+    @Operation(summary = "Buscar último processamento do documento",
+            description = "Retorna o processamento mais recente associado a um documento.")
+    @DocumentarAPI
+    @GetMapping("/documento/{documentoId}/ultimo")
+    public EntityModel<ProcessamentoResponse> buscarUltimoPorDocumento(@PathVariable Long documentoId) {
+        Processamento processamento = processamentoService.buscarUltimoPorDocumento(documentoId);
+        return assembler.toModel(processamento);
+    }
+
     @Operation(summary = "Listar todos os processamentos",
             description = "Retorna uma lista paginada de todos os processamentos.")
     @DocumentarAPI
