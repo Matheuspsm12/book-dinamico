@@ -27,6 +27,9 @@ public interface ProcessamentoRepository extends JpaRepository<Processamento, Lo
     @EntityGraph(attributePaths = {"usuario", "documento"})
     Page<Processamento> findByTipoProcessamento(Integer tipoProcessamento, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"usuario", "documento"})
+    Optional<Processamento> findFirstByDocumentoIdOrderByDataStartDescIdDesc(Long documentoId);
+
     List<Processamento> findByExecutadoFalseOrReprocessarTrue();
 
     @Modifying
