@@ -1,6 +1,24 @@
 import type { NextConfig } from "next";
 
+const configuredApiUrl =
+  process.env.BACKEND_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "";
+const backendUrl = configuredApiUrl.replace(/\/api\/?$/, "").replace(/\/$/, "");
+
 const nextConfig: NextConfig = {
+  async rewrites() {
+    if (!backendUrl) return [];
+
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${backendUrl}/api/:path*`,
+      },
+      {
+        source: "/autenticacao/:path*",
+        destination: `${backendUrl}/autenticacao/:path*`,
+      },
+    ];
+  },
   async headers() {
     return [
       {
