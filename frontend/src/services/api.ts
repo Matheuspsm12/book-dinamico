@@ -7,13 +7,33 @@ export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const SITE_URL = (BASE_URL ?? "").replace(/\/api\/?$/, "");
 
+function resolveBaseURL() {
+  if (typeof window === "undefined" || !SITE_URL) return SITE_URL;
 
-const DEFAULT_TIMEOUT_MS = 30_000;
+  try {
+    const configuredUrl = new URL(SITE_URL, window.location.origin);
+    if (
+      configuredUrl.protocol === window.location.protocol &&
+      configuredUrl.hostname === window.location.hostname
+    ) {
+      return "";
+    }
+  } catch {
+    return SITE_URL;
+  }
+
+  return SITE_URL;
+}
+
+
+// 45s dá margem para o backend reiniciando (boot da JVM após deploy leva
+// ~30-60s); acima disso a mensagem de "servidor acordando" é esperada.
+const DEFAULT_TIMEOUT_MS = 45_000;
 const MULTIPART_TIMEOUT_MS = 120_000;
 
 const api = axios.create({
-  baseURL: SITE_URL,
-
+  baseURL: resolveBaseURL(),
+  timeout: DEFAULT_TIMEOUT_MS,
   headers: {
     "Content-Type": "application/json",
     "X-Client-type": "web",
