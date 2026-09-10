@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   ListChecks,
   LogOut,
+  ScrollText,
   Upload,
   Users,
 } from "lucide-react";
@@ -59,6 +60,12 @@ const items: Item[] = [
     label: "Gerenciar Usuários",
     href: "/gerenciar-usuarios",
     icon: Users,
+    adminOnly: true,
+  },
+  {
+    label: "Diagnóstico",
+    href: "/diagnostico",
+    icon: ScrollText,
     adminOnly: true,
   },
 ];
