@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env.local -- next dev -p 3001",
+    "prestart": "node scripts/log-start.mjs",
     "start": "dotenv -e .env.local -- next start -p 3001",
-    "build": "next build",
+    "build": "node scripts/build-with-log.mjs",
     "lint": "eslint ."
   },
   "overrides": {

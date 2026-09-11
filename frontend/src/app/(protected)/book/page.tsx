@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, Download, Pencil, RefreshCw, Upload, X } from "lucide-react";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "src/components/ui/button";
@@ -130,9 +131,11 @@ export default function BookDownloadPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white">
-      <img
+      <Image
         src="/img/bg_claro.svg"
         alt=""
+        width={600}
+        height={600}
         aria-hidden
         className="pointer-events-none absolute top-1/4 -left-32 w-[600px] opacity-95"
       />
@@ -140,10 +143,13 @@ export default function BookDownloadPage() {
       <div className="relative z-10 grid min-h-screen grid-cols-[1fr_320px]">
         <div className="flex flex-col px-12 py-10">
           <div className="flex justify-center">
-            <img
+            <Image
               src="/img/logo_claro.svg"
               alt="Claro"
+              width={176}
+              height={64}
               className="h-16 w-auto"
+              priority
             />
           </div>
           <div className="mx-auto mt-2 h-px w-40 bg-[var(--claro-red)]/40" />
