@@ -11,6 +11,7 @@ import {
   Upload,
   Users,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -100,9 +101,11 @@ export function Sidebar() {
 
       <div>
         <div className="flex h-16 items-center gap-2 border-zinc-200/70 border-b px-3">
-          <img
+          <Image
             src="/img/logo_symbol_c.svg"
             alt="Claro"
+            width={40}
+            height={40}
             className={cn("ml-1", open ? "max-w-10" : "max-w-8")}
           />
           {open && (
@@ -161,7 +164,13 @@ export function Sidebar() {
         </button>
 
         <div className="flex items-center justify-start gap-2 px-1 text-zinc-500">
-          <img src="/img/logo_tcia_black.svg" alt="TCIA" className="w-12" />
+          <Image
+            src="/img/logo_tcia_black.svg"
+            alt="TCIA"
+            width={48}
+            height={16}
+            className="w-12"
+          />
           {open && (
             <div className="ml-2 border-zinc-300 border-l pl-3">
               <p className="text-[10px]">tciagroup.com / 2025</p>

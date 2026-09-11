@@ -2,6 +2,7 @@ import axios from "axios";
 import { clearSession, getToken } from "src/lib/auth-storage";
 import { friendlyMessage } from "src/lib/api/errors";
 import type { ApiErrorBody } from "src/lib/api/types";
+import { logClientEvent } from "src/lib/client-log";
 
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -65,7 +66,21 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (axios.isAxiosError(error)) {
+      const method = error.config?.method?.toUpperCase() ?? "UNKNOWN";
+      const url = error.config?.url ?? "unknown";
+
       if (error.code === "ECONNABORTED") {
+        logClientEvent(
+          "api-error",
+          {
+            method,
+            url,
+            code: error.code,
+            message: "request-timeout",
+          },
+          "warn",
+        );
+
         return Promise.reject(
           new Error(
             "Tempo esgotado. O servidor pode estar acordando — tente novamente em 1 minuto.",
@@ -73,6 +88,17 @@ api.interceptors.response.use(
         );
       }
       if (!error.response) {
+        logClientEvent(
+          "api-error",
+          {
+            method,
+            url,
+            code: error.code ?? "NETWORK_ERROR",
+            message: "network-error",
+          },
+          "warn",
+        );
+
         return Promise.reject(
           new Error("Falha de rede. Verifique sua conexão e tente novamente."),
         );
@@ -81,6 +107,17 @@ api.interceptors.response.use(
       const status = error.response.status;
       const rawMessage = (error.response.data as ApiErrorBody)?.message;
       const friendly = friendlyMessage(rawMessage);
+
+      logClientEvent(
+        "api-error",
+        {
+          method,
+          url,
+          status,
+          message: friendly || rawMessage || "api-error",
+        },
+        status >= 500 ? "error" : "warn",
+      );
 
       if (status === 401 || status === 403) {
         if (
