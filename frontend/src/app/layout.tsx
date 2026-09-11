@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "src/app/contexts/AuthContext";
+import { BuildRefresh } from "src/components/shared/BuildRefresh";
 
 export const metadata: Metadata = {
   title: "Books Claro",
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <BuildRefresh />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
