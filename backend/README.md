@@ -41,10 +41,10 @@ API Spring Boot para distribuição controlada de books dinâmicos da Claro/Log�
 - Swagger: `http://localhost:8082/book_dinamico/swagger-ui.html`
 
 ## Proxy / Nginx
-Uploads precisam passar pelo proxy antes de chegar ao Spring. A aplicacao valida arquivos ate 60 MiB, entao o Nginx deve permitir um corpo maior que isso:
+Uploads precisam passar pelo proxy antes de chegar ao Spring. A aplicacao valida arquivos ate 500 MB, entao o Nginx deve permitir um corpo maior que isso:
 
 ```nginx
-client_max_body_size 70m;
+client_max_body_size 550m;
 ```
 
 Ha um snippet pronto em `deploy/nginx/book-dinamico-upload.conf`. Aplique dentro do `server` ou `location` que faz proxy para a API e recarregue o Nginx.
