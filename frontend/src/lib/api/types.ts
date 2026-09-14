@@ -152,26 +152,3 @@ export interface ApiErrorBody {
   message: string;
   path: string;
 }
-
-export type LogNivel = "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR";
-
-export interface LogLinhaResponse {
-  /** Carimbo de data/hora como aparece no arquivo (ex.: "2026-09-10 18:21:14"). */
-  timestamp?: string;
-  /** Nível, ou "RAW" para linhas fora do padrão (banner, stdout solto). */
-  nivel: LogNivel | "RAW" | (string & {});
-  logger?: string;
-  mensagem: string;
-  /** Linhas de continuação (stack trace) agrupadas, separadas por "\n". */
-  stacktrace?: string;
-}
-
-export interface LogConsultaResponse {
-  logEmArquivoAtivo: boolean;
-  mensagemInativo?: string;
-  arquivo?: string;
-  arquivosDisponiveis: string[];
-  geradoEm: string;
-  totalLinhas: number;
-  linhas: LogLinhaResponse[];
-}
