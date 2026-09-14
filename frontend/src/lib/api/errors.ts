@@ -39,12 +39,6 @@ const FRIENDLY: Record<string, string> = {
   "erro-limite-armazenamento":
     "Limite de 2 GB de armazenamento atingido. Exclua documentos para liberar espaço antes de enviar novos arquivos.",
 
-  "diagnostico-arquivo-invalido": "Nome de arquivo de log inválido.",
-  "diagnostico-arquivo-nao-encontrado":
-    "Arquivo de log não encontrado no servidor.",
-  "diagnostico-falha-leitura":
-    "Falha ao ler o arquivo de log no servidor.",
-
   "erro-inesperado":
     "Ocorreu um erro inesperado. Tente novamente em instantes.",
   "erro-validacao": "Dados inválidos. Verifique os campos.",
