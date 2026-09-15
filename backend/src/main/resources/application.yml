@@ -13,7 +13,7 @@ app:
 
 scheduling:
   processamento:
-    cron: ${BOOK_SCHEDULING:0 */10 * * * *} # A cada 10 minutos default
+    cron: ${BOOK_SCHEDULING:0 */1 * * * *} # A cada 1 minuto default
   ociosidade:
     cron: ${BOOK_OCIOSIDADE_SCHEDULING:0 0 3 * * *}
 
