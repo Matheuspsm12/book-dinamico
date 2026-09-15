@@ -5,6 +5,7 @@ import com.tcia.book_dinamico_back_end.domain.exception.ResourceNotFoundExceptio
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.log4j.Log4j2;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -138,6 +139,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErroResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         String msg = String.format("Parâmetro '%s' inválido. Valor recebido: '%s'", ex.getName(), ex.getValue());
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Parâmetro inválido: ", msg, request, true);
+    }
+
+    @ExceptionHandler(ClientAbortException.class)
+    public void handleClientAbort(ClientAbortException ex, HttpServletRequest request) {
+        log.warn("Cliente abortou a conexão em [{}]: {}", request.getRequestURI(), ex.getMessage());
     }
 
     @ExceptionHandler(IOException.class)
