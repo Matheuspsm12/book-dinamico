@@ -13,7 +13,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 
 import { useAuth } from "src/app/contexts/AuthContext";
 import { cn } from "src/lib/utils";
@@ -64,8 +63,12 @@ const items: Item[] = [
   },
 ];
 
-export function Sidebar() {
-  const [open, setOpen] = useState(true);
+type SidebarProps = {
+  open: boolean;
+  onToggle: () => void;
+};
+
+export function Sidebar({ open, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
 
@@ -82,7 +85,7 @@ export function Sidebar() {
     >
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={onToggle}
         className="absolute top-20 -right-3 z-10 grid h-6 w-6 place-items-center rounded-full bg-white shadow ring-1 ring-zinc-200"
         aria-label="toggle sidebar"
       >
