@@ -14,8 +14,9 @@
         </appender>
 
         <!-- Grava também em ./logs/book.log para alimentar a tela de Diagnóstico
-             (/diagnostico). Mesmo pattern dos perfis hom/prod, para que o leitor
-             de log do backend interprete qualquer ambiente da mesma forma. -->
+             (/diagnostico). Em dev mantém [%X{traceId}]; em hom/prod o pattern é o
+             padrão oficial exigido pelo validador CI (sem traceId). O leitor de log
+             do backend tolera ambos os formatos. -->
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>logs/book.log</file>
             <encoder>
@@ -45,7 +46,8 @@
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>@PATH_LOG_PRODUCAO@/book.log</file>
             <encoder>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} [%X{traceId}] - %msg%n</pattern>
+                <!-- Pattern fixo exigido pelo validador CI (igual ao prod) -->
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <!-- Nome dos arquivos de log rotacionados -->
@@ -68,7 +70,8 @@
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>@PATH_LOG_PRODUCAO@/book.log</file>
             <encoder>
-                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} [%X{traceId}] - %msg%n</pattern>
+                <!-- Pattern fixo exigido pelo validador CI — NÃO ALTERAR -->
+                <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
                 <!-- Nome dos arquivos de log rotacionados -->
