@@ -466,6 +466,7 @@ function NovoModal({
   const [file, setFile] = useState<File | null>(null);
   const [erroLocal, setErroLocal] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [progresso, setProgresso] = useState<number | null>(null);
 
   function reset() {
     setNome("");
@@ -474,6 +475,7 @@ function NovoModal({
     setFile(null);
     setErroLocal(null);
     setSubmitting(false);
+    setProgresso(null);
   }
 
   function handleOpenChange(o: boolean) {
@@ -507,6 +509,7 @@ function NovoModal({
           dataAtualizacao: data,
         },
         file,
+        setProgresso,
       );
       reset();
       await onSuccess(created);
@@ -586,7 +589,12 @@ function NovoModal({
             Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            <Upload size={14} /> {submitting ? "Criando…" : "Criar documento"}
+            <Upload size={14} />{" "}
+            {submitting
+              ? progresso != null
+                ? `${Math.round(progresso * 100)}%`
+                : "Criando…"
+              : "Criar documento"}
           </Button>
         </div>
       </form>
@@ -610,12 +618,14 @@ function SubstituirArquivoModal({
   const [file, setFile] = useState<File | null>(null);
   const [erroLocal, setErroLocal] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [progresso, setProgresso] = useState<number | null>(null);
 
   function handleOpenChange(o: boolean) {
     if (!o) {
       setFile(null);
       setErroLocal(null);
       setSubmitting(false);
+      setProgresso(null);
       onClose();
     }
   }
@@ -629,10 +639,15 @@ function SubstituirArquivoModal({
     try {
       // Nome e data são atualizados junto com o binário numa única chamada —
       // assim o histórico registra apenas uma "Substituição", não substituição + edição.
-      const updated = await docsApi.substituirArquivo(doc.id, file, {
-        nome: inferNomeFromFilename(file.name),
-        dataAtualizacao: hojeLocal(),
-      });
+      const updated = await docsApi.substituirArquivo(
+        doc.id,
+        file,
+        {
+          nome: inferNomeFromFilename(file.name),
+          dataAtualizacao: hojeLocal(),
+        },
+        setProgresso,
+      );
       await onSuccess(updated);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Erro ao substituir.";
@@ -685,7 +700,12 @@ function SubstituirArquivoModal({
             Cancelar
           </Button>
           <Button type="submit" disabled={submitting}>
-            <RefreshCw size={14} /> {submitting ? "Enviando…" : "Substituir"}
+            <RefreshCw size={14} />{" "}
+            {submitting
+              ? progresso != null
+                ? `${Math.round(progresso * 100)}%`
+                : "Enviando…"
+              : "Substituir"}
           </Button>
         </div>
       </form>

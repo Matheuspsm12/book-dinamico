@@ -1,12 +1,27 @@
-type ClientLogLevel = "info" | "warn" | "error";
+export type ClientLogLevel = "info" | "warn" | "error";
 
-type ClientLogPayload = Record<string, string | number | boolean | null | undefined>;
+export type ClientLogPayload = Record<
+  string,
+  string | number | boolean | null | undefined
+>;
+
+export type ClientLogEvent =
+  | "build-refresh"
+  | "api-error"
+  | "app-error"
+  | "upload-start"
+  | "upload-progress"
+  | "upload-success"
+  | "upload-failed";
 
 const LOG_THROTTLE_MS = 30_000;
 const lastLogByKey = new Map<string, number>();
 
+const UPLOAD_MILESTONES = [25, 50, 75, 100] as const;
+const uploadMilestonesLogged = new Set<string>();
+
 export function logClientEvent(
-  event: "build-refresh" | "api-error",
+  event: ClientLogEvent,
   payload: ClientLogPayload,
   level: ClientLogLevel = "info",
 ) {
@@ -18,6 +33,16 @@ export function logClientEvent(
 
   if (now - lastLogAt < LOG_THROTTLE_MS) return;
   lastLogByKey.set(throttleKey, now);
+
+  enviar(event, payload, level);
+}
+
+function enviar(
+  event: ClientLogEvent,
+  payload: ClientLogPayload,
+  level: ClientLogLevel,
+) {
+  if (typeof window === "undefined") return;
 
   const body = JSON.stringify({
     event,
@@ -51,4 +76,45 @@ export function logClientEvent(
   } catch {
     // Logging must never affect the user's workflow.
   }
+}
+
+/** Marca o início de um upload (resetando os marcos de progresso do fluxo). */
+export function logUploadStart(
+  fluxo: string,
+  bytes: number,
+  nomeArquivo: string,
+) {
+  for (const key of [...uploadMilestonesLogged]) {
+    if (key.startsWith(`${fluxo}:`)) uploadMilestonesLogged.delete(key);
+  }
+  enviar("upload-start", { fluxo, bytes, nomeArquivo }, "info");
+}
+
+/** Registra o cruzamento de marcos (25/50/75/100%) sem repetir. */
+export function logUploadProgress(fluxo: string, percentual: number) {
+  const pct = Math.round(percentual);
+  for (const marco of UPLOAD_MILESTONES) {
+    const chave = `${fluxo}:${marco}`;
+    if (pct >= marco && !uploadMilestonesLogged.has(chave)) {
+      uploadMilestonesLogged.add(chave);
+      enviar("upload-progress", { fluxo, percentual: marco }, "info");
+    }
+  }
+}
+
+export function logUploadSuccess(
+  fluxo: string,
+  bytes: number,
+  duracaoMs: number,
+) {
+  enviar("upload-success", { fluxo, bytes, duracaoMs }, "info");
+}
+
+export function logUploadFailed(
+  fluxo: string,
+  bytes: number,
+  duracaoMs: number,
+  motivo: string,
+) {
+  enviar("upload-failed", { fluxo, bytes, duracaoMs, motivo }, "error");
 }

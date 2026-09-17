@@ -6,7 +6,15 @@ type ClientLogBody = {
   payload?: Record<string, unknown>;
 };
 
-const ALLOWED_EVENTS = new Set(["build-refresh", "api-error"]);
+const ALLOWED_EVENTS = new Set([
+  "build-refresh",
+  "api-error",
+  "app-error",
+  "upload-start",
+  "upload-progress",
+  "upload-success",
+  "upload-failed",
+]);
 
 export async function POST(request: NextRequest) {
   let body: ClientLogBody;
