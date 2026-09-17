@@ -3,6 +3,7 @@ import { clearSession, getToken } from "src/lib/auth-storage";
 import { friendlyMessage } from "src/lib/api/errors";
 import type { ApiErrorBody } from "src/lib/api/types";
 import { logClientEvent } from "src/lib/client-log";
+import { novoTraceId } from "src/lib/trace-id";
 
 export const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -42,6 +43,8 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  config.headers["X-Correlation-Id"] = novoTraceId();
+
   const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -68,6 +71,8 @@ api.interceptors.response.use(
     if (axios.isAxiosError(error)) {
       const method = error.config?.method?.toUpperCase() ?? "UNKNOWN";
       const url = error.config?.url ?? "unknown";
+      const correlationId = error.config?.headers?.["X-Correlation-Id"];
+      const refSuffix = correlationId ? ` (ref: ${correlationId})` : "";
 
       if (error.code === "ECONNABORTED") {
         logClientEvent(
@@ -77,6 +82,7 @@ api.interceptors.response.use(
             url,
             code: error.code,
             message: "request-timeout",
+            correlationId,
           },
           "warn",
         );
@@ -95,6 +101,7 @@ api.interceptors.response.use(
             url,
             code: error.code ?? "NETWORK_ERROR",
             message: "network-error",
+            correlationId,
           },
           "warn",
         );
@@ -105,7 +112,7 @@ api.interceptors.response.use(
       }
 
       const status = error.response.status;
-      const rawMessage = (error.response.data as ApiErrorBody)?.message;
+      const rawMessage = readErrorMessage(error.response.data);
       const friendly = friendlyMessage(rawMessage);
 
       logClientEvent(
@@ -115,6 +122,7 @@ api.interceptors.response.use(
           url,
           status,
           message: friendly || rawMessage || "api-error",
+          correlationId,
         },
         status >= 500 ? "error" : "warn",
       );
@@ -131,7 +139,7 @@ api.interceptors.response.use(
       }
 
       return Promise.reject(
-        new Error(friendly || "Erro ao processar a requisição."),
+        new Error(`${friendly || "Erro ao processar a requisição."}${refSuffix}`),
       );
     }
 
@@ -140,5 +148,13 @@ api.interceptors.response.use(
     );
   },
 );
+
+function readErrorMessage(data: unknown): string | undefined {
+  if (typeof data === "string") return data;
+  if (data && typeof data === "object" && "message" in data) {
+    return String((data as ApiErrorBody).message);
+  }
+  return undefined;
+}
 
 export default api;

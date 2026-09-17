@@ -32,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ProcessamentoService {
 
+    private static final int MAX_REPROCESSAMENTOS_AUTOMATICOS = 3;
+
     private final ProcessamentoRepository processamentoRepository;
     private final ExtracaoConteudoService extracaoConteudoService;
     private final AuditoriaService auditoriaService;
@@ -137,16 +139,36 @@ public class ProcessamentoService {
             registrarMetricas("ERRO", duracaoMs);
             log.error("Processamento falhou id={} documentoId={} arquivo={} duracaoMs={}",
                     p.getId(), documentoId, p.getNomeArquivo(), duracaoMs, e);
-            p.setExecutado(true);
-            p.setReprocessar(false);
-            p.setResultado(ProcessamentoResultado.ERRO.name());
-            p.setResultadoAmigavel(e instanceof NegocioException
-                    ? e.getMessage()
-                    : ProcessamentoResultado.ERRO.getDescricao());
             p.setDataFim(LocalDateTime.now());
+            aplicarFalhaOuReagendar(p, e);
             processamentoRepository.save(p);
             auditar(p, "ERRO", e.getMessage());
         }
+    }
+
+    private void aplicarFalhaOuReagendar(Processamento p, Exception e) {
+        int reprocessados = p.getQtdReprocessado() != null ? p.getQtdReprocessado() : 0;
+        if (reprocessados < MAX_REPROCESSAMENTOS_AUTOMATICOS) {
+            int proximaTentativa = reprocessados + 1;
+            p.setExecutado(false);
+            p.setReprocessar(true);
+            p.setQtdReprocessar(proximaTentativa);
+            p.setQtdReprocessado(proximaTentativa);
+            p.setResultado(ProcessamentoResultado.REPROCESSAMENTO_AGENDADO.name());
+            p.setResultadoAmigavel(ProcessamentoResultado.REPROCESSAMENTO_AGENDADO.getDescricao());
+            log.warn("Reprocessamento agendado id={} tentativa={}/{} motivo={}",
+                    p.getId(), proximaTentativa, MAX_REPROCESSAMENTOS_AUTOMATICOS, e.getMessage());
+            return;
+        }
+
+        p.setExecutado(true);
+        p.setReprocessar(false);
+        p.setResultado(ProcessamentoResultado.ERRO.name());
+        p.setResultadoAmigavel(e instanceof NegocioException
+                ? e.getMessage()
+                : ProcessamentoResultado.ERRO.getDescricao());
+        log.warn("Processamento marcado como erro definitivo id={} tentativas={}",
+                p.getId(), reprocessados);
     }
 
     private long duracaoMs(long inicioMs) {

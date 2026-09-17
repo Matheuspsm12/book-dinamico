@@ -71,14 +71,17 @@ public class UsuarioService {
     @Transactional
     public TokenResponse autenticar(LoginRequest request, HttpServletRequest httpRequest) {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ErroAutenticacaoException("erro-credenciais-invalidas"));
+                .orElseThrow(() -> {
+                    log.warn("Tentativa de login com e-mail inexistente: {}", request.getEmail());
+                    return new ErroAutenticacaoException("erro-credenciais-invalidas");
+                });
 
         if (!passwordEncoder.matches(request.getSenha(), usuario.getSenhaHash())) {
             log.warn("Senha incorreta para {}", request.getEmail());
             throw new ErroAutenticacaoException("erro-credenciais-invalidas");
         }
 
-        validarStatusParaLogin(usuario.getStatus());
+        validarStatusParaLogin(usuario.getStatus(), request.getEmail());
 
         usuarioRepository.registrarAcesso(usuario.getId(), LocalDateTime.now());
 
@@ -95,11 +98,20 @@ public class UsuarioService {
                 .build();
     }
 
-    private void validarStatusParaLogin(UsuarioStatus status) {
+    private void validarStatusParaLogin(UsuarioStatus status, String email) {
         switch (status) {
-            case PENDENTE   -> throw new ErroAutenticacaoException("erro-conta-pendente");
-            case REJEITADO  -> throw new ErroAutenticacaoException("erro-conta-rejeitada");
-            case DESATIVADO -> throw new ErroAutenticacaoException("erro-conta-desativada");
+            case PENDENTE -> {
+                log.warn("Login bloqueado (conta pendente): {}", email);
+                throw new ErroAutenticacaoException("erro-conta-pendente");
+            }
+            case REJEITADO -> {
+                log.warn("Login bloqueado (conta rejeitada): {}", email);
+                throw new ErroAutenticacaoException("erro-conta-rejeitada");
+            }
+            case DESATIVADO -> {
+                log.warn("Login bloqueado (conta desativada): {}", email);
+                throw new ErroAutenticacaoException("erro-conta-desativada");
+            }
             case APROVADO   -> { /* ok */ }
         }
     }

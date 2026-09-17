@@ -60,6 +60,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ErroAutenticacaoException.class)
     public ResponseEntity<ApiErroResponse> handleAutenticacao(ErroAutenticacaoException ex, HttpServletRequest request) {
+        log.warn("Falha de autenticação em [{}]: {}", request.getRequestURI(), ex.getChave());
         return buildErrorResponse(ex, HttpStatus.FORBIDDEN, "Erro de autenticação: ", ex.getChave(), request, false);
     }
 

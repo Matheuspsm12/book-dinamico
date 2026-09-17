@@ -20,6 +20,8 @@
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <lombok.version>1.18.36</lombok.version>
         <flyway-maven-plugin.version>10.20.1</flyway-maven-plugin.version>
+        <!-- Diretório dos logs em hom/prod; sobrescreva com -DPATH_LOG_PRODUCAO=/caminho no build. -->
+        <PATH_LOG_PRODUCAO>logs</PATH_LOG_PRODUCAO>
         <!-- Lidos do ambiente (mesmas BOOK_DB_* do app). NÃO commitar credenciais aqui. NUCNNCA -->
         <flyway.url>${env.BOOK_DB_URL}</flyway.url>
         <flyway.user>${env.BOOK_DB_USERNAME}</flyway.user>
@@ -154,6 +156,21 @@
     </dependencies>
 
     <build>
+        <resources>
+            <!-- Só o logback-spring.xml passa por filtragem Maven, para resolver o
+                 placeholder @PATH_LOG_PRODUCAO@ em tempo de build. -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>logback-spring.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
