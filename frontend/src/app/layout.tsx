@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "src/app/contexts/AuthContext";
 import { BuildRefresh } from "src/components/shared/BuildRefresh";
+import { ErrorBoundary } from "src/components/shared/ErrorBoundary";
+import { GlobalErrorHandler } from "src/components/shared/GlobalErrorHandler";
 
 export const metadata: Metadata = {
   title: "Books Claro",
@@ -18,7 +20,8 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <AuthProvider>
           <BuildRefresh />
-          {children}
+          <GlobalErrorHandler />
+          <ErrorBoundary>{children}</ErrorBoundary>
         </AuthProvider>
       </body>
     </html>

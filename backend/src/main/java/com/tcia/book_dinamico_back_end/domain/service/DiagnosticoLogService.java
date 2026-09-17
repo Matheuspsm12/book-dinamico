@@ -39,10 +39,10 @@ import java.util.stream.Stream;
 @Service
 public class DiagnosticoLogService {
 
-    /** Casa o pattern dos appenders de arquivo: {@code yyyy-MM-dd HH:mm:ss LEVEL logger - msg}. */
+    /** Casa o pattern dos appenders de arquivo: {@code yyyy-MM-dd HH:mm:ss LEVEL logger [traceId] - msg}. */
     private static final Pattern LINHA_LOG = Pattern.compile(
             "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}(?:\\.\\d{3})?)\\s+"
-                    + "(TRACE|DEBUG|INFO|WARN|ERROR)\\s+(\\S+)\\s+-\\s?(.*)$");
+                    + "(TRACE|DEBUG|INFO|WARN|ERROR)\\s+(\\S+)(?:\\s+\\[[^\\]]*\\])?\\s+-\\s?(.*)$");
 
     private static final List<String> ORDEM_NIVEIS = List.of("TRACE", "DEBUG", "INFO", "WARN", "ERROR");
 
