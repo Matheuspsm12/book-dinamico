@@ -97,8 +97,10 @@ public class ProcessamentoService {
     }
 
     @Transactional
-    public void verificarProcessamento() {
-        processamentoRepository.findByExecutadoFalseOrReprocessarTrue().forEach(this::processar);
+    public int verificarProcessamento() {
+        var pendentes = processamentoRepository.findByExecutadoFalseOrReprocessarTrue();
+        pendentes.forEach(this::processar);
+        return pendentes.size();
     }
 
     @Transactional

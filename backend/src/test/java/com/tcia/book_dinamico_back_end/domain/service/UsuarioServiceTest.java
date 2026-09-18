@@ -18,6 +18,7 @@ import com.tcia.book_dinamico_back_end.domain.specification.UsuarioSpecification
 import com.tcia.book_dinamico_back_end.infrastructure.adapter.EmailAdapter;
 import com.tcia.book_dinamico_back_end.infrastructure.mapper.UsuarioMapper;
 import com.tcia.book_dinamico_back_end.infrastructure.security.JwtTokenProvider;
+import com.tcia.book_dinamico_back_end.infrastructure.security.LoginAttemptService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,9 @@ class UsuarioServiceTest {
 
     @Mock
     private AmbienteService ambienteService;
+
+    @Mock
+    private LoginAttemptService loginAttemptService;
 
     @Mock
     private HttpServletRequest httpRequest;

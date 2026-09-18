@@ -82,6 +82,25 @@ public class JwtTokenProvider {
         return false;
     }
 
+    /**
+     * Valida que o token foi emitido para o mesmo cliente (IP + User-Agent) da
+     * requisição atual. Impede o uso de tokens roubados a partir de outro contexto.
+     */
+    public boolean validarFingerprint(String token, HttpServletRequest request) {
+        try {
+            DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
+            String claim = jwt.getClaim("fp").asString();
+            if (claim == null || claim.isBlank()) {
+                log.warn("Token sem fingerprint (fp)");
+                return false;
+            }
+            return claim.equals(gerarFingerprint(request));
+        } catch (Exception e) {
+            log.warn("Erro ao validar fingerprint do token: {}", e.getMessage());
+            return false;
+        }
+    }
+
     public String obterEmail(String token) {
         try {
             DecodedJWT jwt = JWT.require(algorithm).build().verify(token);

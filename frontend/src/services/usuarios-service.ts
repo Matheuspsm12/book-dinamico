@@ -1,7 +1,7 @@
 import api from "src/services/api";
+import { normalizePage, type PagePayload } from "src/lib/api/page";
 import type {
   OciosidadeResultado,
-  PageResponse,
   SimularOciosidadeRequest,
   UsuarioCadastroRequest,
   UsuarioEdicaoRequest,
@@ -28,11 +28,11 @@ export async function paginar(
     size: String(size),
   });
   if (sort) params.set("sort", sort);
-  const { data } = await api.post<PageResponse<UsuarioResponse>>(
+  const { data } = await api.post<PagePayload<UsuarioResponse>>(
     `/api/usuarios/paginar?${params.toString()}`,
     filtro ?? {},
   );
-  return data;
+  return normalizePage<UsuarioResponse>(data);
 }
 
 export async function aprovar(id: number, idPerfil?: number) {

@@ -1,6 +1,8 @@
 package com.tcia.book_dinamico_back_end.infrastructure.security;
 
 import com.tcia.book_dinamico_back_end.domain.model.Usuario;
+import com.tcia.book_dinamico_back_end.core.enums.UsuarioStatus;
+import com.tcia.book_dinamico_back_end.core.util.RecuperarIpUtils;
 import com.tcia.book_dinamico_back_end.infrastructure.security.JwtTokenProvider;
 import com.tcia.book_dinamico_back_end.domain.repository.UsuarioRepository;
 import com.tcia.book_dinamico_back_end.infrastructure.security.CustomUserDetails;
@@ -33,13 +35,23 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = obterToken(request);
         if (token != null && JWT_PATTERN.matcher(token).matches() && jwtTokenProvider.validarToken(token)) {
-            String email = jwtTokenProvider.obterEmail(token);
-            if (email != null) {
-                Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
-                if (usuario != null) {
-                    autenticar(usuario);
-                } else {
-                    log.warn("JWT válido mas usuário não encontrado: {}", email);
+            if (!jwtTokenProvider.validarFingerprint(token, request)) {
+                log.warn("Token com fingerprint incompatível (possível roubo de sessão): ip={}",
+                        RecuperarIpUtils.obterIp(request));
+            } else {
+                String email = jwtTokenProvider.obterEmail(token);
+                if (email != null) {
+                    Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+                    if (usuario != null) {
+                        if (contaAptaParaAutenticacao(usuario)) {
+                            autenticar(usuario);
+                        } else {
+                            log.warn("JWT válido mas conta não apta ({}): {}",
+                                    usuario.getStatus(), email);
+                        }
+                    } else {
+                        log.warn("JWT válido mas usuário não encontrado: {}", email);
+                    }
                 }
             }
         }
@@ -60,5 +72,9 @@ public class JwtFilter extends OncePerRequestFilter {
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private boolean contaAptaParaAutenticacao(Usuario usuario) {
+        return UsuarioStatus.APROVADO.equals(usuario.getStatus()) && Boolean.TRUE.equals(usuario.getAtivo());
     }
 }

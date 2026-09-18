@@ -51,7 +51,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll();
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
-                    auth.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    if (isAmbienteDev()) {
+                        auth.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
+                    }
                     auth.requestMatchers("/actuator/health", "/actuator/info").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/autenticacao/login").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/autenticacao/recuperar-senha").permitAll();
@@ -98,11 +100,15 @@ public class SecurityConfig {
     @Value("${app.ambiente}")
     private String ambiente;
 
+    private boolean isAmbienteDev() {
+        return "DEV".equalsIgnoreCase(ambiente);
+    }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(
-                "DEV".equalsIgnoreCase(ambiente) ? ORIGENS_PERMITIDAS_DEV : ORIGENS_PERMITIDAS_PRODUCAO);
+                isAmbienteDev() ? ORIGENS_PERMITIDAS_DEV : ORIGENS_PERMITIDAS_PRODUCAO);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Client-Type", "X-Device-Id", "X-Correlation-Id"));
         configuration.setExposedHeaders(List.of("Authorization", "X-Correlation-Id"));
