@@ -20,9 +20,11 @@ import com.tcia.book_dinamico_back_end.domain.exception.ErroAutenticacaoExceptio
 import com.tcia.book_dinamico_back_end.domain.exception.NegocioException;
 import com.tcia.book_dinamico_back_end.domain.exception.ResourceNotFoundException;
 import com.tcia.book_dinamico_back_end.infrastructure.security.JwtTokenProvider;
+import com.tcia.book_dinamico_back_end.infrastructure.security.LoginAttemptService;
 import com.tcia.book_dinamico_back_end.domain.repository.UsuarioRepository;
 import com.tcia.book_dinamico_back_end.domain.specification.UsuarioSpecifications;
 import com.tcia.book_dinamico_back_end.core.util.AuthUtils;
+import com.tcia.book_dinamico_back_end.core.util.RecuperarIpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +62,7 @@ public class UsuarioService {
     private final ResetSenhaTokenRepository resetSenhaTokenRepository;
     private final AuditoriaService auditoriaService;
     private final AmbienteService ambienteService;
+    private final LoginAttemptService loginAttemptService;
 
     @Value("${app.url-site}")
     private String urlSite;
@@ -70,6 +73,23 @@ public class UsuarioService {
 
     @Transactional
     public TokenResponse autenticar(LoginRequest request, HttpServletRequest httpRequest) {
+        String ip = RecuperarIpUtils.obterIp(httpRequest);
+        if (loginAttemptService.estaBloqueado(request.getEmail(), ip)) {
+            log.warn("Login bloqueado por excesso de tentativas: email={} ip={}", request.getEmail(), ip);
+            throw new ErroAutenticacaoException("erro-muitas-tentativas-tente-mais-tarde");
+        }
+
+        try {
+            TokenResponse response = autenticarComCredenciais(request, httpRequest);
+            loginAttemptService.registrarSucesso(request.getEmail(), ip);
+            return response;
+        } catch (ErroAutenticacaoException ex) {
+            loginAttemptService.registrarFalha(request.getEmail(), ip);
+            throw ex;
+        }
+    }
+
+    private TokenResponse autenticarComCredenciais(LoginRequest request, HttpServletRequest httpRequest) {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> {
                     log.warn("Tentativa de login com e-mail inexistente: {}", request.getEmail());

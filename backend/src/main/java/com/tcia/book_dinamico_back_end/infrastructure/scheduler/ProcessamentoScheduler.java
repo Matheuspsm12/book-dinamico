@@ -20,15 +20,18 @@ public class ProcessamentoScheduler {
     @Scheduled(cron = "${scheduling.processamento.cron}")
     public void executarProcessamento() {
         try {
-            log.info("Verificando Agendamentos");
             var habilitado = dominioService.buscarPorChave("PROCESSAMENTO_HABILITADO");
 
             if (Objects.nonNull(habilitado.getValor()) && Boolean.parseBoolean(habilitado.getValor())) {
-                service.verificarProcessamento();
-            } else{
-                log.info("Processamento nao habilitado");
+                int processados = service.verificarProcessamento();
+                if (processados > 0) {
+                    log.info("Processamento agendado executado: {} item(ns)", processados);
+                } else {
+                    log.debug("Verificação de agendamentos: nenhum item pendente");
+                }
+            } else {
+                log.debug("Processamento não habilitado");
             }
-            log.info("Processos executados!");
         } catch (Exception e) {
             log.error("Erro ao executar agendamentos", e);
         }

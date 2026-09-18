@@ -6,6 +6,8 @@ const FRIENDLY: Record<string, string> = {
     "Seu cadastro foi rejeitado. Entre em contato com o administrador.",
   "erro-conta-desativada":
     "Sua conta foi desativada. Entre em contato com o administrador.",
+  "erro-muitas-tentativas-tente-mais-tarde":
+    "Muitas tentativas de login. Aguarde alguns minutos e tente novamente.",
 
   "erro-email-duplicado": "Já existe um usuário cadastrado com este e-mail.",
 

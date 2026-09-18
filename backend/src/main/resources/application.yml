@@ -3,6 +3,11 @@ app:
   jwt-secret: ${BOOK_CHAVE_JWT_SECRET}
   jwt-secure-cookie: true
   permitir-login-local: ${BOOK_PERMITIR_LOGIN_LOCAL}
+  login:
+    max-tentativas-email: ${BOOK_LOGIN_MAX_TENTATIVAS_EMAIL:5}
+    max-tentativas-ip: ${BOOK_LOGIN_MAX_TENTATIVAS_IP:20}
+    janela-minutos: ${BOOK_LOGIN_JANELA_MINUTOS:15}
+    bloqueio-minutos: ${BOOK_LOGIN_BLOQUEIO_MINUTOS:15}
   empresa: TCIA
   nome-sistema: ${BOOK_NOME_SISTEMA:Book Dinâmico}
   url-site: ${BOOK_URL_SITE:https://homol.book.tcia.com.br}
