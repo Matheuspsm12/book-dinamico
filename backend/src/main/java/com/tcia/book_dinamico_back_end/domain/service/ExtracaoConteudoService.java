@@ -13,6 +13,7 @@ import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -21,7 +22,9 @@ import org.apache.poi.xssf.binary.XSSFBSheetHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFBReader;
 import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
+import org.apache.poi.xssf.model.SharedStrings;
 import org.apache.poi.xssf.usermodel.XSSFComment;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.springframework.stereotype.Service;
 
@@ -95,6 +98,12 @@ public class ExtracaoConteudoService {
             XSSFBReader reader = new XSSFBReader(pkg);
             XSSFReader.SheetIterator sheets = (XSSFReader.SheetIterator) reader.getSheetsData();
 
+            SharedStrings stringsTable = reader.getSharedStringsTable();
+            if (stringsTable == null) {
+                log.warn("XLSB sem shared strings (strings inline); contando linhas/colunas sem valores de texto");
+                stringsTable = new SharedStringsVazio();
+            }
+
             while (sheets.hasNext()) {
                 abas++;
                 try (InputStream sheetStream = sheets.next()) {
@@ -103,7 +112,7 @@ public class ExtracaoConteudoService {
                             sheetStream,
                             reader.getXSSFBStylesTable(),
                             null,
-                            reader.getSharedStringsTable(),
+                            stringsTable,
                             stats,
                             new DataFormatter(),
                             false);
@@ -179,6 +188,26 @@ public class ExtracaoConteudoService {
                 coluna = coluna * 26 + (Character.toUpperCase(c) - 'A' + 1);
             }
             return Math.max(coluna - 1, 0);
+        }
+    }
+
+    private static final class SharedStringsVazio implements SharedStrings {
+
+        private static final RichTextString VAZIO = new XSSFRichTextString("");
+
+        @Override
+        public RichTextString getItemAt(int index) {
+            return VAZIO;
+        }
+
+        @Override
+        public int getCount() {
+            return 0;
+        }
+
+        @Override
+        public int getUniqueCount() {
+            return 0;
         }
     }
 }
