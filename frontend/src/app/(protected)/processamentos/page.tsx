@@ -177,7 +177,7 @@ export default function ProcessamentosPage() {
                   <th className="px-4 py-3 font-semibold">Usuario</th>
                   <th className="px-4 py-3 font-semibold">Inicio</th>
                   <th className="px-4 py-3 font-semibold">Fim</th>
-                  <th className="px-4 py-3 text-right font-semibold">Acoes</th>
+                  <th className="px-4 py-3 text-right font-semibold">Ações</th>
                 </tr>
               </thead>
               <tbody>
