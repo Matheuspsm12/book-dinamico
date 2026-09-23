@@ -13,15 +13,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -33,7 +38,8 @@ public class GlobalExceptionHandler {
             HttpServletRequest request, boolean logar) {
 
         if (logar) {
-            log.error("{} em [{}]: {}", ex.getClass().getSimpleName(),
+            String ref = request.getHeader("X-Correlation-Id");
+            log.error("[ref={}] {} em [{}]: {}", ref, ex.getClass().getSimpleName(),
                     request.getRequestURI(), cabecalhoLog.concat(message), ex);
         }
 
@@ -158,6 +164,33 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Erro de formato numérico: ", msg, request, true);
     }
 
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ApiErroResponse> handleDateTimeParse(DateTimeParseException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Data inválida: ", "erro-data-invalida", request, true);
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiErroResponse> handleMissingRequestPart(MissingServletRequestPartException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Parte ausente no multipart: ", "arquivo-obrigatorio", request, true);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiErroResponse> handleMissingRequestParam(MissingServletRequestParameterException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, "Parâmetro obrigatório ausente: " + ex.getParameterName(),
+                "parametro-obrigatorio", request, true);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiErroResponse> handleMaxUploadSize(MaxUploadSizeExceededException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.PAYLOAD_TOO_LARGE, "Upload acima do limite: ", "arquivo-tamanho-excedido", request, true);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiErroResponse> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpServletRequest request) {
+        return buildErrorResponse(ex, HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Content-Type não suportado: ",
+                "content-type-nao-suportado", request, true);
+    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiErroResponse> handleNoResourceFound(NoResourceFoundException ex, HttpServletRequest request) {
         return buildErrorResponse(ex, HttpStatus.NOT_FOUND, "Endpoint não encontrado: ",
@@ -166,6 +199,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErroResponse> handleException(Exception ex, HttpServletRequest request) {
-        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado: ", ex.getMessage(), request, true);
+        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado: ", "erro-inesperado", request, true);
     }
 }

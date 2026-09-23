@@ -44,6 +44,11 @@ const FRIENDLY: Record<string, string> = {
   "erro-inesperado":
     "Ocorreu um erro inesperado. Tente novamente em instantes.",
   "erro-validacao": "Dados inválidos. Verifique os campos.",
+  "erro-data-invalida":
+    "Data de atualização inválida. Use o formato dd/mm/aaaa.",
+  "arquivo-obrigatorio": "Envie o arquivo para concluir a operação.",
+  "parametro-obrigatorio": "Faltam dados obrigatórios na requisição.",
+  "content-type-nao-suportado": "Tipo de conteúdo da requisição não suportado.",
 };
 
 export function friendlyMessage(rawMessage: string | undefined | null): string {

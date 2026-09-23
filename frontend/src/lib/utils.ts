@@ -33,7 +33,7 @@ export function formatDateTime(d: string | Date) {
 }
 
 export function inferNomeFromFilename(filename: string): string {
-  let name = filename.replace(/\.(xlsm|xlsx|pptx)$/i, "");
+  let name = filename.replace(/\.(xlsm|xlsx|xlsb|xltx|xltm|pptx)$/i, "");
   name = name.replace(/^\d{4}[\s_]+\p{L}+_/iu, "");
   name = name.replace(/_/g, " ");
   name = name.replace(/\s+Claro.*$/i, "");
