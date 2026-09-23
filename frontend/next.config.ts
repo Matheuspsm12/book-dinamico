@@ -10,6 +10,9 @@ const buildId =
   new Date().toISOString().replace(/[^0-9A-Za-z_-]/g, "-");
 
 const nextConfig: NextConfig = {
+  experimental: {
+    middlewareClientMaxBodySize: "500mb",
+  },
   generateBuildId: async () => buildId,
   env: {
     NEXT_PUBLIC_APP_BUILD_ID: buildId,

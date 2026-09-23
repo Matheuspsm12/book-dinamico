@@ -174,7 +174,11 @@ public class DocumentoService {
                 doc.setNome(nome);
             }
             if (dataAtualizacao != null && !dataAtualizacao.isBlank()) {
-                doc.setDataAtualizacao(java.time.LocalDate.parse(dataAtualizacao));
+                try {
+                    doc.setDataAtualizacao(java.time.LocalDate.parse(dataAtualizacao));
+                } catch (java.time.format.DateTimeParseException dataInvalida) {
+                    throw new NegocioException("erro-data-invalida");
+                }
             }
 
             Documento salvo = documentoRepository.save(doc);
